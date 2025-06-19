@@ -24,7 +24,7 @@ export default function Login() {
   const isFormFilled: boolean = email.trim() !== '' && password.trim() !== ''
 
   return (
-    <div className="flex-1 flex items-center justify-center p-4 sm:p-6 -mt-6">
+    <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -32,7 +32,7 @@ export default function Login() {
         className="flex flex-col sm:flex-row w-full max-w-screen-xl min-h-[600px] rounded-2xl shadow-2xl overflow-hidden"
       >
         {/* Form Section */}
-        <div className="w-full sm:w-1/2 p-4 sm:p-6 lg:p-10 flex flex-col justify-center bg-faint-blue dark:bg-card">
+        <div className="w-full sm:w-1/2 p-4 sm:p-6 lg:p-10 flex flex-col justify-center bg-faint-blue-feature dark:bg-card">
           <div className="lg:max-w-sm mx-auto w-full">
             <div className="mb-6">
               <h2 className="text-3xl sm:text-4xl font-bold" style={{ color: 'var(--color-blue-500)' }}>
@@ -93,7 +93,7 @@ export default function Login() {
           </div>
         </div>
         {/* Illustration Section */}
-        <div className="w-full sm:w-1/2 bg-pure-white dark:bg-blue-light flex items-center justify-center p-4 sm:p-6 min-h-[200px] sm:min-h-full">
+        <div className="w-full sm:w-1/2 bg-pure-white-feature dark:bg-blue-light flex items-center justify-center p-4 sm:p-6 min-h-[200px] sm:min-h-full">
           <Image
             src="/login.png"
             alt="Login Illustration"

@@ -42,7 +42,7 @@ export default function Signup() {
         className="flex flex-col sm:flex-row w-full max-w-screen-xl min-h-[600px] rounded-2xl shadow-2xl overflow-hidden"
       >
         {/* Form Section */}
-        <div className="w-full sm:w-1/2 p-4 sm:p-6 lg:p-10 flex flex-col bg-faint-blue dark:bg-card min-h-[600px]">
+        <div className="w-full sm:w-1/2 p-4 sm:p-6 lg:p-10 flex flex-col bg-faint-blue-feature dark:bg-card min-h-[600px]">
           <div className="lg:max-w-sm mx-0 sm:mx-auto w-full flex flex-col mt-0 sm:mt-4">
             {/* Header Section */}
             <div className="mb-6">
@@ -184,7 +184,7 @@ export default function Signup() {
           </div>
         </div>
         {/* Illustration Section */}
-        <div className="w-full sm:w-1/2 bg-pure-white dark:bg-blue-light flex items-center justify-center p-4 sm:p-6 min-h-[200px] sm:min-h-full">
+        <div className="w-full sm:w-1/2 bg-pure-white-feature dark:bg-blue-light flex items-center justify-center p-4 sm:p-6 min-h-[200px] sm:min-h-full">
           <Image
             src="/signup.png"
             alt="Signup Illustration"
