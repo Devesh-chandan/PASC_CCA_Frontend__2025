@@ -30,7 +30,6 @@ export default function Login() {
     setLoading(true);
     setError(null);
 
-    // Adjust the endpoint as per your backend routes
     const endpoint =
       role === "admin"
         ? "http://localhost:4000/api/auth/admin/login"
