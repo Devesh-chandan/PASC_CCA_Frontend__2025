@@ -12,6 +12,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleRoleChange = (selectedRole: string): void => {
     setRole(selectedRole);
@@ -22,6 +24,42 @@ export default function Login() {
   };
 
   const isFormFilled: boolean = email.trim() !== "" && password.trim() !== "";
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    // Adjust the endpoint as per your backend routes
+    const endpoint =
+      role === "admin"
+        ? "http://localhost:4000/api/auth/admin/login"
+        : "http://localhost:4000/api/auth/user/login";
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        // Save token (localStorage/sessionStorage/cookie)
+        localStorage.setItem("token", data.data.token);
+        // Redirect user (example: to dashboard)
+        window.location.href =
+          role === "admin" ? "/admin/dashboard" : "/student/events";
+      } else {
+        setError(data.error || "Login failed");
+      }
+    } catch (err) {
+      console.log(err);
+      setError("Network error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
@@ -46,7 +84,7 @@ export default function Login() {
               </p>
             </div>
             <RoleToggle onRoleChange={handleRoleChange} />
-            <div className="space-y-4 sm:space-y-5">
+            <form className="space-y-4 sm:space-y-5" onSubmit={handleLogin}>
               <input
                 type="email"
                 placeholder="Email"
@@ -55,6 +93,7 @@ export default function Login() {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setEmail(e.target.value)
                 }
+                required
               />
               <div className="relative">
                 <input
@@ -65,6 +104,7 @@ export default function Login() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setPassword(e.target.value)
                   }
+                  required
                 />
                 <button
                   type="button"
@@ -76,6 +116,7 @@ export default function Login() {
                       "--hover-color": "var(--color-blue-500)",
                     } as React.CSSProperties
                   }
+                  tabIndex={-1}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -88,11 +129,15 @@ export default function Login() {
                   Forgot Password?
                 </Link>
               </div>
+              {/* {error && (
+                <div className="text-red-500 text-xs sm:text-sm">{error}</div>
+              )} */}
               <button
-                disabled={!isFormFilled}
+                type="submit"
+                disabled={!isFormFilled || loading}
                 className="auth-button w-full py-2 rounded-lg text-white font-medium text-sm sm:text-base"
               >
-                Login
+                {loading ? "Logging in..." : "Login"}
               </button>
               <p className="text-center text-secondary text-xs sm:text-sm">
                 Don't have an account?{" "}
@@ -100,7 +145,7 @@ export default function Login() {
                   Sign Up
                 </Link>
               </p>
-            </div>
+            </form>
           </div>
         </div>
         {/* Illustration Section */}

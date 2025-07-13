@@ -20,6 +20,8 @@ export default function Signup() {
   const [passoutYear, setPassoutYear] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleRoleChange = (selectedRole: string) => {
     setRole(selectedRole);
@@ -34,6 +36,58 @@ export default function Signup() {
     (role === "admin" ||
       (department.trim() !== "" && passoutYear.trim() !== "")) &&
     (role !== "student" || (year.trim() !== "" && rollNumber.trim() !== ""));
+const handleSignup = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+
+  if (password !== confirmPassword) {
+    setError("Passwords do not match");
+    return;
+  }
+
+  setLoading(true);
+
+  const endpoint =
+    role === "admin"
+      ? "http://localhost:4000/api/auth/admin/register"
+      : "http://localhost:4000/api/auth/user/register";
+
+  // Build payload based on role
+  let payload: any = {
+    name: `${firstName} ${surname}`,
+    email: email,
+    password: password,
+  };
+
+  if (role === "student") {
+    payload = {
+      ...payload,
+      department: department,
+      year: Number(year),
+      passoutYear: Number(passoutYear),
+      roll: Number(rollNumber),
+    };
+  }
+
+  try {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      window.location.href = "/auth/login";
+    } else {
+      setError(data.error || "Signup failed");
+    }
+  } catch (err) {
+    setError("Network error");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex-1 flex items-center justify-center p-4 sm:p-6 -mt-6">
@@ -43,167 +97,164 @@ export default function Signup() {
         transition={{ duration: 0.5 }}
         className="flex flex-col sm:flex-row w-full max-w-screen-xl min-h-[600px] rounded-2xl shadow-2xl overflow-hidden"
       >
-        {/* Form Section */}
         <div className="w-full sm:w-1/2 p-4 sm:p-6 lg:p-10 flex flex-col bg-faint-blue-feature dark:bg-card min-h-[600px]">
           <div className="lg:max-w-sm mx-0 sm:mx-auto w-full flex flex-col mt-0 sm:mt-4">
-            {/* Header Section */}
             <div className="mb-6">
               <h2 className="text-3xl sm:text-4xl font-bold text-blue-500">
                 Join the PICT ACM Community
               </h2>
             </div>
             <RoleToggle onRoleChange={handleRoleChange} />
-            {/* Form Fields with Animation */}
-            <AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4 sm:space-y-5 min-h-[450px] mt-4"
-              >
-                <div className="flex flex-row gap-4">
-                  <input
-                    type="text"
-                    placeholder="First Name"
-                    className="input-field text-sm sm:text-base w-1/2"
-                    value={firstName}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setFirstName(e.target.value)
-                    }
-                  />
-                  <input
-                    type="text"
-                    placeholder="Surname"
-                    className="input-field text-sm sm:text-base w-1/2"
-                    value={surname}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setSurname(e.target.value)
-                    }
-                  />
-                </div>
-                <input
-                  type="email"
-                  placeholder="Email"
-                  className="input-field text-sm sm:text-base w-full"
-                  value={email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setEmail(e.target.value)
-                  }
-                />
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Password"
-                    className="input-field text-sm sm:text-base w-full pr-10"
-                    value={password}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setPassword(e.target.value)
-                    }
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-blue-500"
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm Password"
-                    className="input-field text-sm sm:text-base w-full pr-10"
-                    value={confirmPassword}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setConfirmPassword(e.target.value)
-                    }
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-blue-500"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff size={20} />
-                    ) : (
-                      <Eye size={20} />
-                    )}
-                  </button>
-                </div>
-                {role === "student" && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-4 sm:space-y-5"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Year"
-                      className="input-field text-sm sm:text-base w-full"
-                      value={year}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setYear(e.target.value)
-                      }
-                    />
-                    <input
-                      type="text"
-                      placeholder="Roll Number"
-                      className="input-field text-sm sm:text-base w-full"
-                      value={rollNumber}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setRollNumber(e.target.value)
-                      }
-                    />
-                  </motion.div>
-                )}
-                {role !== "admin" && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-4 sm:space-y-5"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Department"
-                      className="input-field text-sm sm:text-base w-full"
-                      value={department}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setDepartment(e.target.value)
-                      }
-                    />
-                    <input
-                      type="text"
-                      placeholder="Passout Year"
-                      className="input-field text-sm sm:text-base w-full"
-                      value={passoutYear}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setPassoutYear(e.target.value)
-                      }
-                    />
-                  </motion.div>
-                )}
-                <button
-                  disabled={!isFormFilled}
-                  className="auth-button w-full py-2 rounded-lg text-white font-medium text-sm sm:text-base"
+            <form onSubmit={handleSignup}>
+              <AnimatePresence>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4 sm:space-y-5 min-h-[450px] mt-4"
                 >
-                  Sign Up
-                </button>
-                <p className="text-center text-secondary text-xs sm:text-sm">
-                  Already have an account?{" "}
-                  <Link href="/auth/login" className="link-text">
-                    Sign In
-                  </Link>
-                </p>
-              </motion.div>
-            </AnimatePresence>
+                  <div className="flex flex-row gap-4">
+                    <input
+                      type="text"
+                      placeholder="First Name"
+                      className="input-field text-sm sm:text-base w-1/2"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                    />
+                    <input
+                      type="text"
+                      placeholder="Surname"
+                      className="input-field text-sm sm:text-base w-1/2"
+                      value={surname}
+                      onChange={(e) => setSurname(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    className="input-field text-sm sm:text-base w-full"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Password"
+                      className="input-field text-sm sm:text-base w-full pr-10"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-blue-500"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm Password"
+                      className="input-field text-sm sm:text-base w-full pr-10"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-blue-500"
+                      tabIndex={-1}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff size={20} />
+                      ) : (
+                        <Eye size={20} />
+                      )}
+                    </button>
+                  </div>
+                  {role === "student" && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="space-y-4 sm:space-y-5"
+                    >
+                      <input
+                        type="text"
+                        placeholder="Year"
+                        className="input-field text-sm sm:text-base w-full"
+                        value={year}
+                        onChange={(e) => setYear(e.target.value)}
+                        required
+                      />
+                      <input
+                        type="text"
+                        placeholder="Roll Number"
+                        className="input-field text-sm sm:text-base w-full"
+                        value={rollNumber}
+                        onChange={(e) => setRollNumber(e.target.value)}
+                        required
+                      />
+                    </motion.div>
+                  )}
+                  {role !== "admin" && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="space-y-4 sm:space-y-5"
+                    >
+                      <input
+                        type="text"
+                        placeholder="Department"
+                        className="input-field text-sm sm:text-base w-full"
+                        value={department}
+                        onChange={(e) => setDepartment(e.target.value)}
+                        required
+                      />
+                      <input
+                        type="text"
+                        placeholder="Passout Year"
+                        className="input-field text-sm sm:text-base w-full"
+                        value={passoutYear}
+                        onChange={(e) => setPassoutYear(e.target.value)}
+                        required
+                      />
+                    </motion.div>
+                  )}
+                  {/* {error && (
+                    <div className="text-red-500 text-xs sm:text-sm">{error}</div>
+                  )} */}
+                  <button
+                    type="submit"
+                    disabled={!isFormFilled || loading}
+                    className="auth-button w-full py-2 rounded-lg text-white font-medium text-sm sm:text-base"
+                  >
+                    {loading ? "Signing up..." : "Sign Up"}
+                  </button>
+                  <p className="text-center text-secondary text-xs sm:text-sm">
+                    Already have an account?{" "}
+                    <Link href="/auth/login" className="link-text">
+                      Sign In
+                    </Link>
+                  </p>
+                </motion.div>
+              </AnimatePresence>
+            </form>
           </div>
         </div>
-        {/* Illustration Section */}
         <div className="w-full sm:w-1/2 bg-pure-white-feature dark:bg-blue-light flex items-center justify-center p-4 sm:p-6 min-h-[200px] sm:min-h-full">
           <Image
             src="/signup.png"
