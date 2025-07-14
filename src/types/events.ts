@@ -9,7 +9,7 @@ export type Event = {
   endDate: string;
   creditHours: string;
   rsvpStatus: "not_rsvped" | "rsvped" | "disabled";
-  aboutEvent?: string; // Detailed description for "About Event" section
-  prerequisites?: string; // Prerequisites text
+  // 'prerequisites' is now the only field for event requirements. 'aboutEvent' has been removed.
+  prerequisites?: string;
   contact?: string;
 };

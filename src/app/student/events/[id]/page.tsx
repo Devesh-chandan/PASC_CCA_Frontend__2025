@@ -52,20 +52,6 @@ export default async function EventDetailPage({
             </CardHeader>
           </Card>
 
-          {/* About Event */}
-          <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-gray-900">
-                About Event
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 leading-relaxed">
-                {event.aboutEvent}
-              </p>
-            </CardContent>
-          </Card>
-
           {/* Prerequisites */}
           <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200">
             <CardHeader>
