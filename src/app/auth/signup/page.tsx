@@ -122,7 +122,7 @@ export default function Signup() {
             </div>
             <RoleToggle onRoleChange={handleRoleChange} />
             <form onSubmit={handleSignup}>
-              <AnimatePresence>
+              <AnimatePresence> 
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}

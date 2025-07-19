@@ -1,5 +1,17 @@
 import { create } from 'zustand';
 import { IUser, IAdmin } from '@/types/auth';
+import { EventWithRsvp, RsvpStatus } from '@/types/events';
+import axios from 'axios';
+
+// Helper function to format date
+const formatDateToDDMMYY = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit'
+  });
+};
 
 interface AuthStore {
   user?: IUser;

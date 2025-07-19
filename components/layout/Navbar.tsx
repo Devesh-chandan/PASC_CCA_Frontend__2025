@@ -5,6 +5,9 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon, User } from "lucide-react";
 import ThemeSwitcher from "./ThemeSwitcher";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/store";
 
 const Navbar = () => {
   return (
@@ -16,9 +19,23 @@ const Navbar = () => {
         <div className="flex items-center gap-6">
           <ThemeSwitcher />
 
-          <div className="bg-profile  p-2 rounded-full">
-            <User className="h-8 w-8 p-0.5" />
-          </div>
+          {/* User Icon with role-based navigation */}
+          {(() => {
+            const router = useRouter();
+            const role = useAuthStore((state) => state.role);
+            const handleUserClick = () => {
+              if (role === "admin") {
+                router.push("/admin/profile");
+              } else {
+                router.push("/student/profile");
+              }
+            };
+            return (
+              <div className="bg-profile  p-2 rounded-full cursor-pointer" onClick={handleUserClick}>
+                <User className="h-8 w-8 p-0.5" />
+              </div>
+            );
+          })()}
         </div>
       </div>
     </nav>
