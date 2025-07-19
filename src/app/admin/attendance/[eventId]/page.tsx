@@ -25,7 +25,7 @@ interface Session {
   present: number;
   absent: number;
   total: number;
-  code?: string; // Add code field
+  code?: string; 
 }
 
 const AttendanceManagement: React.FC = () => {
@@ -65,7 +65,7 @@ const AttendanceManagement: React.FC = () => {
               startTime: s.startTime,
               endTime: s.endTime,
               isActive: s.isActive,
-              present: 0, // Placeholder, update if you have stats
+              present: s.present, // Placeholder, update if you have stats
               absent: 0,  // Placeholder, update if you have stats
               total: 0,   // Placeholder, update if you have stats
               code: s.code, // Store code
@@ -97,6 +97,26 @@ const AttendanceManagement: React.FC = () => {
     });
   };
 
+  const editSession = async (session : Session) => {
+    try{
+      const token = localStorage.getItem('token')
+      const res = await axios.put(
+        `http://localhost:4000/api/attendance/events/sessions/${session.id}`,
+        session,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+    }catch(err)
+    {
+      console.log(err);
+      console.log("edit failed")
+    }
+  }
+
   const handleCloseAddModal = () => {
     setShowAddModal(false);
     setEditSessionId(null);
@@ -111,76 +131,113 @@ const AttendanceManagement: React.FC = () => {
     }));
   };
 
-  const handleAddOrEditSession = async (e: React.FormEvent) => {
+  const handleAddSession = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editSessionId !== null) {
-      // Edit mode (leave as is for now)
-      setSessions((prev) =>
-        prev.map((session) =>
-          session.id === editSessionId
-            ? {
-                ...session,
-                sessionName: newSession.sessionName,
-                location: newSession.location,
-                startTime: newSession.startTime,
-                endTime: newSession.endTime,
-                isActive: newSession.isActive,
-              }
-            : session
-        )
-      );
-    } else {
-      // Add mode: make API request
-      if (!eventId) {
-        alert('Event ID not found in URL.');
-        return;
-      }
-      try {
-        const payload = {
-          sessionName: newSession.sessionName,
-          location: newSession.location,
-          startTime: new Date(newSession.startTime).toISOString(),
-          endTime: new Date(newSession.endTime).toISOString(),
-          isActive: newSession.isActive,
-        };
-        await axios.post(`http://localhost:4000/api/attendance/events/${eventId}/sessions`, payload, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-      } catch (err) {
-        console.log(err);
-        alert('Failed to add session.');
-      
-        return;
-      }
+    if (!eventId) {
+      alert('Event ID not found in URL.');
+      return;
+    }
+    try {
+      const payload = {
+        sessionName: newSession.sessionName,
+        location: newSession.location,
+        startTime: new Date(newSession.startTime).toISOString(),
+        endTime: new Date(newSession.endTime).toISOString(),
+        isActive: newSession.isActive,
+      };
+      const response = await axios.post(`http://localhost:4000/api/attendance/events/${eventId}/sessions`, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const createdSession = response.data;
       setSessions((prev) => [
         ...prev,
         {
-          id: prev.length + 1,
+          id: createdSession.id,
           sessionName: newSession.sessionName,
           location: newSession.location,
           startTime: newSession.startTime,
           endTime: newSession.endTime,
-          isActive: newSession.isActive,
+          isActive: createdSession.isActive,
           present: 0,
           absent: 0,
           total: 0,
         },
       ]);
+    } catch (err) {
+      console.log(err);
+      alert('Failed to add session.');
+      return;
     }
     handleCloseAddModal();
   };
 
-  const toggleSession = (sessionId: number) => {
-    setSessions((prevSessions) =>
-      prevSessions.map((session) =>
-        session.id === sessionId
-          ? { ...session, isActive: !session.isActive }
-          : session
-      )
-    );
+  // New: Edit session function
+  const handleEditSession = async (session: Session) => {
+    try {
+      const token = localStorage.getItem('token');
+      const payload = {
+        sessionName: session.sessionName,
+        location: session.location,
+        startTime: session.startTime,
+        endTime: session.endTime,
+        isActive: session.isActive,
+      };
+      const res = await axios.put(
+        `http://localhost:4000/api/attendance/events/sessions/${session.id}`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+      if (res.data && res.data.success) {
+        setSessions((prevSessions) =>
+          prevSessions.map((s) =>
+            s.id === session.id ? { ...s, ...payload } : s
+          )
+        );
+      } else {
+        alert(res.data?.message || 'Failed to update session.');
+      }
+    } catch (err) {
+      console.error('Failed to update session:', err);
+      alert('Failed to update session.');
+    }
+  };
+
+  const toggleSession = async (sessionId: number) => {
+    console.log(sessionId)
+    const sessionToToggle = sessions.find((s) => s.id === sessionId);
+    if (!sessionToToggle) return;
+    const newIsActive = !sessionToToggle.isActive;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `http://localhost:4000/api/attendance/events/sessions/${sessionId}`,
+        { isActive: newIsActive },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+      setSessions((prevSessions) =>
+        prevSessions.map((session) =>
+          session.id === sessionId
+            ? { ...session, isActive: newIsActive }
+            : session
+        )
+      );
+    } catch (err) {
+      console.error('Failed to update session status:', err);
+      alert('Failed to update session status.');
+    }
   };
 
   const updateSessionTitle = (sessionId: number, newTitle: string) => {
@@ -224,6 +281,35 @@ const AttendanceManagement: React.FC = () => {
     const activeSessionData = sessions.find((s) => s.id === activeSession);
     console.log('Exporting attendance data for:', activeSessionData?.sessionName);
     // TODO: Add actual export logic
+  };
+
+  const handleUpdateSession = async (session: Session) => {
+    try {
+      const token = localStorage.getItem('token');
+      const payload = { isActive: session.isActive };
+      const res = await axios.put(
+        `http://localhost:4000/api/attendance/events/sessions/${session.id}`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+      if (res.data && res.data.success) {
+        setSessions((prevSessions) =>
+          prevSessions.map((s) =>
+            s.id === session.id ? { ...s, isActive: session.isActive } : s
+          )
+        );
+      } else {
+        alert(res.data?.message || 'Failed to update session.');
+      }
+    } catch (err) {
+      console.error('Failed to update session:', err);
+      alert('Failed to update session.');
+    }
   };
 
   return (
@@ -293,7 +379,17 @@ const AttendanceManagement: React.FC = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        toggleSession(session.id);
+                        handleEditSession(session);
+                      }}
+                      className="p-1.5 rounded-md text-gray-400 hover:text-green-600 hover:bg-green-50"
+                      title="Update Session"
+                    >
+                      <span className="font-bold">Update</span>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleSession(activeSession as number);
                       }}
                       className={`p-1.5 rounded-md ${
                         session.isActive
@@ -421,7 +517,21 @@ const AttendanceManagement: React.FC = () => {
               ×
             </button>
             <h3 className="text-lg font-semibold mb-4">{editSessionId !== null ? 'Edit Session' : 'Add New Session'}</h3>
-            <form onSubmit={handleAddOrEditSession} className="space-y-4">
+            <form onSubmit={editSessionId !== null ? (e) => {
+              e.preventDefault();
+              const sessionToEdit = sessions.find(s => s.id === editSessionId);
+              if (sessionToEdit) {
+                handleEditSession({
+                  ...sessionToEdit,
+                  sessionName: newSession.sessionName,
+                  location: newSession.location,
+                  startTime: newSession.startTime,
+                  endTime: newSession.endTime,
+                  isActive: newSession.isActive,
+                });
+              }
+              handleCloseAddModal();
+            } : handleAddSession} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Session Name</label>
                 <input
@@ -431,6 +541,7 @@ const AttendanceManagement: React.FC = () => {
                   onChange={handleNewSessionChange}
                   className="w-full border rounded px-3 py-2"
                   required
+                  placeholder="Enter session name"
                 />
               </div>
               <div>
@@ -442,6 +553,7 @@ const AttendanceManagement: React.FC = () => {
                   onChange={handleNewSessionChange}
                   className="w-full border rounded px-3 py-2"
                   required
+                  placeholder="Enter location (e.g. Hall A)"
                 />
               </div>
               <div>
@@ -453,6 +565,7 @@ const AttendanceManagement: React.FC = () => {
                   onChange={handleNewSessionChange}
                   className="w-full border rounded px-3 py-2"
                   required
+                  placeholder="Select start time"
                 />
               </div>
               <div>
@@ -464,6 +577,7 @@ const AttendanceManagement: React.FC = () => {
                   onChange={handleNewSessionChange}
                   className="w-full border rounded px-3 py-2"
                   required
+                  placeholder="Select end time"
                 />
               </div>
               <div className="flex items-center">

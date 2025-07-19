@@ -24,3 +24,20 @@ export interface UserPersonalBest{
   userId : number;
   credits : number;
 }
+
+interface AttendanceSessionForUser {
+  id?: number;
+  eventId: number;
+  startTime?: Date|null;
+  endTime?: Date | null;
+  isActive: boolean;
+  sessionName: string;
+  location:string; 
+  credits : number;
+  attened : boolean;
+}
+
+export interface EventAttendanceSessionForUser {
+  event : Event;
+  session : AttendanceSessionForUser[];
+}
