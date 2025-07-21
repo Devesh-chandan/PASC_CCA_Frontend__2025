@@ -10,20 +10,44 @@ import { StatsCard } from "@/components/admin/stats-card";
 import { EventsList } from "@/components/admin/event-list";
 import {  useFetchEventsForAdmin } from "@/hooks/events";
 import { Event, EventStatus } from "@/types/events";
+import axios from "axios";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("ALL EVENTS");
+  const [studentCount, setStudentCount] = useState<number | null>(null);
+  const [studentLoading, setStudentLoading] = useState(true);
+  const [studentError, setStudentError] = useState<string | null>(null);
   const router = useRouter();
 
   // Use the hook to fetch events
   const { events, loading, error } = useFetchEventsForAdmin();
+
+  // Fetch student count
+  React.useEffect(() => {
+    const fetchStudentCount = async () => {
+      setStudentLoading(true);
+      setStudentError(null);
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get("http://localhost:4000/api/auth/user/count", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStudentCount(res.data.count);
+      } catch (err: any) {
+        setStudentError("Failed to fetch student count");
+        setStudentCount(null);
+      } finally {
+        setStudentLoading(false);
+      }
+    };
+    fetchStudentCount();
+  }, []);
 
   // Calculate stats from fetched events
   const totalEvents = events.length;
   const activeEvents = events.filter(
     (event) => event.status === "ONGOING" || event.status === "UPCOMING"
   ).length;
-  const totalStudents = 1250;
 
   if (loading) return <div>Loading events...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
@@ -55,7 +79,11 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <StatsCard title="Total Events" value={totalEvents} Icon={Calendar} />
           <StatsCard title="Active Events" value={activeEvents} />
-          <StatsCard title="Total Students" value={totalStudents} Icon={Users} />
+          <StatsCard
+            title="Total Students"
+            value={studentLoading ? "Loading..." : studentError ? studentError : studentCount ?? "-"}
+            Icon={Users}
+          />
         </div>
 
         {/* Events Section */}
