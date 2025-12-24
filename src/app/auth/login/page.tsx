@@ -126,9 +126,11 @@ export default function Login() {
                   Forgot Password?
                 </Link>
               </div>
-              {/* {error && (
-                <div className="text-red-500 text-xs sm:text-sm">{error}</div>
-              )} */}
+              {error && (
+                <div className="text-red-500 text-xs sm:text-sm bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
+                  {error}
+                </div>
+              )}
               <button
                 type="submit"
                 disabled={!isFormFilled || loading}

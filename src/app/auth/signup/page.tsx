@@ -206,14 +206,18 @@ export default function Signup() {
                       transition={{ duration: 0.3 }}
                       className="space-y-4 sm:space-y-5"
                     >
-                      <input
-                        type="text"
-                        placeholder="Year"
+                      <select
                         className="input-field text-sm sm:text-base w-full"
                         value={year}
                         onChange={(e) => setYear(e.target.value)}
                         required
-                      />
+                      >
+                        <option value="">Select Year</option>
+                        <option value="1">First Year (FE)</option>
+                        <option value="2">Second Year (SE)</option>
+                        <option value="3">Third Year (TE)</option>
+                        <option value="4">Final Year (BE)</option>
+                      </select>
                       <input
                         type="text"
                         placeholder="Roll Number"
@@ -232,14 +236,19 @@ export default function Signup() {
                       transition={{ duration: 0.3 }}
                       className="space-y-4 sm:space-y-5"
                     >
-                      <input
-                        type="text"
-                        placeholder="Department"
+                      <select
                         className="input-field text-sm sm:text-base w-full"
                         value={department}
                         onChange={(e) => setDepartment(e.target.value)}
                         required
-                      />
+                      >
+                        <option value="">Select Department</option>
+                        <option value="CE">Computer Engineering (CE)</option>
+                        <option value="IT">Information Technology (IT)</option>
+                        <option value="ENTC">Electronics & Telecommunication (ENTC)</option>
+                        <option value="ECE">Electronics & Computer (ECE)</option>
+                        <option value="AIDS">AI & Data Science (AIDS)</option>
+                      </select>
                       <input
                         type="text"
                         placeholder="Passout Year"
@@ -250,9 +259,11 @@ export default function Signup() {
                       />
                     </motion.div>
                   )}
-                  {/* {error && (
-                    <div className="text-red-500 text-xs sm:text-sm">{error}</div>
-                  )} */}
+                  {error && (
+                    <div className="text-red-500 text-xs sm:text-sm bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
+                      {error}
+                    </div>
+                  )}
                   <button
                     type="submit"
                     disabled={!isFormFilled || loading}

@@ -1,0 +1,285 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+import { Trophy, Medal, Award, Crown, TrendingUp } from 'lucide-react';
+import { leaderboardAPI } from '@/lib/api';
+import { LeaderboardEntry, LeaderboardPeriod } from '@/types/leaderboard';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
+const periods: { value: LeaderboardPeriod; label: string }[] = [
+  { value: 'WEEKLY', label: 'This Week' },
+  { value: 'MONTHLY', label: 'This Month' },
+  { value: 'SEMESTER', label: 'This Semester' },
+  { value: 'YEARLY', label: 'This Year' },
+  { value: 'ALL_TIME', label: 'All Time' },
+];
+
+export default function LeaderboardPage() {
+  const [selectedPeriod, setSelectedPeriod] = useState<LeaderboardPeriod>('SEMESTER');
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [userRank, setUserRank] = useState<LeaderboardEntry | null>(null);
+
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [selectedPeriod]);
+
+  const fetchLeaderboard = async () => {
+    setLoading(true);
+    try {
+      const response = await leaderboardAPI.get({ 
+        period: selectedPeriod,
+        limit: 50 
+      });
+      
+      if (response.data?.success && response.data.data) {
+        const data = response.data.data as LeaderboardEntry[];
+        setLeaderboard(data);
+        
+        // Find current user
+        const userId = parseInt(localStorage.getItem('userId') || '0');
+        const userEntry = data.find(entry => entry.userId === userId);
+        setUserRank(userEntry || null);
+      }
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getRankIcon = (rank: number) => {
+    switch (rank) {
+      case 1:
+        return <Crown className="w-6 h-6 text-yellow-500" />;
+      case 2:
+        return <Medal className="w-6 h-6 text-gray-400" />;
+      case 3:
+        return <Medal className="w-6 h-6 text-orange-500" />;
+      default:
+        return <Award className="w-6 h-6 text-blue-500" />;
+    }
+  };
+
+  const getRankBadgeColor = (rank: number) => {
+    switch (rank) {
+      case 1:
+        return 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900';
+      case 2:
+        return 'bg-gradient-to-r from-gray-300 to-gray-500 text-gray-900';
+      case 3:
+        return 'bg-gradient-to-r from-orange-400 to-orange-600 text-orange-900';
+      default:
+        return 'bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100';
+    }
+  };
+
+  return (
+    <main className="min-h-screen bg-background p-4 md:p-6">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <Trophy className="w-10 h-10 text-yellow-500" />
+            <h1 className="text-4xl font-bold text-foreground">Leaderboard</h1>
+          </div>
+          <p className="text-muted-foreground">
+            Compete with your peers and climb the ranks!
+          </p>
+        </div>
+
+        {/* Period Selector */}
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {periods.map(period => (
+            <button
+              key={period.value}
+              onClick={() => setSelectedPeriod(period.value)}
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                selectedPeriod === period.value
+                  ? 'bg-primary text-primary-foreground shadow-lg scale-105'
+                  : 'bg-card text-foreground border border-border hover:bg-accent'
+              }`}
+            >
+              {period.label}
+            </button>
+          ))}
+        </div>
+
+        {/* User's Current Rank */}
+        {userRank && (
+          <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white shadow-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
+                  <TrendingUp className="w-8 h-8" />
+                </div>
+                <div>
+                  <p className="text-blue-100 text-sm font-medium">Your Current Rank</p>
+                  <h2 className="text-4xl font-bold">#{userRank.rank}</h2>
+                  <p className="text-blue-100 mt-1">
+                    {userRank.credits} credits • {userRank.eventsAttended} events
+                  </p>
+                </div>
+              </div>
+              {getRankIcon(userRank.rank)}
+            </div>
+          </div>
+        )}
+
+        {/* Top 3 Podium */}
+        {!loading && leaderboard.length >= 3 && (
+          <div className="grid grid-cols-3 gap-4 mb-8">
+            {/* 2nd Place */}
+            <div className="flex flex-col items-center pt-8">
+              <Medal className="w-12 h-12 text-gray-400 mb-3" />
+              <Avatar className="w-20 h-20 border-4 border-gray-400">
+                <AvatarFallback className="bg-gray-200 text-gray-800 text-2xl font-bold">
+                  {leaderboard[1].user?.name?.charAt(0) || '2'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="mt-3 text-center">
+                <p className="font-bold text-lg">{leaderboard[1].user?.name || 'User'}</p>
+                <p className="text-sm text-muted-foreground">
+                  {leaderboard[1].user?.department}
+                </p>
+                <p className="text-2xl font-bold text-foreground mt-2">
+                  {leaderboard[1].credits}
+                </p>
+                <p className="text-xs text-muted-foreground">credits</p>
+              </div>
+            </div>
+
+            {/* 1st Place */}
+            <div className="flex flex-col items-center">
+              <Crown className="w-16 h-16 text-yellow-500 mb-3 animate-bounce" />
+              <Avatar className="w-24 h-24 border-4 border-yellow-500">
+                <AvatarFallback className="bg-yellow-100 text-yellow-800 text-3xl font-bold">
+                  {leaderboard[0].user?.name?.charAt(0) || '1'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="mt-3 text-center">
+                <p className="font-bold text-xl">{leaderboard[0].user?.name || 'User'}</p>
+                <p className="text-sm text-muted-foreground">
+                  {leaderboard[0].user?.department}
+                </p>
+                <p className="text-3xl font-bold text-yellow-600 mt-2">
+                  {leaderboard[0].credits}
+                </p>
+                <p className="text-xs text-muted-foreground">credits</p>
+              </div>
+            </div>
+
+            {/* 3rd Place */}
+            <div className="flex flex-col items-center pt-12">
+              <Medal className="w-10 h-10 text-orange-500 mb-3" />
+              <Avatar className="w-18 h-18 border-4 border-orange-500">
+                <AvatarFallback className="bg-orange-100 text-orange-800 text-xl font-bold">
+                  {leaderboard[2].user?.name?.charAt(0) || '3'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="mt-3 text-center">
+                <p className="font-bold">{leaderboard[2].user?.name || 'User'}</p>
+                <p className="text-sm text-muted-foreground">
+                  {leaderboard[2].user?.department}
+                </p>
+                <p className="text-xl font-bold text-foreground mt-2">
+                  {leaderboard[2].credits}
+                </p>
+                <p className="text-xs text-muted-foreground">credits</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Full Leaderboard Table */}
+        <div className="bg-card rounded-xl border border-border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-accent">
+                <tr>
+                  <th className="px-6 py-4 text-left text-sm font-semibold">Rank</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold">Student</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold">Department</th>
+                  <th className="px-6 py-4 text-right text-sm font-semibold">Events</th>
+                  <th className="px-6 py-4 text-right text-sm font-semibold">Credits</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {loading ? (
+                  Array.from({ length: 10 }).map((_, i) => (
+                    <tr key={i}>
+                      <td className="px-6 py-4"><Skeleton className="h-8 w-8" /></td>
+                      <td className="px-6 py-4"><Skeleton className="h-4 w-32" /></td>
+                      <td className="px-6 py-4"><Skeleton className="h-4 w-16" /></td>
+                      <td className="px-6 py-4"><Skeleton className="h-4 w-12" /></td>
+                      <td className="px-6 py-4"><Skeleton className="h-4 w-16" /></td>
+                    </tr>
+                  ))
+                ) : leaderboard.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                      No data available for this period
+                    </td>
+                  </tr>
+                ) : (
+                  leaderboard.map((entry) => {
+                    const isCurrentUser = entry.userId === parseInt(localStorage.getItem('userId') || '0');
+                    return (
+                      <tr
+                        key={entry.id}
+                        className={`hover:bg-accent transition-colors ${
+                          isCurrentUser ? 'bg-blue-50 dark:bg-blue-950/20' : ''
+                        }`}
+                      >
+                        <td className="px-6 py-4">
+                          <div className={`inline-flex items-center justify-center w-10 h-10 rounded-full font-bold ${getRankBadgeColor(entry.rank)}`}>
+                            {entry.rank}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="w-10 h-10">
+                              <AvatarFallback>
+                                {entry.user?.name?.charAt(0) || 'U'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">
+                                {entry.user?.name || 'Anonymous'}
+                                {isCurrentUser && (
+                                  <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
+                                    You
+                                  </span>
+                                )}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                Year {entry.user?.year}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-muted-foreground">
+                          {entry.user?.department}
+                        </td>
+                        <td className="px-6 py-4 text-right font-medium">
+                          {entry.eventsAttended}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <span className="text-lg font-bold text-foreground">
+                            {entry.credits}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
+

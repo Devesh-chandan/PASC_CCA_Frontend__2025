@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, Clock, MapPin, Phone, ArrowLeft } from "lucide-react";
-import { getStatusBadgeVariant, getStatusColor } from "@/lib/utils";
+import { getStatusBadgeVariant, getStatusColor, formatDate } from "@/lib/utils";
 import axios from "axios";
 import { EventAttendanceSessionForUser } from "@/types/attendance";
 import type { Event } from "@/types/events";
@@ -267,7 +267,7 @@ export default function EventDetailPage({
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">Start Date</p>
-                  <p className="text-gray-600 text-sm">{eventDetails?.startDate}</p>
+                  <p className="text-gray-600 text-sm">{formatDate(eventDetails?.startDate)}</p>
                 </div>
               </div>
 
@@ -280,7 +280,7 @@ export default function EventDetailPage({
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">End Date</p>
-                  <p className="text-gray-600 text-sm">{eventDetails?.endDate}</p>
+                  <p className="text-gray-600 text-sm">{formatDate(eventDetails?.endDate)}</p>
                 </div>
               </div>
 

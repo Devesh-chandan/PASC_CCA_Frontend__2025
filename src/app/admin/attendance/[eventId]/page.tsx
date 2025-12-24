@@ -131,7 +131,7 @@ const AttendanceManagement: React.FC = () => {
     const { name, value, type, checked } = e.target;
     setNewSession((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : name === 'credits' ? parseInt(value) || 0 : value,
+      [name]: type === 'checkbox' ? checked : name === 'credits' ? parseFloat(value) || 0 : value,
     }));
   };
 
@@ -226,7 +226,14 @@ const AttendanceManagement: React.FC = () => {
       const token = localStorage.getItem('token');
       await axios.put(
         `${apiUrl}/attendance/events/sessions/${sessionId}`,
-        { isActive: newIsActive },
+        { 
+          sessionName: sessionToToggle.sessionName,
+          location: sessionToToggle.location,
+          startTime: sessionToToggle.startTime,
+          endTime: sessionToToggle.endTime,
+          isActive: newIsActive,
+          credits: sessionToToggle.credits
+        },
         {
           headers: {
             'Content-Type': 'application/json',
@@ -515,7 +522,7 @@ const AttendanceManagement: React.FC = () => {
 
       {/* Add Session Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
             <button
               className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
@@ -593,11 +600,12 @@ const AttendanceManagement: React.FC = () => {
                 <input
                   type="number"
                   name="credits"
-                  value={newSession.credits}
+                  value={newSession.credits === 0 ? '' : newSession.credits}
                   onChange={handleNewSessionChange}
                   className="w-full border rounded px-3 py-2"
                   required
                   min="0"
+                  step="0.5"
                   placeholder="Enter credits"
                 />
               </div>

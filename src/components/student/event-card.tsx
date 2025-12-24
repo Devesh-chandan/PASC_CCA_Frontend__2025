@@ -2,9 +2,9 @@ import { EventWithRsvp } from "@/types/events";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, MapPin } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Award } from "lucide-react";
 import Link from "next/link";
-import { getStatusBadgeVariant, getStatusColor } from "@/lib/utils";
+import { getStatusBadgeVariant, getStatusColor, formatDate } from "@/lib/utils";
 import axios from "axios";
 import {apiUrl} from "@/lib/utils";
 // Event Card Component
@@ -13,9 +13,13 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
   async function handleRsvpButton() {
      try {
       const token = localStorage.getItem('token')
-      console.log(token)
+      if (!token) {
+        alert('Please login first');
+        return;
+      }
+      console.log('Creating RSVP for event:', eventWithRsvp.event.id);
       const response = await axios.post(
-        `${apiUrl}/rsvps/`,
+        `${apiUrl}/rsvps`,
         {
           eventId: eventWithRsvp.event.id,
           status: 'ATTENDING'
@@ -23,35 +27,48 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
         {
           headers: {
             'Content-Type': 'application/json',
-            'authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`
           }
         }
       );
-      console.log(response);
-     } catch (error) {
-      console.log(error);
-
+      console.log('RSVP Success:', response.data);
+      alert('RSVP successful!');
+      // Reload the page to update RSVP status
+      window.location.reload();
+     } catch (error: any) {
+      console.error('RSVP Error Details:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Failed to RSVP. Please try again.';
+      alert(errorMessage);
      }
    }
 
    async function handleRsvpCancle()
    {
     try {
+      if (!eventWithRsvp.rsvp || !eventWithRsvp.rsvp.id) {
+        alert('No RSVP found to cancel');
+        return;
+      }
       const token = localStorage.getItem('token')
-      console.log(token)
       const response = await axios.delete(
         `${apiUrl}/rsvps/${eventWithRsvp.rsvp.id}`,
         {
           headers: {
-        'Content-Type': 'application/json',
-        'authorization': `Bearer ${token}`
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           }
         }
       );
-      console.log(response);
-     } catch (error) {
-      console.log(error);
-
+      console.log('Cancel RSVP Success:', response.data);
+      // Reload the page to update RSVP status
+      window.location.reload();
+     } catch (error: any) {
+      console.error('Cancel RSVP Error:', error.response?.data || error);
+      alert(error.response?.data?.error || 'Failed to cancel RSVP. Please try again.');
      }
    }
 
@@ -97,20 +114,23 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
         <div className="space-y-3 mb-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Calendar className="w-4 h-4" />
-            <span>{event.duration}</span>
+            <span>Start: {formatDate(event.startDate)}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Calendar className="w-4 h-4" />
+            <span>End: {formatDate(event.endDate)}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <MapPin className="w-4 h-4" />
             <span>{event.location}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Calendar className="w-4 h-4" />
-            <span>Start Date: {event.startDate}</span>
-            <span className="mx-2">End Date: {event.endDate}</span>
+            <Award className="w-4 h-4 text-yellow-600" />
+            <span className="font-medium">{event.credits} Credit Hours</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Clock className="w-4 h-4" />
-            <span>{event.creditHours}</span>
+            <Users className="w-4 h-4 text-blue-600" />
+            <span>Capacity: {event.capacity} students</span>
           </div>
         </div>
         <div className="flex gap-2">

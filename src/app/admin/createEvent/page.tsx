@@ -54,10 +54,20 @@ const Page: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? parseInt(value) || 0 : value
-    }));
+    if (type === 'number') {
+      // Handle number inputs
+      const numValue = value === '' ? 0 : parseFloat(value);
+      setFormData(prev => ({
+        ...prev,
+        [name]: isNaN(numValue) ? 0 : numValue
+      }));
+    } else {
+      // Handle text inputs
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const calculateNumDays = (startDate: string, endDate: string): number => {
@@ -354,10 +364,11 @@ const Page: React.FC = () => {
                   <input
                     type="number"
                     name="credits"
-                    value={formData.credits}
+                    value={formData.credits === 0 ? '' : formData.credits}
                     onChange={handleInputChange}
-                    placeholder="e.g., 2"
+                    placeholder="e.g., 2.5"
                     min="0"
+                    step="0.5"
                     className={`w-full px-5 py-4 rounded-xl border-2 transition-all duration-300 focus:ring-4 focus:ring-yellow-500/20 focus:border-yellow-500 focus:scale-[1.02] ${
                       isDarkMode 
                         ? 'bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 hover:bg-gray-700/70 hover:border-gray-500' 
@@ -379,7 +390,7 @@ const Page: React.FC = () => {
                   <input
                     type="number"
                     name="capacity"
-                    value={formData.capacity}
+                    value={formData.capacity === 0 ? '' : formData.capacity}
                     onChange={handleInputChange}
                     placeholder="e.g., 50"
                     min="1"
