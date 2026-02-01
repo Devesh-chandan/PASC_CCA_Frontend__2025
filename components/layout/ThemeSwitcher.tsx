@@ -1,23 +1,33 @@
 "use client";
-import React from "react";
+
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
-function ThemeSwitcher() {
+
+export default function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="h-6 w-6" /> // placeholder to keep layout stable
+    );
+  }
+
   return (
-    <div>
-      <button onClick={toggleTheme} className=" cursor-pointer">
-        {theme === "dark" ? (
-          <Sun className="h-6 w-6" />
-        ) : (
-          <Moon className="h-6 w-6" />
-        )}
-      </button>
-    </div>
+    <button
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className="cursor-pointer"
+    >
+      {theme === "dark" ? (
+        <Sun className="h-6 w-6" />
+      ) : (
+        <Moon className="h-6 w-6" />
+      )}
+    </button>
   );
 }
-
-export default ThemeSwitcher;

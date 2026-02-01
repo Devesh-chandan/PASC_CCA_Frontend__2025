@@ -7,25 +7,25 @@ import {
   Trophy, 
   Users, 
   TrendingUp, 
-  Award,
-  Clock,
-  Star,
-  ArrowRight,
-  CheckCircle,
-  Sparkles,
-  Zap,
-  Target,
-  Shield,
-  QrCode,
-  BarChart3,
-  MessageSquare,
-  Bell,
-  Github,
-  Twitter,
-  Instagram,
-  Mail,
-  ChevronRight,
-  GraduationCap
+  Award, 
+  Clock, 
+  Star, 
+  ArrowRight, 
+  CheckCircle, 
+  Sparkles, 
+  Zap, 
+  Target, 
+  Shield, 
+  QrCode, 
+  BarChart3, 
+  MessageSquare, 
+  Bell, 
+  Github, 
+  Twitter, 
+  Instagram, 
+  Mail, 
+  ChevronRight, 
+  GraduationCap 
 } from 'lucide-react';
 import { motion, useInView, useMotionValue, useTransform, animate } from 'framer-motion';
 import Link from 'next/link';
@@ -92,13 +92,10 @@ function GridPattern() {
     <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30 dark:opacity-20">
       <div 
         className="absolute inset-0" 
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px'
-        }}
+        style={{ 
+          backgroundImage: `linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px' 
+        }} 
       />
     </div>
   );
@@ -106,35 +103,35 @@ function GridPattern() {
 
 export default function Home() {
   const router = useRouter();
-
+  
   const features = [
-    {
-      icon: <Calendar className="w-7 h-7" />,
-      title: "Event Discovery",
-      description: "Browse curated co-curricular activities and never miss an opportunity to grow",
-      color: "from-blue-500 to-cyan-500",
-      bgColor: "bg-blue-500/10 dark:bg-blue-500/20"
+    { 
+      icon: <Calendar className="w-7 h-7" />, 
+      title: "Event Discovery", 
+      description: "Browse curated co-curricular activities and never miss an opportunity to grow", 
+      color: "from-blue-500 to-cyan-500", 
+      bgColor: "bg-blue-500/10 dark:bg-blue-500/20" 
     },
-    {
-      icon: <Trophy className="w-7 h-7" />,
-      title: "Compete & Excel",
-      description: "Rise through the ranks on dynamic leaderboards and earn recognition",
-      color: "from-amber-500 to-orange-500",
-      bgColor: "bg-amber-500/10 dark:bg-amber-500/20"
+    { 
+      icon: <Trophy className="w-7 h-7" />, 
+      title: "Compete & Excel", 
+      description: "Rise through the ranks on dynamic leaderboards and earn recognition", 
+      color: "from-amber-500 to-orange-500", 
+      bgColor: "bg-amber-500/10 dark:bg-amber-500/20" 
     },
-    {
-      icon: <Award className="w-7 h-7" />,
-      title: "Credit Tracking",
-      description: "Automatic credit calculation with real-time progress monitoring",
-      color: "from-emerald-500 to-green-500",
-      bgColor: "bg-emerald-500/10 dark:bg-emerald-500/20"
+    { 
+      icon: <Award className="w-7 h-7" />, 
+      title: "Credit Tracking", 
+      description: "Automatic credit calculation with real-time progress monitoring", 
+      color: "from-emerald-500 to-green-500", 
+      bgColor: "bg-emerald-500/10 dark:bg-emerald-500/20" 
     },
-    {
-      icon: <Users className="w-7 h-7" />,
-      title: "Community Hub",
-      description: "Connect with peers across departments and build lasting networks",
-      color: "from-purple-500 to-pink-500",
-      bgColor: "bg-purple-500/10 dark:bg-purple-500/20"
+    { 
+      icon: <Users className="w-7 h-7" />, 
+      title: "Community Hub", 
+      description: "Connect with peers across departments and build lasting networks", 
+      color: "from-purple-500 to-pink-500", 
+      bgColor: "bg-purple-500/10 dark:bg-purple-500/20" 
     }
   ];
 
@@ -155,7 +152,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 overflow-hidden">
+    <div className="min-h-screen bg-background overflow-hidden">
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center">
         <FloatingShapes />
@@ -181,22 +178,22 @@ export default function Home() {
                   PASC CCA Platform 2025
                 </span>
               </motion.div>
-              
+
               {/* Headline */}
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-                className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-[1.1] tracking-tight"
+                transition={{ delay: 0.0, duration: 0.0 }}
+                className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-[1.1] tracking-tight"
               >
-                Where Students
+                Where Students{" "}
                 <span className="block mt-2">
                   <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">
                     Become Achievers
                   </span>
                 </span>
               </motion.h1>
-              
+
               {/* Description */}
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
@@ -204,9 +201,7 @@ export default function Home() {
                 transition={{ delay: 0.4, duration: 0.6 }}
                 className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-xl leading-relaxed"
               >
-                Your one-stop platform for discovering events, tracking credits, 
-                and competing with peers. Transform your college journey into an 
-                adventure of growth and achievement.
+                Your one-stop platform for discovering events, tracking credits, and competing with peers. Transform your college journey into an adventure of growth and achievement.
               </motion.p>
 
               {/* CTA Buttons */}
@@ -256,7 +251,7 @@ export default function Home() {
                   ))}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  <span className="font-semibold text-gray-900 dark:text-white">1000+</span> students already registered
+                  <span className="font-semibold text-[hsl(var(--mini-text))]">1000+</span> students already registered
                 </div>
               </motion.div>
             </motion.div>
@@ -272,7 +267,7 @@ export default function Home() {
               <div className="relative">
                 {/* Background glow */}
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-3xl" />
-                
+
                 {/* Stats Card */}
                 <motion.div
                   initial={{ y: 20, opacity: 0 }}
@@ -289,6 +284,7 @@ export default function Home() {
                       <p className="text-gray-500 dark:text-gray-400 text-sm">Spring Semester 2025</p>
                     </div>
                   </div>
+                  
                   <div className="space-y-3">
                     <div>
                       <div className="flex justify-between text-sm mb-1">
@@ -304,6 +300,7 @@ export default function Home() {
                         />
                       </div>
                     </div>
+                    
                     <div className="flex gap-4 pt-2">
                       <div className="flex-1 text-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                         <div className="text-2xl font-bold text-gray-900 dark:text-white">12</div>
@@ -340,6 +337,7 @@ export default function Home() {
                       <Zap className="w-6 h-6" />
                     </div>
                   </div>
+                  
                   <div className="flex items-center gap-4 text-sm">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-white/70" />
@@ -350,6 +348,7 @@ export default function Home() {
                       <span>120 registered</span>
                     </div>
                   </div>
+                  
                   <div className="mt-4 flex items-center gap-2">
                     <div className="flex -space-x-2">
                       {[...Array(3)].map((_, i) => (
@@ -397,7 +396,7 @@ export default function Home() {
                   <div className="text-4xl font-bold text-gray-900 dark:text-white mb-1">
                     {count}{stat.suffix}
                   </div>
-                  <div className="text-gray-600 dark:text-gray-400 font-medium">
+                  <div className="-400 text-400 text-[hsl(var(--mini-text))] font-medium">
                     {stat.label}
                   </div>
                 </motion.div>
@@ -419,13 +418,13 @@ export default function Home() {
             <span className="inline-block px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm font-semibold mb-4">
               Features
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Everything You Need to
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+              Everything You Need to{" "}
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
                 Excel in Activities
               </span>
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               A comprehensive platform designed with students in mind
             </p>
           </motion.div>
@@ -476,15 +475,13 @@ export default function Home() {
                 Why PASC CCA?
               </span>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-                Built for Students,
+                Built for Students,{" "}
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-blue-600">
                   By Students
                 </span>
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                We understand the challenges of managing co-curricular activities. 
-                That's why we've built a platform that makes tracking and participating 
-                in events effortless and engaging.
+                We understand the challenges of managing co-curricular activities. That's why we've built a platform that makes tracking and participating in events effortless and engaging.
               </p>
               
               <div className="grid sm:grid-cols-2 gap-4">
@@ -593,12 +590,12 @@ export default function Home() {
             </motion.div>
             
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-              Ready to Transform Your
+              Ready to Transform Your{" "}
               <span className="block">College Experience?</span>
             </h2>
+            
             <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-              Join hundreds of students already using PASC CCA Platform to 
-              track their achievements and unlock new opportunities.
+              Join hundreds of students already using PASC CCA Platform to track their achievements and unlock new opportunities.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -609,6 +606,7 @@ export default function Home() {
                 Create Free Account
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
+              
               <button
                 onClick={() => router.push('/auth/login')}
                 className="px-8 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-xl font-semibold text-lg hover:bg-white/20 transition-all duration-300"
