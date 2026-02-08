@@ -5,37 +5,25 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, Users, Award } from "lucide-react";
 import Link from "next/link";
 import { getStatusBadgeVariant, getStatusColor, formatDate } from "@/lib/utils";
-import axios from "axios";
-import {apiUrl} from "@/lib/utils";
+import { rsvpAPI } from "@/lib/api";
+
 // Event Card Component
 export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) => {
 
   async function handleRsvpButton() {
-     try {
+    try {
       const token = localStorage.getItem('token')
       if (!token) {
         alert('Please login first');
         return;
       }
       console.log('Creating RSVP for event:', eventWithRsvp.event.id);
-      const response = await axios.post(
-        `${apiUrl}/rsvps`,
-        {
-          eventId: eventWithRsvp.event.id,
-          status: 'ATTENDING'
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
+      const response = await rsvpAPI.create(eventWithRsvp.event.id);
       console.log('RSVP Success:', response.data);
       alert('RSVP successful!');
       // Reload the page to update RSVP status
       window.location.reload();
-     } catch (error: any) {
+    } catch (error: any) {
       console.error('RSVP Error Details:', {
         status: error.response?.status,
         data: error.response?.data,
@@ -43,50 +31,40 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
       });
       const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Failed to RSVP. Please try again.';
       alert(errorMessage);
-     }
-   }
+    }
+  }
 
-   async function handleRsvpCancle()
-   {
+  async function handleRsvpCancle() {
     try {
       if (!eventWithRsvp.rsvp || !eventWithRsvp.rsvp.id) {
         alert('No RSVP found to cancel');
         return;
       }
-      const token = localStorage.getItem('token')
-      const response = await axios.delete(
-        `${apiUrl}/rsvps/${eventWithRsvp.rsvp.id}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
+      const response = await rsvpAPI.cancel(eventWithRsvp.rsvp.id);
       console.log('Cancel RSVP Success:', response.data);
       // Reload the page to update RSVP status
       window.location.reload();
-     } catch (error: any) {
+    } catch (error: any) {
       console.error('Cancel RSVP Error:', error.response?.data || error);
       alert(error.response?.data?.error || 'Failed to cancel RSVP. Please try again.');
-     }
-   }
+    }
+  }
 
   const event = eventWithRsvp.event;
   const getRSVPButton = () => {
     if (eventWithRsvp.rsvp) {
       return (
         <Button variant="outline" className="flex-1 border-none"
-        onClick={handleRsvpCancle}>
+          onClick={handleRsvpCancle}>
           Cancel RSVP
         </Button>
       );
     }
     return (
       <Button className="flex-1 text-white bg-blue-600 hover:bg-blue-700"
-      onClick={()=>{
-        handleRsvpButton()
-      }}>
+        onClick={() => {
+          handleRsvpButton()
+        }}>
         RSVP
       </Button>
     );
@@ -97,11 +75,10 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <CardTitle className="text-xl font-semibold">{event.title}</CardTitle>
-          <Badge 
+          <Badge
             variant={getStatusBadgeVariant(event.status)}
-            className={`${getStatusColor(event.status)} ${
-              event.status === 'ONGOING' ? 'bg-green-100' : ''
-            }`}
+            className={`${getStatusColor(event.status)} ${event.status === 'ONGOING' ? 'bg-green-100' : ''
+              }`}
           >
             {event.status}
           </Badge>
@@ -137,7 +114,7 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
           {getRSVPButton()}
           <Button variant="outline" className="flex-1" asChild>
             <Link href={`/student/events/${event.id}`} className="flex items-center justify-center">
-            Details
+              Details
             </Link>
           </Button>
         </div>

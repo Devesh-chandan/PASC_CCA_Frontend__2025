@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { Event, EventWithRsvp } from "@/types/events";
 import { eventAPI } from "@/lib/api";
+import { useAuthStore } from "@/lib/store";
 
-function formatDateToDDMMYY(dateString: string): string {
+function formatDateToDDMMYY(dateString: string | Date): string {
     if (!dateString) return "";
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
@@ -48,7 +49,14 @@ export function useFetchEventsForStudentRsvp() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const role = useAuthStore(state => state.role);
+
     const fetchEvents = useCallback(async () => {
+        if (role !== 'student') {
+            setLoading(false);
+            setFetchedEvents([]);
+            return;
+        }
         setLoading(true);
         setError(null);
         try {
@@ -67,11 +75,11 @@ export function useFetchEventsForStudentRsvp() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [role]);
 
     useEffect(() => {
         fetchEvents();
-    }, [fetchEvents]);
+    }, [fetchEvents, role]);
 
     return { events: fetchedEvents, loading, error, refetchEvents: fetchEvents };
 }

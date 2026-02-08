@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Star, ThumbsUp, Edit2, Trash2, X } from 'lucide-react';
-import { reviewAPI } from '@/lib/api';
+import { reviewAPI, authAPI } from '@/lib/api';
 import { EventReview, ReviewStats, ReviewCreateInput } from '@/types/review';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
@@ -21,6 +21,8 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
   const [submitting, setSubmitting] = useState(false);
   const [editingReview, setEditingReview] = useState<EventReview | null>(null);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [myReview, setMyReview] = useState<EventReview | null>(null);
 
   const [formData, setFormData] = useState<ReviewCreateInput>({
     eventId,
@@ -32,18 +34,83 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
     anonymous: false,
   });
 
-  // Get current user ID from localStorage
+  // Get current user ID and role from localStorage, fetch if missing
   useEffect(() => {
-    const userId = localStorage.getItem('userId');
-    if (userId) {
-      setCurrentUserId(parseInt(userId));
-    }
+    const checkAuth = async () => {
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+      let storedUserId = localStorage.getItem('userId');
+
+      if (!token) return;
+
+      // If userId is missing but we have token/role, try to fetch it
+      if (!storedUserId && role) {
+        try {
+          let fetchedUserId = '';
+          if (role === 'admin') {
+            const res = await authAPI.getCurrentAdmin();
+            if (res.data?.success && res.data.data?.admin) {
+              fetchedUserId = res.data.data.admin.id.toString();
+            }
+          } else {
+            const res = await authAPI.getCurrentUser();
+            if (res.data?.success && res.data.data?.user) {
+              fetchedUserId = res.data.data.user.id.toString();
+            }
+          }
+
+          if (fetchedUserId) {
+            localStorage.setItem('userId', fetchedUserId);
+            storedUserId = fetchedUserId;
+          }
+        } catch (error) {
+          console.error("Failed to fetch user info for delete permissions", error);
+        }
+      }
+
+      if (storedUserId) {
+        setCurrentUserId(Number(storedUserId));
+      }
+      if (role === 'admin') {
+        setIsAdmin(true);
+      }
+    };
+
+    checkAuth();
   }, []);
+
+  // Sync formData with eventId when it changes
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      eventId: eventId
+    }));
+  }, [eventId]);
 
   useEffect(() => {
     fetchReviews();
     fetchStats();
+    if (localStorage.getItem('token')) {
+      fetchMyReview();
+    }
   }, [eventId]);
+
+  const fetchMyReview = async () => {
+    try {
+      const response = await reviewAPI.getMyReview(eventId);
+      if (response.data?.success && response.data.data) {
+        setMyReview(response.data.data as EventReview);
+        return response.data.data;
+      } else {
+        setMyReview(null);
+        return null;
+      }
+    } catch (error) {
+      // Ignore 404 or other errors for my review
+      setMyReview(null);
+      return null;
+    }
+  };
 
   const fetchReviews = async () => {
     try {
@@ -72,35 +139,73 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
   const handleSubmitReview = async () => {
     setSubmitting(true);
     try {
+      // Construct payload explicitly to ensure all fields are present
+      const payload: ReviewCreateInput = {
+        eventId: eventId,
+        rating: formData.rating,
+        review: formData.review || '',
+        contentRating: formData.contentRating || 5,
+        speakerRating: formData.speakerRating || 5,
+        organizationRating: formData.organizationRating || 5,
+        anonymous: formData.anonymous || false,
+      };
+
+      console.log('=== REVIEW SUBMISSION DEBUG ===');
+      console.log('Payload being sent:', payload);
+      console.log('FormData state:', formData);
+      console.log('EventId:', eventId);
+      console.log('==============================');
+
       if (editingReview) {
         // Update existing review
-        const response = await reviewAPI.update(editingReview.id, {
-          rating: formData.rating,
-          review: formData.review,
-          contentRating: formData.contentRating,
-          speakerRating: formData.speakerRating,
-          organizationRating: formData.organizationRating,
-          anonymous: formData.anonymous,
-        });
+        const response = await reviewAPI.update(editingReview.id, payload);
         if (response.data?.success) {
           setShowReviewForm(false);
           setEditingReview(null);
+          // Update myReview immediately
+          setMyReview(response.data.data);
           fetchReviews();
           fetchStats();
           resetForm();
         }
       } else {
         // Create new review
-        const response = await reviewAPI.create(formData);
+        const response = await reviewAPI.create(payload);
         if (response.data?.success) {
           setShowReviewForm(false);
+          // Set my review from response
+          setMyReview(response.data.data);
           fetchReviews();
           fetchStats();
           resetForm();
         }
       }
-    } catch (error) {
-      console.error('Error submitting review:', error);
+    } catch (error: any) {
+      console.error('=== REVIEW SUBMISSION ERROR ===');
+      console.error('Error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Form data state:', formData);
+      console.error('==============================');
+
+      if (error.response?.data?.message) {
+        const msg = error.response.data.message;
+
+        // If error is "already reviewed", try fetching my review
+        if (msg.includes('already reviewed')) {
+          const review = await fetchMyReview();
+          if (review) {
+            alert("You have already reviewed this event. We loaded your review so you can edit it.");
+            handleEditReview(review as EventReview);
+          } else {
+            // Fallback if we can't fetch it (e.g. backend route issue)
+            alert(`Error: ${msg}. Please refresh the page.`);
+          }
+        } else {
+          alert(`Error: ${msg}`);
+        }
+      } else {
+        alert('Failed to submit review. Please try again.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -122,12 +227,16 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
 
   const handleDeleteReview = async (reviewId: number) => {
     if (!confirm('Are you sure you want to delete your review?')) return;
-    
+
     try {
       const response = await reviewAPI.delete(reviewId);
       if (response.data?.success) {
         fetchReviews();
         fetchStats();
+        // Clear myReview if I deleted it
+        if (myReview && myReview.id === reviewId) {
+          setMyReview(null);
+        }
       }
     } catch (error) {
       console.error('Error deleting review:', error);
@@ -154,7 +263,7 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
   };
 
   // Check if current user has already reviewed
-  const userHasReviewed = reviews.some(r => r.userId === currentUserId);
+  const userHasReviewed = !!myReview || reviews.some(r => r.userId === currentUserId);
 
   const renderStars = (rating: number, interactive: boolean = false, onChange?: (rating: number) => void) => {
     return (
@@ -162,9 +271,8 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
         {[1, 2, 3, 4, 5].map(star => (
           <Star
             key={star}
-            className={`w-5 h-5 ${
-              star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-            } ${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`}
+            className={`w-5 h-5 ${star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+              } ${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`}
             onClick={() => interactive && onChange && onChange(star)}
           />
         ))}
@@ -189,7 +297,7 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
                 Based on {stats.totalReviews} review{stats.totalReviews !== 1 ? 's' : ''}
               </p>
             </div>
-            {eventStatus === 'COMPLETED' && !userHasReviewed && !showReviewForm && (
+            {['COMPLETED', 'ONGOING', 'UPCOMING'].includes(eventStatus) && !userHasReviewed && !showReviewForm && (
               <Button onClick={() => setShowReviewForm(true)}>
                 Write Review
               </Button>
@@ -232,12 +340,12 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
           <h3 className="text-lg font-semibold mb-4">
             {editingReview ? 'Edit Your Review' : 'Write Your Review'}
           </h3>
-          
+
           <div className="space-y-4">
             {/* Overall Rating */}
             <div>
               <label className="block text-sm font-medium mb-2">Overall Rating</label>
-              {renderStars(formData.rating, true, (rating) => 
+              {renderStars(formData.rating, true, (rating) =>
                 setFormData({ ...formData, rating })
               )}
             </div>
@@ -246,19 +354,19 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Content</label>
-                {renderStars(formData.contentRating || 5, true, (rating) => 
+                {renderStars(formData.contentRating || 5, true, (rating) =>
                   setFormData({ ...formData, contentRating: rating })
                 )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Speaker</label>
-                {renderStars(formData.speakerRating || 5, true, (rating) => 
+                {renderStars(formData.speakerRating || 5, true, (rating) =>
                   setFormData({ ...formData, speakerRating: rating })
                 )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Organization</label>
-                {renderStars(formData.organizationRating || 5, true, (rating) => 
+                {renderStars(formData.organizationRating || 5, true, (rating) =>
                   setFormData({ ...formData, organizationRating: rating })
                 )}
               </div>
@@ -305,7 +413,7 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
       {/* Reviews List */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Reviews</h3>
-        
+
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
@@ -321,85 +429,93 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
             No reviews yet. Be the first to review!
           </div>
         ) : (
-          reviews.map(review => {
-            const isOwnReview = review.userId === currentUserId;
-            return (
-              <div key={review.id} className={`bg-card rounded-lg border p-4 ${isOwnReview ? 'border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-950/20' : 'border-border'}`}>
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <p className="font-medium flex items-center gap-2">
-                      {review.anonymous ? 'Anonymous' : review.user?.name || 'User'}
-                      {isOwnReview && (
-                        <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full">
-                          Your review
+          (() => {
+            const displayedReviews = [...reviews];
+            if (myReview && !reviews.some(r => r.id === myReview.id)) {
+              displayedReviews.unshift(myReview);
+            }
+
+            return displayedReviews.map(review => {
+              const isOwnReview = review.userId === currentUserId;
+              return (
+                <div key={review.id} className={`bg-card rounded-lg border p-4 ${isOwnReview ? 'border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-950/20' : 'border-border'}`}>
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="font-medium flex items-center gap-2">
+                        {review.anonymous ? 'Anonymous' : review.user?.name || 'User'}
+                        {isOwnReview && (
+                          <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full">
+                            Your review
+                          </span>
+                        )}
+                      </p>
+                      {!review.anonymous && review.user?.department && (
+                        <p className="text-sm text-muted-foreground">
+                          {review.user.department}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="text-right">
+                        {renderStars(review.rating)}
+                        <p className="text-xs text-muted-foreground mt-1" suppressHydrationWarning>
+                          {formatDistanceToNow(new Date(review.createdAt))}
+                        </p>
+                      </div>
+                      {/* Edit/Delete buttons for own reviews or Admin */}
+                      {(isOwnReview || isAdmin) && (
+                        <div className="flex gap-1">
+                          {isOwnReview && (
+                            <button
+                              onClick={() => handleEditReview(review)}
+                              className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                              title="Edit review"
+                            >
+                              <Edit2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDeleteReview(review.id)}
+                            className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                            title="Delete review"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {review.review && (
+                    <p className="text-foreground mt-2">{review.review}</p>
+                  )}
+
+                  {(review.contentRating || review.speakerRating || review.organizationRating) && (
+                    <div className="flex gap-4 mt-3 text-sm">
+                      {review.contentRating && (
+                        <span className="text-muted-foreground">
+                          Content: {review.contentRating}/5
                         </span>
                       )}
-                    </p>
-                    {!review.anonymous && review.user?.department && (
-                      <p className="text-sm text-muted-foreground">
-                        {review.user.department}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="text-right">
-                      {renderStars(review.rating)}
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {formatDistanceToNow(new Date(review.createdAt))}
-                      </p>
+                      {review.speakerRating && (
+                        <span className="text-muted-foreground">
+                          Speaker: {review.speakerRating}/5
+                        </span>
+                      )}
+                      {review.organizationRating && (
+                        <span className="text-muted-foreground">
+                          Organization: {review.organizationRating}/5
+                        </span>
+                      )}
                     </div>
-                    {/* Edit/Delete buttons for own reviews */}
-                    {isOwnReview && (
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => handleEditReview(review)}
-                          className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
-                          title="Edit review"
-                        >
-                          <Edit2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteReview(review.id)}
-                          className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-                          title="Delete review"
-                        >
-                          <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
-                
-                {review.review && (
-                  <p className="text-foreground mt-2">{review.review}</p>
-                )}
-                
-                {(review.contentRating || review.speakerRating || review.organizationRating) && (
-                  <div className="flex gap-4 mt-3 text-sm">
-                    {review.contentRating && (
-                      <span className="text-muted-foreground">
-                        Content: {review.contentRating}/5
-                      </span>
-                    )}
-                    {review.speakerRating && (
-                      <span className="text-muted-foreground">
-                        Speaker: {review.speakerRating}/5
-                      </span>
-                    )}
-                    {review.organizationRating && (
-                      <span className="text-muted-foreground">
-                        Organization: {review.organizationRating}/5
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })
+              );
+            })
+          })()
         )}
       </div>
     </div>
   );
 }
-
 

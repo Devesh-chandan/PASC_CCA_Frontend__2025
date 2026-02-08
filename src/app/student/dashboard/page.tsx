@@ -40,7 +40,7 @@ export default function StudentDashboard() {
   const fetchAttendanceData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/attendance/user-attendance-stats`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/attendance/user-attendance-stats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await response.json();
@@ -55,6 +55,7 @@ export default function StudentDashboard() {
 
   const fetchDashboardData = async () => {
     try {
+      // Fetch analytics - BigInt issue is now resolved
       const analyticsResponse = await analyticsAPI.getUserAnalytics();
       console.log('Analytics response:', analyticsResponse.data);
       if (analyticsResponse.data?.success && analyticsResponse.data.data) {
@@ -88,14 +89,15 @@ export default function StudentDashboard() {
           if (userEntry) {
             setUserRank(userEntry);
           } else if (rankData.rank > 0) {
+            // Use flat structure to match backend
             setUserRank({
               userId: userId,
-              userName: 'You',
-              department: 'IT',
-              year: 1,
+              rank: rankData.rank,
               credits: rankData.credits,
               eventsAttended: 0,
-              rank: rankData.rank
+              userName: 'You',
+              department: 'IT',
+              year: new Date().getFullYear()
             } as LeaderboardEntry);
           }
         }
@@ -109,12 +111,7 @@ export default function StudentDashboard() {
       }
     } catch (error: any) {
       console.error('Error fetching dashboard data:', error);
-      setStats({
-        totalCredits: 0,
-        eventsAttended: 0,
-        upcomingEvents: 0,
-        completionRate: 0,
-      });
+      // Don't set hardcoded fallback values - let the error surface
     } finally {
       setLoading(false);
     }
@@ -146,8 +143,8 @@ export default function StudentDashboard() {
             <button
               onClick={() => setActiveTab('overview')}
               className={`py-3 px-6 border-b-2 font-medium text-sm transition-all ${activeTab === 'overview'
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
                 }`}
             >
               Overview
@@ -155,8 +152,8 @@ export default function StudentDashboard() {
             <button
               onClick={() => setActiveTab('attendance')}
               className={`py-3 px-6 border-b-2 font-medium text-sm transition-all ${activeTab === 'attendance'
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
                 }`}
             >
               Attendance History
@@ -164,8 +161,8 @@ export default function StudentDashboard() {
             <button
               onClick={() => setActiveTab('achievements')}
               className={`py-3 px-6 border-b-2 font-medium text-sm transition-all ${activeTab === 'achievements'
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
                 }`}
             >
               Achievements
@@ -255,22 +252,22 @@ export default function StudentDashboard() {
                     <div className="space-y-2">
                       {topPerformers.map((entry, index) => (
                         <div
-                          key={entry.id}
+                          key={`${entry.userId}-${index}`}
                           className="flex items-center gap-4 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
                         >
                           <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${index === 0 ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
-                              index === 1 ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300' :
-                                index === 2 ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400' :
-                                  'bg-muted text-muted-foreground'
+                            index === 1 ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300' :
+                              index === 2 ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400' :
+                                'bg-muted text-muted-foreground'
                             }`}>
                             {entry.rank}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-foreground truncate">
-                              {entry.user?.name || 'Anonymous'}
+                              {entry.userName || 'Anonymous'}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {entry.user?.department} • Year {entry.user?.year}
+                              {entry.department} • Year {entry.year}
                             </p>
                           </div>
                           <div className="text-right">
@@ -350,7 +347,12 @@ export default function StudentDashboard() {
                         </div>
                         <div className="text-xs text-muted-foreground space-y-1">
                           <p>📍 {session.location}</p>
-                          <p>📅 {new Date(session.startTime).toLocaleDateString()}</p>
+                          <p>📅 {new Date(session.startTime).toLocaleDateString('en-GB', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            timeZone: 'UTC'
+                          })}</p>
                         </div>
                       </div>
                     ))}

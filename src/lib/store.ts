@@ -16,7 +16,7 @@ const formatDateToDDMMYY = (dateString: string) => {
 interface AuthStore {
   user?: IUser;
   admin?: IAdmin;
-  role : "student" | "admin";
+  role: "student" | "admin" | null;
   setAuth: (auth: { user?: IUser; admin?: IAdmin; role: "student" | "admin" }) => void;
   clearAuth: () => void;
 }
@@ -24,9 +24,9 @@ interface AuthStore {
 export const useAuthStore = create<AuthStore>((set) => ({
   user: undefined,
   admin: undefined,
-  role: "student",
+  role: null,
 
-  setAuth: ({ user, admin , role }) => set(() => ({
+  setAuth: ({ user, admin, role }) => set(() => ({
     user,
     admin,
     role,
@@ -34,7 +34,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   clearAuth: () => set(() => ({
     user: undefined,
     admin: undefined,
-    role: "student",
+    role: null,
   })),
 }));
 

@@ -2,18 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  ArrowLeft, 
-  Users, 
-  Award, 
-  Star, 
-  TrendingUp, 
+import {
+  ArrowLeft,
+  Users,
+  Award,
+  Star,
+  TrendingUp,
   Calendar,
   CheckCircle,
   Clock,
-  BarChart3
+  BarChart3,
+  RefreshCw
 } from 'lucide-react';
-import { analyticsAPI, eventAPI, rsvpAPI, reviewAPI } from '@/lib/api';
+import { analyticsAPI, eventAPI, rsvpAPI } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -27,6 +28,35 @@ interface EventAnalytics {
   totalCreditsDistributed: number;
   sessionsCount: number;
   reviewsCount: number;
+  reviews?: {
+    averageRating: number;
+    totalReviews: number;
+    list: Array<{
+      id: number;
+      rating: number;
+      review: string;
+      createdAt: string;
+      user: {
+        name: string;
+        department: string | null;
+      } | null;
+    }>;
+  };
+  attendanceList?: Array<{
+    id: number;
+    user: {
+      name: string;
+      email: string;
+      department: string | null;
+      year: number | null;
+    };
+    session: {
+      id: number;
+      name: string;
+      credits: number;
+    };
+    attendedAt: string;
+  }>;
 }
 
 export default function EventAnalyticsPage({
@@ -55,6 +85,8 @@ export default function EventAnalyticsPage({
     };
     init();
   }, [params]);
+
+
 
   const fetchEvent = async (id: number) => {
     try {
@@ -108,6 +140,8 @@ export default function EventAnalyticsPage({
     }
   };
 
+
+
   return (
     <main className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -120,7 +154,7 @@ export default function EventAnalyticsPage({
             <ArrowLeft className="w-5 h-5 mr-1" />
             Back
           </button>
-          
+
           {loading ? (
             <div className="space-y-2">
               <Skeleton className="h-8 w-64" />
@@ -142,9 +176,26 @@ export default function EventAnalyticsPage({
                   <span>📍 {event.location}</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-lg">
-                <BarChart3 className="w-6 h-6 text-primary" />
-                <span className="font-semibold text-foreground">Event Analytics</span>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    setLoading(true);
+                    if (eventId) {
+                      Promise.all([
+                        fetchAnalytics(eventId),
+                        fetchRsvps(eventId)
+                      ]).then(() => setLoading(false));
+                    }
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950/20 rounded-lg transition-colors"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Refresh Data
+                </button>
+                <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-lg">
+                  <BarChart3 className="w-6 h-6 text-primary" />
+                  <span className="font-semibold text-foreground">Event Analytics</span>
+                </div>
               </div>
             </div>
           ) : null}
@@ -155,7 +206,7 @@ export default function EventAnalyticsPage({
           <MetricCard
             icon={<Users className="w-6 h-6 text-blue-500" />}
             title="Total RSVPs"
-            value={analytics?.totalRsvps || rsvps.length || 0}
+            value={analytics?.totalRsvps ?? rsvps.length}
             subtitle={`${event?.maxCapacity ? `of ${event.maxCapacity} capacity` : 'registered'}`}
             loading={loading}
             color="bg-blue-50 dark:bg-blue-950/20"
@@ -163,24 +214,24 @@ export default function EventAnalyticsPage({
           <MetricCard
             icon={<CheckCircle className="w-6 h-6 text-green-500" />}
             title="Attendance"
-            value={analytics?.totalAttendance || 0}
-            subtitle={`${analytics?.attendanceRate || 0}% attendance rate`}
+            value={analytics?.totalAttendance ?? analytics?.attendanceList?.length ?? 0}
+            subtitle={`${analytics?.attendanceRate ?? 0}% attendance rate`}
             loading={loading}
             color="bg-green-50 dark:bg-green-950/20"
           />
           <MetricCard
             icon={<Award className="w-6 h-6 text-yellow-500" />}
             title="Credits Distributed"
-            value={analytics?.totalCreditsDistributed || 0}
-            subtitle={`${analytics?.sessionsCount || 0} sessions`}
+            value={analytics?.totalCreditsDistributed ?? 0}
+            subtitle={`${analytics?.sessionsCount ?? 0} sessions`}
             loading={loading}
             color="bg-yellow-50 dark:bg-yellow-950/20"
           />
           <MetricCard
             icon={<Star className="w-6 h-6 text-purple-500" />}
             title="Average Rating"
-            value={analytics?.averageRating?.toFixed(1) || '0.0'}
-            subtitle={`${analytics?.reviewsCount || 0} reviews`}
+            value={analytics?.averageRating?.toFixed(1) ?? '0.0'}
+            subtitle={`${analytics?.reviewsCount ?? analytics?.reviews?.list?.length ?? 0} reviews`}
             loading={loading}
             color="bg-purple-50 dark:bg-purple-950/20"
           />
@@ -227,7 +278,7 @@ export default function EventAnalyticsPage({
               Registered Students ({rsvps.length})
             </h3>
           </div>
-          
+
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3, 4, 5].map(i => (
@@ -283,8 +334,119 @@ export default function EventAnalyticsPage({
             </div>
           )}
         </div>
+
+        {/* Credits & Attendance List */}
+        <div className="bg-card rounded-xl border border-border p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              <Award className="w-5 h-5 text-primary" />
+              Credits & Attendance ({analytics?.attendanceList?.length || 0})
+            </h3>
+          </div>
+
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          ) : !analytics?.attendanceList || analytics.attendanceList.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Award className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p>No attendance records yet</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-accent">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Student</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Department</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Session</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Credits</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Time</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {analytics.attendanceList.map((record: any) => (
+                    <tr key={record.id} className="hover:bg-accent/50 transition-colors">
+                      <td className="px-4 py-3">
+                        <div>
+                          <p className="font-medium text-foreground">{record.user?.name || 'Unknown'}</p>
+                          <p className="text-xs text-muted-foreground">{record.user?.email}</p>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {record.user?.department || '-'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {record.session?.name}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge variant="outline" className="font-mono">
+                          +{record.session?.credits}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {formatDateTime(record.attendedAt)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Reviews List */}
+        <div className="bg-card rounded-xl border border-border p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              <Star className="w-5 h-5 text-primary" />
+              Student Reviews ({analytics?.reviews?.list?.length ?? analytics?.reviewsCount ?? 0})
+            </h3>
+          </div>
+
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full" />)}
+            </div>
+          ) : !analytics?.reviews?.list || analytics.reviews.list.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Star className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p>No reviews yet</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {analytics.reviews.list.map((review: any) => (
+                <div key={review.id} className="border border-border rounded-lg p-4 bg-accent/20">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="font-medium text-foreground">
+                        {review.user?.name || 'Anonymous'}
+                      </p>
+                      {review.user?.department && (
+                        <p className="text-xs text-muted-foreground">{review.user.department}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                      <span className="text-xl font-bold">{review.rating}</span>
+                      <span className="text-sm text-muted-foreground">/5</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-foreground/90">{review.review}</p>
+
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {formatDateTime(review.createdAt)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </main>
+    </main >
   );
 }
 

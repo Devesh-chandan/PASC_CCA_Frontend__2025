@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Notification } from '@/types/notification';
 import { NotificationItem } from './NotificationItem';
 import { Skeleton } from '../ui/skeleton';
@@ -21,6 +22,7 @@ export function NotificationDropdown({
   onMarkAllAsRead,
 }: NotificationDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -32,6 +34,11 @@ export function NotificationDropdown({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [onClose]);
+
+  const handleViewAll = () => {
+    onClose();
+    router.push('/student/notifications');
+  };
 
   return (
     <div
@@ -83,7 +90,7 @@ export function NotificationDropdown({
       {notifications.length > 0 && (
         <div className="p-3 border-t border-border text-center">
           <button
-            onClick={onClose}
+            onClick={handleViewAll}
             className="text-sm text-blue-600 hover:text-blue-800 font-medium"
           >
             View all notifications

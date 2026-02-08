@@ -28,15 +28,15 @@ export default function LeaderboardPage() {
   const fetchLeaderboard = async () => {
     setLoading(true);
     try {
-      const response = await leaderboardAPI.get({ 
+      const response = await leaderboardAPI.get({
         period: selectedPeriod,
-        limit: 50 
+        limit: 50
       });
-      
+
       if (response.data?.success && response.data.data) {
         const data = response.data.data as LeaderboardEntry[];
         setLeaderboard(data);
-        
+
         // Find current user
         const userId = parseInt(localStorage.getItem('userId') || '0');
         const userEntry = data.find(entry => entry.userId === userId);
@@ -95,11 +95,10 @@ export default function LeaderboardPage() {
             <button
               key={period.value}
               onClick={() => setSelectedPeriod(period.value)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                selectedPeriod === period.value
-                  ? 'bg-primary text-primary-foreground shadow-lg scale-105'
-                  : 'bg-card text-foreground border border-border hover:bg-accent'
-              }`}
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${selectedPeriod === period.value
+                ? 'bg-primary text-primary-foreground shadow-lg scale-105'
+                : 'bg-card text-foreground border border-border hover:bg-accent'
+                }`}
             >
               {period.label}
             </button>
@@ -135,13 +134,13 @@ export default function LeaderboardPage() {
               <Medal className="w-12 h-12 text-gray-400 mb-3" />
               <Avatar className="w-20 h-20 border-4 border-gray-400">
                 <AvatarFallback className="bg-gray-200 text-gray-800 text-2xl font-bold">
-                  {leaderboard[1].user?.name?.charAt(0) || '2'}
+                  {leaderboard[1].userName?.charAt(0) || '2'}
                 </AvatarFallback>
               </Avatar>
               <div className="mt-3 text-center">
-                <p className="font-bold text-lg">{leaderboard[1].user?.name || 'User'}</p>
+                <p className="font-bold text-lg">{leaderboard[1].userName || 'User'}</p>
                 <p className="text-sm text-muted-foreground">
-                  {leaderboard[1].user?.department}
+                  {leaderboard[1].department}
                 </p>
                 <p className="text-2xl font-bold text-foreground mt-2">
                   {leaderboard[1].credits}
@@ -155,13 +154,13 @@ export default function LeaderboardPage() {
               <Crown className="w-16 h-16 text-yellow-500 mb-3 animate-bounce" />
               <Avatar className="w-24 h-24 border-4 border-yellow-500">
                 <AvatarFallback className="bg-yellow-100 text-yellow-800 text-3xl font-bold">
-                  {leaderboard[0].user?.name?.charAt(0) || '1'}
+                  {leaderboard[0].userName?.charAt(0) || '1'}
                 </AvatarFallback>
               </Avatar>
               <div className="mt-3 text-center">
-                <p className="font-bold text-xl">{leaderboard[0].user?.name || 'User'}</p>
+                <p className="font-bold text-xl">{leaderboard[0].userName || 'User'}</p>
                 <p className="text-sm text-muted-foreground">
-                  {leaderboard[0].user?.department}
+                  {leaderboard[0].department}
                 </p>
                 <p className="text-3xl font-bold text-yellow-600 mt-2">
                   {leaderboard[0].credits}
@@ -175,13 +174,13 @@ export default function LeaderboardPage() {
               <Medal className="w-10 h-10 text-orange-500 mb-3" />
               <Avatar className="w-18 h-18 border-4 border-orange-500">
                 <AvatarFallback className="bg-orange-100 text-orange-800 text-xl font-bold">
-                  {leaderboard[2].user?.name?.charAt(0) || '3'}
+                  {leaderboard[2].userName?.charAt(0) || '3'}
                 </AvatarFallback>
               </Avatar>
               <div className="mt-3 text-center">
-                <p className="font-bold">{leaderboard[2].user?.name || 'User'}</p>
+                <p className="font-bold">{leaderboard[2].userName || 'User'}</p>
                 <p className="text-sm text-muted-foreground">
-                  {leaderboard[2].user?.department}
+                  {leaderboard[2].department}
                 </p>
                 <p className="text-xl font-bold text-foreground mt-2">
                   {leaderboard[2].credits}
@@ -223,14 +222,13 @@ export default function LeaderboardPage() {
                     </td>
                   </tr>
                 ) : (
-                  leaderboard.map((entry) => {
+                  leaderboard.map((entry, index) => {
                     const isCurrentUser = entry.userId === parseInt(localStorage.getItem('userId') || '0');
                     return (
                       <tr
-                        key={entry.id}
-                        className={`hover:bg-accent transition-colors ${
-                          isCurrentUser ? 'bg-blue-50 dark:bg-blue-950/20' : ''
-                        }`}
+                        key={`${entry.userId}-${index}`}
+                        className={`hover:bg-accent transition-colors ${isCurrentUser ? 'bg-blue-50 dark:bg-blue-950/20' : ''
+                          }`}
                       >
                         <td className="px-6 py-4">
                           <div className={`inline-flex items-center justify-center w-10 h-10 rounded-full font-bold ${getRankBadgeColor(entry.rank)}`}>
@@ -241,12 +239,12 @@ export default function LeaderboardPage() {
                           <div className="flex items-center gap-3">
                             <Avatar className="w-10 h-10">
                               <AvatarFallback>
-                                {entry.user?.name?.charAt(0) || 'U'}
+                                {entry.userName?.charAt(0) || 'U'}
                               </AvatarFallback>
                             </Avatar>
                             <div>
                               <p className="font-medium">
-                                {entry.user?.name || 'Anonymous'}
+                                {entry.userName || 'Anonymous'}
                                 {isCurrentUser && (
                                   <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
                                     You
@@ -254,13 +252,13 @@ export default function LeaderboardPage() {
                                 )}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                Year {entry.user?.year}
+                                Year {entry.year}
                               </p>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 text-muted-foreground">
-                          {entry.user?.department}
+                          {entry.department}
                         </td>
                         <td className="px-6 py-4 text-right font-medium">
                           {entry.eventsAttended}

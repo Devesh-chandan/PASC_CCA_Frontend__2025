@@ -50,7 +50,7 @@ export default function SessionManagementPage({
       const { id } = await params;
       const numId = parseInt(id);
       setEventId(numId);
-      
+
       // Fetch event details
       try {
         const eventResponse = await eventAPI.getById(numId);
@@ -81,6 +81,11 @@ export default function SessionManagementPage({
   };
 
   const handleSubmit = async () => {
+    if (!formData.startTime) {
+      alert('Please select a start time');
+      return;
+    }
+
     try {
       const payload = {
         sessionName: formData.sessionName,
@@ -110,7 +115,7 @@ export default function SessionManagementPage({
   // Sessions can be deactivated by setting isActive to false
   const handleDeactivate = async (session: AttendanceSession) => {
     if (!confirm(`Are you sure you want to ${session.isActive ? 'deactivate' : 'activate'} this session?`)) return;
-    
+
     try {
       await attendanceAPI.updateSession(session.id, { isActive: !session.isActive });
       fetchSessions(eventId);
@@ -168,16 +173,37 @@ export default function SessionManagementPage({
             <h1 className="text-3xl font-bold text-foreground">Session Management</h1>
             <p className="text-muted-foreground mt-1">{eventTitle}</p>
           </div>
-          <Button
-            onClick={() => {
-              resetForm();
-              setShowDialog(true);
-            }}
-            className="flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            Create Session
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                const csvContent = "data:text/csv;charset=utf-8," +
+                  "Session Name,Code,Location,Credits,Start Time,End Time,Status\n" +
+                  sessions.map(s =>
+                    `"${s.sessionName}","${s.code}","${s.location}",${s.credits},"${s.startTime}","${s.endTime || ''}","${s.isActive ? 'Active' : 'Inactive'}"`
+                  ).join("\n");
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `attendance_sessions_${eventId}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+            >
+              Export CSV
+            </Button>
+            <Button
+              onClick={() => {
+                resetForm();
+                setShowDialog(true);
+              }}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Create Session
+            </Button>
+          </div>
         </div>
 
         {/* Sessions List */}
@@ -220,11 +246,10 @@ export default function SessionManagementPage({
                       </button>
                       <button
                         onClick={() => handleDeactivate(session)}
-                        className={`p-2 rounded-lg transition-colors ${
-                          session.isActive 
-                            ? 'hover:bg-red-100 dark:hover:bg-red-900/20' 
-                            : 'hover:bg-green-100 dark:hover:bg-green-900/20'
-                        }`}
+                        className={`p-2 rounded-lg transition-colors ${session.isActive
+                          ? 'hover:bg-red-100 dark:hover:bg-red-900/20'
+                          : 'hover:bg-green-100 dark:hover:bg-green-900/20'
+                          }`}
                         title={session.isActive ? 'Deactivate session' : 'Activate session'}
                       >
                         <Clock className={`w-4 h-4 ${session.isActive ? 'text-red-600' : 'text-green-600'}`} />
@@ -265,7 +290,7 @@ export default function SessionManagementPage({
               {editingSession ? 'Edit Session' : 'Create Session'}
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Session Name</label>

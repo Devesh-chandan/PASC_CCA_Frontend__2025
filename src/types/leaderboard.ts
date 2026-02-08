@@ -1,23 +1,14 @@
 export type LeaderboardPeriod = 'WEEKLY' | 'MONTHLY' | 'SEMESTER' | 'YEARLY' | 'ALL_TIME';
 
+// Backend returns flat structure, not nested user object
 export interface LeaderboardEntry {
-  id: number;
-  userId: number;
   rank: number;
+  userId: number;
+  userName: string;      // Backend returns this directly
+  department: string;    // Backend returns this directly
+  year: number;          // Backend returns this directly
   credits: number;
   eventsAttended: number;
-  period: LeaderboardPeriod;
-  year: number;
-  month?: number | null;
-  createdAt: string | Date;
-  updatedAt: string | Date;
-  user?: {
-    id: number;
-    name?: string;
-    email: string;
-    department: string;
-    year: number;
-  };
 }
 
 export interface LeaderboardResponse {

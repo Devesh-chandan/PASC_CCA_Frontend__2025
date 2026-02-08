@@ -53,9 +53,8 @@ export function AnnouncementCard({ announcement, onMarkAsRead }: AnnouncementCar
   return (
     <div
       onClick={handleClick}
-      className={`p-4 rounded-lg border-l-4 ${config.bgColor} ${config.borderColor} cursor-pointer transition-all hover:shadow-md ${
-        !announcement.isRead ? 'ring-2 ring-blue-200 dark:ring-blue-800' : ''
-      }`}
+      className={`p-4 rounded-lg border-l-4 ${config.bgColor} ${config.borderColor} cursor-pointer transition-all hover:shadow-md ${!announcement.isRead ? 'ring-2 ring-blue-200 dark:ring-blue-800' : ''
+        }`}
     >
       <div className="flex gap-3">
         <div className={`flex-shrink-0 ${config.textColor}`}>
@@ -77,11 +76,16 @@ export function AnnouncementCard({ announcement, onMarkAsRead }: AnnouncementCar
           </p>
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span className="font-medium uppercase">{announcement.priority}</span>
-            <span>{formatDistanceToNow(new Date(announcement.createdAt))}</span>
+            <span suppressHydrationWarning>{formatDistanceToNow(new Date(announcement.createdAt))}</span>
           </div>
           {announcement.expiresAt && (
             <p className="text-xs text-muted-foreground mt-2">
-              Expires: {new Date(announcement.expiresAt).toLocaleDateString()}
+              Expires: {new Date(announcement.expiresAt).toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                timeZone: 'UTC'
+              })}
             </p>
           )}
         </div>
@@ -89,5 +93,3 @@ export function AnnouncementCard({ announcement, onMarkAsRead }: AnnouncementCar
     </div>
   );
 }
-
-

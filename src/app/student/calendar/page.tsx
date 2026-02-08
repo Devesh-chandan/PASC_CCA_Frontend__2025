@@ -45,7 +45,15 @@ export default function CalendarPage() {
 
   const handleDownloadAll = async () => {
     try {
-      const response = await calendarAPI.getAllEventsCalendar();
+      // Try to download personalized calendar first
+      let response;
+      try {
+        response = await calendarAPI.downloadMyCalendar();
+      } catch (e) {
+        console.warn('Failed to download personal calendar, falling back to public:', e);
+        response = await calendarAPI.downloadPublicCalendar();
+      }
+
       if (response.data) {
         // Create a blob and download
         const blob = new Blob([response.data as any], { type: 'text/calendar' });
@@ -110,7 +118,7 @@ export default function CalendarPage() {
         {/* Events List */}
         <div className="bg-card rounded-xl border border-border p-6">
           <h2 className="text-xl font-semibold mb-4">Upcoming Events</h2>
-          
+
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3, 4].map(i => (

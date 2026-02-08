@@ -9,8 +9,8 @@ import { Eye, EyeOff } from "lucide-react";
 import { useAuthStore } from "@/lib/store";
 import { Department, IUser } from "@/types/auth";
 import { IAdmin } from "@/types/auth";
-import axios from "axios";
-import { apiUrl } from "@/lib/utils";
+import { authAPI } from "@/lib/api";
+
 export default function Signup() {
 
   const [role, setRole] = useState("student");
@@ -30,7 +30,7 @@ export default function Signup() {
 
   const { setAuth } = useAuthStore();
 
-    
+
   const handleRoleChange = (selectedRole: string) => {
     setRole(selectedRole);
   };
@@ -56,11 +56,6 @@ export default function Signup() {
 
     setLoading(true);
 
-    const endpoint =
-      role === "admin"
-        ? `${apiUrl}/auth/admin/register`
-        : `${apiUrl}/auth/user/register`;
-
     try {
       let payload;
       if (role === "student") {
@@ -81,7 +76,11 @@ export default function Signup() {
           password: password,
         };
       }
-      const res = await axios.post(endpoint, payload);
+
+      const res = role === "admin"
+        ? await authAPI.adminRegister(payload)
+        : await authAPI.userRegister(payload);
+
       const data = res.data;
       const authResponse = data.data;
       if (data.success) {
@@ -92,6 +91,11 @@ export default function Signup() {
         });
         if (authResponse.token) {
           localStorage.setItem("token", authResponse.token);
+          localStorage.setItem("role", role);
+          const userId = role === "student" ? authResponse.user?.id : authResponse.admin?.id;
+          if (userId) {
+            localStorage.setItem("userId", userId.toString());
+          }
         }
         window.location.href = "/auth/login";
       } else {
@@ -122,7 +126,7 @@ export default function Signup() {
             </div>
             <RoleToggle onRoleChange={handleRoleChange} />
             <form onSubmit={handleSignup}>
-              <AnimatePresence> 
+              <AnimatePresence>
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}

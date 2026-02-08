@@ -5,25 +5,28 @@ import { Bell } from 'lucide-react';
 import { notificationAPI } from '@/lib/api';
 import { Notification } from '@/types/notification';
 import { NotificationDropdown } from './NotificationDropdown';
+import { useAuthStore } from '@/lib/store';
 
 export function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const role = useAuthStore((state) => state.role);
 
   useEffect(() => {
-    // Only fetch if user has a token
+    // Only fetch if user has a token and is a student
     const token = localStorage.getItem('token');
-    if (!token) return;
-    
+    if (!token || role !== 'student') return;
+
     fetchUnreadCount();
     // Poll for new notifications every 30 seconds
     const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [role]);
 
   const fetchUnreadCount = async () => {
+    if (role !== 'student') return;
     try {
       const response = await notificationAPI.getUnreadCount();
       if (response.data?.success && response.data.data) {
@@ -35,6 +38,7 @@ export function NotificationBell() {
   };
 
   const fetchNotifications = async () => {
+    if (role !== 'student') return;
     setLoading(true);
     try {
       const response = await notificationAPI.getAll({ limit: 10 });
@@ -58,7 +62,7 @@ export function NotificationBell() {
   const handleMarkAsRead = async (notificationId: number) => {
     try {
       await notificationAPI.markAsRead(notificationId);
-      setNotifications(notifications.map(n => 
+      setNotifications(notifications.map(n =>
         n.id === notificationId ? { ...n, read: true } : n
       ));
       setUnreadCount(Math.max(0, unreadCount - 1));

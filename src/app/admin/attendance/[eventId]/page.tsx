@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, KeyboardEvent, useEffect } from 'react';
@@ -14,7 +15,7 @@ import {
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { apiUrl } from '@/lib/utils';
-import axios from 'axios';
+import { attendanceAPI } from '@/lib/api';
 
 interface Session {
   id: number;
@@ -26,8 +27,8 @@ interface Session {
   present: number;
   absent: number;
   total: number;
-  code?: string; 
-  credits:number;
+  code?: string;
+  credits: number;
 }
 
 const AttendanceManagement: React.FC = () => {
@@ -53,11 +54,7 @@ const AttendanceManagement: React.FC = () => {
     const fetchSessions = async () => {
       if (!eventId) return;
       try {
-        const res = await axios.get(`${apiUrl}/attendance/events/${eventId}/sessions`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
+        const res = await attendanceAPI.getEventSessions(Number(eventId));
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
           setSessions(
             res.data.data.map((s: any) => ({
@@ -101,21 +98,10 @@ const AttendanceManagement: React.FC = () => {
     });
   };
 
-  const editSession = async (session : Session) => {
-    try{
-      const token = localStorage.getItem('token')
-      const res = await axios.put(
-        `${apiUrl}/attendance/events/sessions/${session.id}`,
-        session,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
-    }catch(err)
-    {
+  const editSession = async (session: Session) => {
+    try {
+      const res = await attendanceAPI.updateSession(session.id, session);
+    } catch (err) {
       console.log(err);
       console.log("edit failed")
     }
@@ -150,26 +136,28 @@ const AttendanceManagement: React.FC = () => {
         isActive: newSession.isActive,
         credits: newSession.credits,
       };
-      const response = await axios.post(`${apiUrl}/attendance/events/${eventId}/sessions`, payload, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const createdSession = response.data;
+      const response = await attendanceAPI.createSession(Number(eventId), payload);
+      // Fix: correct data access structure (response.data.data contains the session)
+      const createdSessionData = response.data.data;
+
+      if (!createdSessionData) {
+        throw new Error('No data received from create session API');
+      }
+
       setSessions((prev) => [
         ...prev,
         {
-          id: createdSession.id,
+          id: createdSessionData.id,
           sessionName: newSession.sessionName,
           location: newSession.location,
           startTime: newSession.startTime,
           endTime: newSession.endTime,
-          isActive: createdSession.isActive,
+          isActive: createdSessionData.isActive,
           present: 0,
           absent: 0,
           total: 0,
           credits: newSession.credits,
+          code: createdSessionData.code
         },
       ]);
     } catch (err) {
@@ -187,25 +175,16 @@ const AttendanceManagement: React.FC = () => {
       const payload = {
         sessionName: session.sessionName,
         location: session.location,
-        startTime: session.startTime,
-        endTime: session.endTime,
+        startTime: new Date(session.startTime).toISOString(),
+        endTime: session.endTime ? new Date(session.endTime).toISOString() : null,
         isActive: session.isActive,
-        credits: session.credits,
+        credits: Number(session.credits),
       };
-      const res = await axios.put(
-        `${apiUrl}/attendance/events/sessions/${session.id}`,
-        payload,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await attendanceAPI.updateSession(session.id, payload);
       if (res.data && res.data.success) {
         setSessions((prevSessions) =>
           prevSessions.map((s) =>
-            s.id === session.id ? { ...s, ...payload } : s
+            s.id === session.id ? { ...s, ...payload, endTime: payload.endTime || '' } : s
           )
         );
       } else {
@@ -224,23 +203,15 @@ const AttendanceManagement: React.FC = () => {
     const newIsActive = !sessionToToggle.isActive;
     try {
       const token = localStorage.getItem('token');
-      await axios.put(
-        `${apiUrl}/attendance/events/sessions/${sessionId}`,
-        { 
-          sessionName: sessionToToggle.sessionName,
-          location: sessionToToggle.location,
-          startTime: sessionToToggle.startTime,
-          endTime: sessionToToggle.endTime,
-          isActive: newIsActive,
-          credits: sessionToToggle.credits
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
+      // Fix: Ensure dates are ISO strings and credits is number
+      await attendanceAPI.updateSession(sessionId, {
+        sessionName: sessionToToggle.sessionName,
+        location: sessionToToggle.location,
+        startTime: new Date(sessionToToggle.startTime).toISOString(),
+        endTime: sessionToToggle.endTime ? new Date(sessionToToggle.endTime).toISOString() : null,
+        isActive: newIsActive,
+        credits: Number(sessionToToggle.credits)
+      });
       setSessions((prevSessions) =>
         prevSessions.map((session) =>
           session.id === sessionId
@@ -284,10 +255,11 @@ const AttendanceManagement: React.FC = () => {
 
   const formatDisplayDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'numeric',
+    return date.toLocaleDateString('en-GB', {
       day: 'numeric',
+      month: 'numeric',
       year: 'numeric',
+      timeZone: 'UTC'
     });
   };
 
@@ -301,16 +273,7 @@ const AttendanceManagement: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const payload = { isActive: session.isActive };
-      const res = await axios.put(
-        `${apiUrl}/attendance/events/sessions/${session.id}`,
-        payload,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await attendanceAPI.updateSession(session.id, payload);
       if (res.data && res.data.success) {
         setSessions((prevSessions) =>
           prevSessions.map((s) =>
@@ -372,11 +335,10 @@ const AttendanceManagement: React.FC = () => {
               {sessions.map((session) => (
                 <div
                   key={session.id}
-                  className={`relative border rounded-lg p-4 cursor-pointer transition-all ${
-                    activeSession === session.id
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`relative border rounded-lg p-4 cursor-pointer transition-all ${activeSession === session.id
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
                   onClick={() => setActiveSession(session.id)}
                 >
                   <div className="flex items-center justify-end space-x-2 mb-3 pb-2 border-b border-gray-100">
@@ -405,11 +367,10 @@ const AttendanceManagement: React.FC = () => {
                         e.stopPropagation();
                         toggleSession(activeSession as number);
                       }}
-                      className={`p-1.5 rounded-md ${
-                        session.isActive
-                          ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
-                          : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
-                      }`}
+                      className={`p-1.5 rounded-md ${session.isActive
+                        ? 'text-green-600 hover:text-green-700 hover:bg-green-50'
+                        : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                        }`}
                       title={session.isActive ? 'Disable Session' : 'Enable Session'}
                     >
                       {session.isActive ? <Power className="w-4 h-4" /> : <PowerOff className="w-4 h-4" />}
@@ -443,9 +404,8 @@ const AttendanceManagement: React.FC = () => {
                   {/* Status */}
                   <div className="flex items-center justify-between">
                     <span
-                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        session.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}
+                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${session.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}
                     >
                       {session.isActive ? 'Active' : 'Disabled'}
                     </span>
@@ -471,18 +431,16 @@ const AttendanceManagement: React.FC = () => {
                   <span className="text-sm text-gray-600">Enable Attendance</span>
                   <button
                     onClick={() => toggleSession(activeSession)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      sessions.find((s) => s.id === activeSession)?.isActive
-                        ? 'bg-blue-600'
-                        : 'bg-gray-200'
-                    }`}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${sessions.find((s) => s.id === activeSession)?.isActive
+                      ? 'bg-blue-600'
+                      : 'bg-gray-200'
+                      }`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        sessions.find((s) => s.id === activeSession)?.isActive
-                          ? 'translate-x-6'
-                          : 'translate-x-1'
-                      }`}
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${sessions.find((s) => s.id === activeSession)?.isActive
+                        ? 'translate-x-6'
+                        : 'translate-x-1'
+                        }`}
                     />
                   </button>
                 </div>

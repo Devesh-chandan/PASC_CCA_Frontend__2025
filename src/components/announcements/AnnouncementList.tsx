@@ -10,6 +10,7 @@ import { Megaphone } from 'lucide-react';
 export function AnnouncementList() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAnnouncements();
@@ -21,8 +22,13 @@ export function AnnouncementList() {
       if (response.data?.success && response.data.data) {
         setAnnouncements(response.data.data as Announcement[]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching announcements:', error);
+      if (error.response?.status === 403) {
+        setError("Access Denied: You might be logged in as an Admin. Please logout and login as a Student.");
+      } else {
+        setError("Failed to load announcements.");
+      }
     } finally {
       setLoading(false);
     }
@@ -31,7 +37,7 @@ export function AnnouncementList() {
   const handleMarkAsRead = async (id: number) => {
     try {
       await announcementAPI.markAsRead(id);
-      setAnnouncements(announcements.map(a => 
+      setAnnouncements(announcements.map(a =>
         a.id === id ? { ...a, isRead: true } : a
       ));
     } catch (error) {
@@ -49,6 +55,17 @@ export function AnnouncementList() {
             <Skeleton className="h-4 w-2/3" />
           </div>
         ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12 text-red-500">
+        <p>{error}</p>
+        <button onClick={() => window.location.reload()} className="mt-4 underline">
+          Retry
+        </button>
       </div>
     );
   }

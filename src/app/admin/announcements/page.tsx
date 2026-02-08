@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { formatDateTime } from '@/lib/utils';
+import { formatDateTime, cn } from '@/lib/utils';
 
 const departments = ['CE', 'IT', 'ENTC', 'ECE', 'AIDS'];
 const years = [1, 2, 3, 4];
@@ -60,13 +60,40 @@ export default function AdminAnnouncementsPage() {
     setSubmitError(null);
     setSubmitting(true);
     try {
+      // Sanitize payload
+      const targetAudienceRaw = formData.targetAudience || { departments: [], years: [] };
+      const targetAudience: any = {};
+
+      if (targetAudienceRaw.departments && targetAudienceRaw.departments.length > 0) {
+        targetAudience.departments = targetAudienceRaw.departments;
+      }
+
+      if (targetAudienceRaw.years && targetAudienceRaw.years.length > 0) {
+        targetAudience.years = targetAudienceRaw.years;
+      }
+
+      // Check if targetAudience is empty (no departments or years)
+      const hasTarget = Object.keys(targetAudience).length > 0;
+
+      const payload = {
+        title: formData.title,
+        message: formData.message,
+        priority: formData.priority,
+        targetAudience: hasTarget ? targetAudience : undefined, // Send undefined if empty to let backend handle default
+        expiresAt: formData.expiresAt && !isNaN(Date.parse(formData.expiresAt as string))
+          ? new Date(formData.expiresAt).toISOString()
+          : undefined
+      };
+
+      console.log('Creating announcement with payload:', payload);
+
       if (editingAnnouncement) {
-        const response = await announcementAPI.update(editingAnnouncement.id, formData);
+        const response = await announcementAPI.update(editingAnnouncement.id, payload);
         if (!response.data?.success) {
           throw new Error(response.data?.error || 'Failed to update announcement');
         }
       } else {
-        const response = await announcementAPI.create(formData);
+        const response = await announcementAPI.create(payload);
         if (!response.data?.success) {
           throw new Error(response.data?.error || 'Failed to create announcement');
         }
@@ -85,7 +112,7 @@ export default function AdminAnnouncementsPage() {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Are you sure you want to delete this announcement?')) return;
-    
+
     try {
       await announcementAPI.delete(id);
       fetchAnnouncements();
@@ -226,10 +253,10 @@ export default function AdminAnnouncementsPage() {
                         )}
                         {announcement.targetAudience && (
                           <>
-                            {announcement.targetAudience.departments && announcement.targetAudience.departments.length > 0 && (
+                            {announcement.targetAudience.departments && Array.isArray(announcement.targetAudience.departments) && announcement.targetAudience.departments.length > 0 && (
                               <span>Depts: {announcement.targetAudience.departments.join(', ')}</span>
                             )}
-                            {announcement.targetAudience.years && announcement.targetAudience.years.length > 0 && (
+                            {announcement.targetAudience.years && Array.isArray(announcement.targetAudience.years) && announcement.targetAudience.years.length > 0 && (
                               <span>Years: {announcement.targetAudience.years.join(', ')}</span>
                             )}
                           </>
@@ -266,7 +293,7 @@ export default function AdminAnnouncementsPage() {
               {editingAnnouncement ? 'Edit Announcement' : 'New Announcement'}
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">Title</label>
@@ -290,33 +317,43 @@ export default function AdminAnnouncementsPage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">Priority</label>
-              <select
-                value={formData.priority}
-                onChange={(e) => setFormData({ ...formData, priority: e.target.value as AnnouncementPriority })}
-                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="LOW">Low</option>
-                <option value="NORMAL">Normal</option>
-                <option value="HIGH">High</option>
-                <option value="URGENT">Urgent</option>
-              </select>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: 'LOW', label: 'Low', color: 'bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-200' },
+                  { value: 'NORMAL', label: 'Normal', color: 'bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200' },
+                  { value: 'HIGH', label: 'High', color: 'bg-orange-100 text-orange-800 hover:bg-orange-200 border-orange-200' },
+                  { value: 'URGENT', label: 'Urgent', color: 'bg-red-100 text-red-800 hover:bg-red-200 border-red-200' }
+                ].map((priority) => (
+                  <button
+                    key={priority.value}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, priority: priority.value as AnnouncementPriority })}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm font-medium border transition-all",
+                      formData.priority === priority.value
+                        ? `${priority.color} ring-2 ring-offset-1 ring-gray-400 border-transparent`
+                        : "bg-transparent border-gray-200 text-gray-600 hover:bg-gray-50"
+                    )}
+                  >
+                    {priority.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">Target Departments (optional)</label>
               <div className="flex flex-wrap gap-2">
                 {departments.map(dept => (
-                  <button
+                  <Button
                     key={dept}
+                    type="button"
+                    variant={formData.targetAudience?.departments?.includes(dept) ? "default" : "outline"}
                     onClick={() => toggleDepartment(dept)}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                      formData.targetAudience?.departments?.includes(dept)
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-accent text-foreground hover:bg-accent/80'
-                    }`}
+                    className="h-8 text-sm"
                   >
                     {dept}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -325,17 +362,15 @@ export default function AdminAnnouncementsPage() {
               <label className="block text-sm font-medium mb-2">Target Years (optional)</label>
               <div className="flex gap-2">
                 {years.map(year => (
-                  <button
+                  <Button
                     key={year}
+                    type="button"
+                    variant={formData.targetAudience?.years?.includes(year) ? "default" : "outline"}
                     onClick={() => toggleYear(year)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      formData.targetAudience?.years?.includes(year)
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-accent text-foreground hover:bg-accent/80'
-                    }`}
+                    className="h-8 text-sm"
                   >
                     Year {year}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -344,7 +379,10 @@ export default function AdminAnnouncementsPage() {
               <label className="block text-sm font-medium mb-2">Expires At (optional)</label>
               <Input
                 type="datetime-local"
-                value={formData.expiresAt || ''}
+                value={formData.expiresAt instanceof Date
+                  ? formData.expiresAt.toISOString().slice(0, 16)
+                  : (formData.expiresAt || '')
+                }
                 onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
               />
             </div>

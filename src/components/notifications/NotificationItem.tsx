@@ -1,14 +1,14 @@
 "use client";
 
 import { Notification, NotificationType } from '@/types/notification';
-import { 
-  Bell, 
-  Calendar, 
-  CheckCircle, 
-  AlertCircle, 
+import {
+  Bell,
+  Calendar,
+  CheckCircle,
+  AlertCircle,
   Trophy,
   Users,
-  Megaphone 
+  Megaphone
 } from 'lucide-react';
 import { formatDistanceToNow } from '@/lib/utils';
 
@@ -40,9 +40,8 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
   return (
     <div
       onClick={handleClick}
-      className={`p-4 hover:bg-accent cursor-pointer transition-colors ${
-        !notification.read ? 'bg-blue-50 dark:bg-blue-950/20' : ''
-      }`}
+      className={`p-4 hover:bg-accent cursor-pointer transition-colors ${!notification.read ? 'bg-blue-50 dark:bg-blue-950/20' : ''
+        }`}
     >
       <div className="flex gap-3">
         <div className="flex-shrink-0 mt-1">
@@ -60,7 +59,7 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
           <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
             {notification.message}
           </p>
-          <p className="text-xs text-muted-foreground mt-2">
+          <p className="text-xs text-muted-foreground mt-2" suppressHydrationWarning>
             {formatDistanceToNow(new Date(notification.sentAt))}
           </p>
         </div>

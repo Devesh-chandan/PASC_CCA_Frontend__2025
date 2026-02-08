@@ -5,14 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, Clock, MapPin, Phone, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, MapPin, Phone, ArrowLeft, FileText, Video, Link as LinkIcon, Code, File } from "lucide-react";
 import { getStatusBadgeVariant, getStatusColor, formatDate } from "@/lib/utils";
-import axios from "axios";
+import { attendanceAPI, resourceAPI } from "@/lib/api";
 import { EventAttendanceSessionForUser } from "@/types/attendance";
-import type { Event } from "@/types/events";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { apiUrl } from "@/lib/utils";
+import { ReviewSection } from "@/components/events/ReviewSection";
+import { GallerySection } from "@/components/events/GallerySection";
 
 function formatDateToDDMMYY(dateString: string): string {
   if (!dateString) return "";
@@ -30,6 +30,7 @@ export default function EventDetailPage({
 }) {
   const router = useRouter();
   const [event, setEvent] = useState<EventAttendanceSessionForUser | null>(null);
+  const [resources, setResources] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [attendanceModal, setAttendanceModal] = useState<{ open: boolean; sessionId: number | null }>({ open: false, sessionId: null });
@@ -43,20 +44,22 @@ export default function EventDetailPage({
     const resolveParamsAndFetch = async () => {
       try {
         setLoading(true);
-        const  {id}  = await params;
+        const { id } = await params;
         console.log(id);
         const token = localStorage.getItem("token");
         console.log("getting the event.")
-        const res = await axios.get(
-          `${apiUrl}/attendance/user/events/${id}/sessions`,
-          {
-            headers: {
-              'Content-type' : 'Application/json',
-              'Authorization': `Bearer ${token}`
-            },
-          }
-        );
+        const res = await attendanceAPI.getUserSessionsByEvent(Number(id));
         setEvent(res.data.data);
+
+        // Fetch resources
+        try {
+          const resourceRes = await resourceAPI.getEventResources(Number(id));
+          if (resourceRes.data.success) {
+            setResources(resourceRes.data.data);
+          }
+        } catch (resourceErr) {
+          console.error("Failed to fetch resources:", resourceErr);
+        }
       } catch (err) {
         setError("Failed to fetch event");
         setEvent(null);
@@ -76,17 +79,10 @@ export default function EventDetailPage({
     setAttendanceSuccess(null);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(
-        `${apiUrl}/attendance/events/${eventDetails?.id}/sessions/${attendanceModal.sessionId}/attend`,
-        {
-          code: attendanceCode,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const res = await attendanceAPI.markAttendance(
+        Number(eventDetails?.id),
+        Number(attendanceModal.sessionId),
+        attendanceCode
       );
       if (res.data && res.data.success) {
         setAttendanceSuccess("Attendance marked successfully!");
@@ -128,7 +124,7 @@ export default function EventDetailPage({
         </div>
       </div>
     );
-  } 
+  }
 
   // TODO: Fix typing once API response is finalized
   const eventDetails: any = event.event;
@@ -137,7 +133,7 @@ export default function EventDetailPage({
     <div className="max-w-7xl w-full mx-auto px-4 py-8">
       {/* Navigation Header */}
       <div className="flex items-center space-x-4 mb-6">
-        <button 
+        <button
           className="flex items-center text-blue-600 hover:text-blue-800"
           onClick={() => router.push('/student/events')}
         >
@@ -213,9 +209,8 @@ export default function EventDetailPage({
                       {/* Status */}
                       <div className="mt-2">
                         <span
-                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            session.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                          }`}
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${session.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                            }`}
                         >
                           {session.isActive ? 'Active' : 'Disabled'}
                         </span>
@@ -246,6 +241,88 @@ export default function EventDetailPage({
               ) : (
                 <div className="text-gray-500">No sessions available for this event.</div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Resources List */}
+          <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                Event Resources
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {resources.length > 0 ? (
+                <div className="grid grid-cols-1 gap-4">
+                  {resources.map((resource: any) => {
+                    const getIcon = (type: string) => {
+                      switch (type) {
+                        case 'SLIDES': return <FileText className="w-5 h-5 text-orange-500" />;
+                        case 'VIDEO': return <Video className="w-5 h-5 text-red-500" />;
+                        case 'CODE': return <Code className="w-5 h-5 text-blue-500" />;
+                        case 'LINK': return <LinkIcon className="w-5 h-5 text-green-500" />;
+                        case 'DOCUMENT': return <FileText className="w-5 h-5 text-blue-400" />;
+                        default: return <File className="w-5 h-5 text-gray-500" />;
+                      }
+                    };
+
+                    return (
+                      <div
+                        key={resource.id}
+                        className="flex items-center justify-between p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 overflow-hidden">
+                          <div className="p-2 bg-white rounded-lg border shadow-sm flex-shrink-0">
+                            {getIcon(resource.type)}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-medium text-gray-900 truncate">{resource.title}</h4>
+                            {resource.description && (
+                              <p className="text-sm text-gray-500 truncate">{resource.description}</p>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="ml-4 flex-shrink-0"
+                          onClick={() => window.open(resource.url, '_blank')}
+                        >
+                          View
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed">
+                  <p className="text-gray-500">No resources available for this event yet.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Gallery Section */}
+          <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                Event Gallery
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <GallerySection eventId={Number(eventDetails?.id)} />
+            </CardContent>
+          </Card>
+
+          {/* Reviews Section */}
+          <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-gray-900">
+                Reviews & Ratings
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ReviewSection eventId={Number(eventDetails?.id)} eventStatus={eventDetails?.status || ''} />
             </CardContent>
           </Card>
         </div>

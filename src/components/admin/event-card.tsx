@@ -3,11 +3,18 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { BarChart3, Edit, Users, Clock, FolderOpen, Image } from "lucide-react";
+import { BarChart3, Edit, Users, Clock, FolderOpen, Image, Trash2, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { eventAPI } from "@/lib/api";
 
-export const EventCard = (event: Event) => {
+interface EventCardProps extends Event {
+  onRefresh?: () => void;
+}
+
+export const EventCard = ({ onRefresh, ...event }: EventCardProps) => {
   const router = useRouter();
-  
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const getStatusBadge = (status: Event["status"]) => {
     const variants: Record<string, string> = {
       UPCOMING: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
@@ -21,12 +28,35 @@ export const EventCard = (event: Event) => {
     );
   };
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
+  const formatDate = (dateStr: string | Date) => {
+    const date = new Date(dateStr);
+    // Use UTC to prevent timezone shifts
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC'
+    };
+    return date.toLocaleDateString('en-GB', options);
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this event? This action cannot be undone.")) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await eventAPI.delete(event.id);
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      console.error("Failed to delete event:", error);
+      alert("Failed to delete event. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -42,49 +72,49 @@ export const EventCard = (event: Event) => {
               {formatDate(event.startDate)} - {formatDate(event.endDate)} • {event.location}
             </p>
             <p className="text-sm text-muted-foreground">
-              {event.credits} credits • Capacity: {event.maxCapacity}
+              {event.credits} credits • Capacity: {event.capacity}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => router.push(`/admin/events/${event.id}/analytics`)}
               className="flex items-center gap-1"
             >
               <BarChart3 className="w-4 h-4" />
               Analytics
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => router.push(`/admin/events/${event.id}/sessions`)}
               className="flex items-center gap-1"
             >
               <Clock className="w-4 h-4" />
               Sessions
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => router.push(`/admin/events/${event.id}/resources`)}
               className="flex items-center gap-1"
             >
               <FolderOpen className="w-4 h-4" />
               Resources
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => router.push(`/admin/events/${event.id}/gallery`)}
               className="flex items-center gap-1"
             >
               <Image className="w-4 h-4" />
               Gallery
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => router.push(`/admin/editEvent/${event.id}`)}
               className="flex items-center gap-1"
             >
@@ -99,6 +129,16 @@ export const EventCard = (event: Event) => {
             >
               <Users className="w-4 h-4" />
               Attendance
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="flex items-center gap-1 bg-red-500"
+            >
+              {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+              Delete
             </Button>
           </div>
         </div>

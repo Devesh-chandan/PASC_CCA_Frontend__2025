@@ -11,29 +11,29 @@ export const EventsTab = ({ eventsWithRsvp }: { eventsWithRsvp: EventWithRsvp[] 
 
   const filterEvents = (status?: string) => {
     let filtered = eventsWithRsvp;
-    
+
     // Filter by status
     if (status && status !== "all-events") {
       filtered = filtered.filter(e => e.event.status === status.toUpperCase());
     }
-    
+
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(e => 
+      filtered = filtered.filter(e =>
         e.event.title.toLowerCase().includes(query) ||
         e.event.description.toLowerCase().includes(query) ||
-        e.event.location.toLowerCase().includes(query) ||
-        e.event.category.toLowerCase().includes(query)
+        e.event.location.toLowerCase().includes(query)
+
       );
     }
-    
+
     return filtered;
   };
 
   const getTabContent = (tabValue: string) => {
     const filteredEvents = filterEvents(tabValue);
-    
+
     if (filteredEvents.length === 0) {
       return (
         <div className="text-center py-12">
@@ -45,7 +45,7 @@ export const EventsTab = ({ eventsWithRsvp }: { eventsWithRsvp: EventWithRsvp[] 
         </div>
       );
     }
-    
+
     return (
       <div>
         <p className="text-sm text-gray-600 mb-4">
@@ -68,7 +68,7 @@ export const EventsTab = ({ eventsWithRsvp }: { eventsWithRsvp: EventWithRsvp[] 
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="Search events by title, description, location, or category..."
+            placeholder="Search events by title, description, or location..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -88,26 +88,26 @@ export const EventsTab = ({ eventsWithRsvp }: { eventsWithRsvp: EventWithRsvp[] 
         {/* Full width tabs container with gray background */}
         <div className="w-full rounded-lg p-1 mb-6">
           <TabsList className="w-full h-auto p-3 flex justify-between items-center bg-gray-100 rounded-lg flex-wrap">
-            <TabsTrigger 
-              value="all-events" 
+            <TabsTrigger
+              value="all-events"
               className="text-sm py-1.5 px-4 rounded-md data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 transition-all duration-200"
             >
               All Events
             </TabsTrigger>
-            <TabsTrigger 
-              value="upcoming" 
+            <TabsTrigger
+              value="upcoming"
               className="text-sm py-1.5 px-4 rounded-md data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 transition-all duration-200"
             >
               Upcoming
             </TabsTrigger>
-            <TabsTrigger 
-              value="ongoing" 
+            <TabsTrigger
+              value="ongoing"
               className="text-sm py-1.5 px-4 rounded-md data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 transition-all duration-200"
             >
               Ongoing
             </TabsTrigger>
-            <TabsTrigger 
-              value="completed" 
+            <TabsTrigger
+              value="completed"
               className="text-sm py-1.5 px-4 rounded-md data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 hover:text-gray-900 transition-all duration-200"
             >
               Completed

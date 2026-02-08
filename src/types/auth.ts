@@ -4,7 +4,7 @@ export enum Department {
     ENTC = 'ENTC',
     ECE = 'ECE',
     AIDS = 'AIDS'
-  }
+}
 
 export interface IAuthResponse {
     user?: IUser;
@@ -12,11 +12,11 @@ export interface IAuthResponse {
     token: string;
 }
 
+// Backend never returns password in API responses
 export interface IUser {
     id?: number;
     name?: string;
     email: string;
-    password: string;
     department: Department;
     year: number;
     passoutYear: number;
@@ -28,7 +28,7 @@ export interface IAdmin {
     id?: number;
     name?: string;
     email: string;
-    password: string;
+    password?: string;  // Only used for registration, not returned in responses
 }
 
 

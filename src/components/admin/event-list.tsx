@@ -6,9 +6,10 @@ import { EventCard } from "@/components/admin/event-card";
 interface EventsListProps {
   events: Event[];
   filterStatus: EventStatus;
+  onRefresh?: () => void;
 }
 
-export const EventsList = ({ events, filterStatus }: EventsListProps) => {
+export const EventsList = ({ events, filterStatus, onRefresh }: EventsListProps) => {
   const filteredEvents =
     filterStatus !== "ALL EVENTS"
       ? events.filter((event) => event.status === filterStatus)
@@ -17,7 +18,7 @@ export const EventsList = ({ events, filterStatus }: EventsListProps) => {
   return (
     <div className="space-y-4">
       {filteredEvents.map((event) => (
-        <EventCard key={event.id} {...event} />
+        <EventCard key={event.id} {...event} onRefresh={onRefresh} />
       ))}
     </div>
   );

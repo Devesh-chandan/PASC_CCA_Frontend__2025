@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  ArrowLeft, 
-  User as UserIcon, 
-  BadgeCheck, 
-  Clock, 
-  Star, 
+import {
+  ArrowLeft,
+  User as UserIcon,
+  BadgeCheck,
+  Clock,
+  Star,
   BookOpen,
   Award,
   Calendar,
@@ -84,23 +84,18 @@ export default function ProfilePage() {
     },
   };
 
-  // Set the dummy user in the zustand store (for demo purposes)
-  const setAuth = useAuthStore((state) => state.setAuth);
   const userStore = useAuthStore((state) => state.user);
-  if (!userStore) {
-    setAuth({ user: dummyUser, admin: undefined, role: "student" });
-  }
 
   // Map the zustand user to the UI User type
   const user = userStore
     ? {
-        name: userStore.name || "",
-        email: userStore.email,
-        department: userStore.department,
-        passOutYear: userStore.passoutYear?.toString() || "",
-        rollNo: userStore.roll?.toString() || "",
-        year: userStore.year?.toString() || "",
-      }
+      name: userStore.name || "",
+      email: userStore.email,
+      department: userStore.department,
+      passOutYear: userStore.passoutYear?.toString() || "",
+      rollNo: userStore.roll?.toString() || "",
+      year: userStore.year?.toString() || "",
+    }
     : undefined;
 
   // Use custom hook for dashboard data
@@ -111,7 +106,9 @@ export default function ProfilePage() {
   const recentActivities = stats.sessions.slice(0, 5).map((session) => ({
     icon: <BookOpen className="w-4 h-4 text-blue-600" />,
     title: `Attended ${session.sessionName}`,
-    date: session.startTime ? new Date(session.startTime).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    date: session.startTime
+      ? new Date(session.startTime.toString()).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0],
     credits: session.credits,
   }));
 
@@ -120,7 +117,7 @@ export default function ProfilePage() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Navigation Header */}
         <div className="flex items-center justify-between">
-          <button 
+          <button
             className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
             onClick={() => router.push('/student/dashboard')}
           >
@@ -135,11 +132,10 @@ export default function ProfilePage() {
             <nav className="flex space-x-8 px-6" aria-label="Tabs">
               <button
                 onClick={() => setActiveTab("overview")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === "overview"
-                    ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === "overview"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
               >
                 <div className="flex items-center gap-2">
                   <UserIcon className="w-4 h-4" />
@@ -148,11 +144,10 @@ export default function ProfilePage() {
               </button>
               <button
                 onClick={() => setActiveTab("attendance")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === "attendance"
-                    ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === "attendance"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
               >
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
@@ -161,11 +156,10 @@ export default function ProfilePage() {
               </button>
               <button
                 onClick={() => setActiveTab("achievements")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === "achievements"
-                    ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === "achievements"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
               >
                 <div className="flex items-center gap-2">
                   <Trophy className="w-4 h-4" />

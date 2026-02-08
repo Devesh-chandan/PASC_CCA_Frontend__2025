@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Users, Plus, BarChart3, Megaphone } from "lucide-react";
 import { StatsCard } from "@/components/admin/stats-card";
 import { EventsList } from "@/components/admin/event-list";
-import {  useFetchEventsForAdmin } from "@/hooks/events";
+import { useFetchEventsForAdmin } from "@/hooks/events";
 import { Event, EventStatus } from "@/types/events";
 import axios from "axios";
 import { apiUrl } from "@/lib/utils";
@@ -22,7 +22,7 @@ const AdminDashboard = () => {
   const router = useRouter();
 
   // Use the hook to fetch events
-  const { events, loading, error } = useFetchEventsForAdmin();
+  const { events, loading, error, refetchEvents } = useFetchEventsForAdmin();
 
   // Fetch student count
   React.useEffect(() => {
@@ -71,7 +71,7 @@ const AdminDashboard = () => {
       <div className="min-h-screen p-6 flex items-center justify-center">
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 text-center max-w-md">
           <p className="text-red-600 dark:text-red-400 font-medium">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg hover:bg-red-200 transition-colors"
           >
@@ -151,7 +151,7 @@ const AdminDashboard = () => {
 
               {["ALL EVENTS", "UPCOMING", "ONGOING", "COMPLETED"].map((status) => (
                 <TabsContent key={status} value={status} className="mt-6">
-                  <EventsList events={events} filterStatus={status as EventStatus} />
+                  <EventsList events={events} filterStatus={status as EventStatus} onRefresh={refetchEvents} />
                 </TabsContent>
               ))}
             </Tabs>

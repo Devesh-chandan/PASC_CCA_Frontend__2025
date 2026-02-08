@@ -8,11 +8,11 @@ export function cn(...inputs: ClassValue[]) {
 
 export const getStatusColor = (status: Event['status']) => {
   switch (status) {
-    case 'Upcoming':
+    case 'UPCOMING':
       return 'text-blue-600';
-    case 'Ongoing':
+    case 'ONGOING':
       return 'text-green-600';
-    case 'Completed':
+    case 'COMPLETED':
       return 'text-gray-600';
     default:
       return 'text-gray-600';
@@ -22,18 +22,18 @@ export const getStatusColor = (status: Event['status']) => {
 
 export const getStatusBadgeVariant = (status: Event['status']) => {
   switch (status) {
-    case 'Upcoming':
+    case 'UPCOMING':
       return 'default';
-    case 'Ongoing':
+    case 'ONGOING':
       return 'secondary';
-    case 'Completed':
+    case 'COMPLETED':
       return 'outline';
     default:
       return 'default';
   }
 };
 
-export const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api';
+export const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/';
 
 // Date formatting utilities
 export function formatDistanceToNow(date: Date): string {
@@ -49,21 +49,23 @@ export function formatDistanceToNow(date: Date): string {
 
 export function formatDate(date: Date | string): string {
   const d = new Date(date);
-  return d.toLocaleDateString('en-US', {
+  return d.toLocaleDateString('en-GB', {
     year: 'numeric',
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'UTC'
   });
 }
 
 export function formatDateTime(date: Date | string): string {
   const d = new Date(date);
-  return d.toLocaleDateString('en-US', {
+  return d.toLocaleDateString('en-GB', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    timeZone: 'UTC'
   });
 }
 
