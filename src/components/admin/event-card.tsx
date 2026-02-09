@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { BarChart3, Edit, Users, Clock, FolderOpen, Image, Trash2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { eventAPI } from "@/lib/api";
+import { getStatusBadgeVariant, getStatusColor, formatDate } from "@/lib/utils";
+
 
 interface EventCardProps extends Event {
   onRefresh?: () => void;
@@ -28,17 +30,35 @@ export const EventCard = ({ onRefresh, ...event }: EventCardProps) => {
     );
   };
 
-  const formatDate = (dateStr: string | Date) => {
-    const date = new Date(dateStr);
-    // Use UTC to prevent timezone shifts
-    const options: Intl.DateTimeFormatOptions = {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      timeZone: 'UTC'
-    };
-    return date.toLocaleDateString('en-GB', options);
-  };
+  // const formatDate = (date: string | Date) => {
+  //   if (!date) return "—";
+
+  //   const d = date instanceof Date ? date : new Date(date);
+
+  //   if (isNaN(d.getTime())) return "—";
+
+  //   return d.toLocaleDateString('en-GB', {
+  //   year: 'numeric',
+  //   month: 'short',
+  //   day: 'numeric',
+  //   hour: '2-digit',
+  //   minute: '2-digit',
+  //   timeZone: 'UTC'
+  // });
+  // };
+
+  // export function formatDateTime(date: Date | string): string {
+  // const d = new Date(date);
+  // return d.toLocaleDateString('en-GB', {
+  //   year: 'numeric',
+  //   month: 'short',
+  //   day: 'numeric',
+  //   hour: '2-digit',
+  //   minute: '2-digit',
+  //   timeZone: 'UTC'
+  // });
+
+
 
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this event? This action cannot be undone.")) {
