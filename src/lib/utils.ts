@@ -64,8 +64,7 @@ export function formatDateTime(date: Date | string): string {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'UTC'
+    minute: '2-digit'
   });
 }
 

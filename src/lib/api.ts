@@ -170,6 +170,9 @@ export const attendanceAPI = {
 
   getEventSessions: (eventId: number) =>
     api.get(`attendance/events/${eventId}/sessions`),
+
+  exportEventSessions: (eventId: number) =>
+    api.get(`attendance/events/${eventId}/sessions/export`, { responseType: 'blob' }),
 };
 
 // Review APIs
@@ -246,7 +249,7 @@ export const notificationAPI = {
 // Announcement APIs
 export const announcementAPI = {
   // User endpoints (requireUser)
-  getAll: (params?: { priority?: string; limit?: number }) =>
+  getAll: (params?: { priority?: string; limit?: number; includeRead?: boolean }) =>
     api.get('announcements', { params }),
 
   markAsRead: (id: number) =>
@@ -271,13 +274,13 @@ export const announcementAPI = {
 
 // Leaderboard APIs
 export const leaderboardAPI = {
-  // Public endpoint
-  get: (params?: { period?: string; year?: number; month?: number; limit?: number }) =>
+  // Public endpoint; division 1–13 for division-wise leaderboard
+  get: (params?: { period?: string; year?: number; month?: number; division?: number; limit?: number }) =>
     api.get('leaderboard', { params }),
 
-  // User endpoint (requireUser)
-  getMyRank: () =>
-    api.get('leaderboard/my-rank'),
+  // User endpoint (requireUser); division for rank within that division
+  getMyRank: (params?: { period?: string; division?: number }) =>
+    api.get('leaderboard/my-rank', { params }),
 };
 
 // Analytics APIs

@@ -127,13 +127,20 @@ export default function SessionManagementPage({
 
   const handleEdit = (session: AttendanceSession) => {
     setEditingSession(session);
+
+    const toLocalDatetime = (isoString: string | null) => {
+      if (!isoString) return '';
+      const d = new Date(isoString);
+      return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    };
+
     setFormData({
       sessionName: session.sessionName,
       location: session.location,
       code: session.code,
       credits: session.credits,
-      startTime: session.startTime ? new Date(session.startTime).toISOString().slice(0, 16) : '',
-      endTime: session.endTime ? new Date(session.endTime).toISOString().slice(0, 16) : '',
+      startTime: toLocalDatetime(session.startTime),
+      endTime: toLocalDatetime(session.endTime),
       isActive: session.isActive,
     });
     setShowDialog(true);
@@ -176,22 +183,37 @@ export default function SessionManagementPage({
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={() => {
-                const csvContent = "data:text/csv;charset=utf-8," +
-                  "Session Name,Code,Location,Credits,Start Time,End Time,Status\n" +
-                  sessions.map(s =>
-                    `"${s.sessionName}","${s.code}","${s.location}",${s.credits},"${s.startTime}","${s.endTime || ''}","${s.isActive ? 'Active' : 'Inactive'}"`
-                  ).join("\n");
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", `attendance_sessions_${eventId}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+              onClick={async () => {
+                try {
+                  const response = await attendanceAPI.exportEventSessions(eventId);
+
+                  // Extract filename from Content-Disposition header if available
+                  let filename = `attendance_sessions_${eventId}.xlsx`;
+                  const disposition = response.headers['content-disposition'];
+                  if (disposition && disposition.indexOf('filename=') !== -1) {
+                    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                    const matches = filenameRegex.exec(disposition);
+                    if (matches != null && matches[1]) {
+                      filename = matches[1].replace(/['"]/g, '');
+                    }
+                  }
+
+                  const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                  const url = window.URL.createObjectURL(blob);
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.setAttribute("download", filename);
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  window.URL.revokeObjectURL(url);
+                } catch (error) {
+                  console.error('Error exporting sessions:', error);
+                  alert('Failed to export sessions. Please try again.');
+                }
               }}
             >
-              Export CSV
+              Export Excel
             </Button>
             <Button
               onClick={() => {
