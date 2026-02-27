@@ -249,7 +249,7 @@ export const notificationAPI = {
 // Announcement APIs
 export const announcementAPI = {
   // User endpoints (requireUser)
-  getAll: (params?: { priority?: string; limit?: number }) =>
+  getAll: (params?: { priority?: string; limit?: number; includeRead?: boolean }) =>
     api.get('announcements', { params }),
 
   markAsRead: (id: number) =>
