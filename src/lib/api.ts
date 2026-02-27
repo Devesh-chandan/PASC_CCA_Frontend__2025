@@ -112,8 +112,8 @@ export const eventAPI = {
   delete: (id: number) =>
     api.delete(`events/${id}`),
 
-  getAdminEvents: () =>
-    api.get('events/admin'),
+  getAdminEvents: (params?: { search?: string; page?: number; limit?: number }) =>
+    api.get('events/admin', { params }),
 
   // User endpoints (requireUser)
   getUserEvents: () =>
