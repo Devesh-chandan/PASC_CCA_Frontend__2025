@@ -103,7 +103,18 @@ function GridPattern() {
 
 export default function Home() {
   const router = useRouter();
-  
+
+  // If already logged in, redirect to the appropriate dashboard
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    if (token && role === 'admin') {
+      router.replace('/admin/dashboard');
+    } else if (token && role === 'student') {
+      router.replace('/student/dashboard');
+    }
+  }, [router]);
+
   const features = [
     { 
       icon: <Calendar className="w-7 h-7" />, 
