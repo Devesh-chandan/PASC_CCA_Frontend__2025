@@ -210,111 +210,159 @@ export default function SessionManagementPage({
   };
 
   return (
-    <main className="min-h-screen bg-background p-4 md:p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen p-6 bg-background">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex flex-col gap-2">
             <button
               onClick={() => router.back()}
-              className="flex items-center text-blue-600 hover:text-blue-800 mb-2"
+              className="flex items-center gap-2 self-start px-3 py-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 mr-1" />
-              Back
+              <ArrowLeft className="w-4 h-4" />
+              Back to Events
             </button>
-            <h1 className="text-3xl font-bold text-foreground">Session Management</h1>
-            <p className="text-muted-foreground mt-1">{eventTitle}</p>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                <Clock className="w-8 h-8 text-primary" />
+                Session Management
+              </h1>
+              <p className="text-muted-foreground mt-1 text-base font-medium">
+                {eventTitle || 'Manage attendance sessions'}
+              </p>
+            </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-3 items-center mt-3 md:mt-0">
             <Button
               onClick={() => {
                 resetForm();
                 setShowDialog(true);
               }}
-              className="flex items-center gap-2"
+              className="px-6 py-6 rounded-2xl text-base font-semibold shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center gap-2"
               disabled={eventStatus === 'COMPLETED'}
-              title={eventStatus === 'COMPLETED' ? 'Cannot create sessions for a completed event' : undefined}
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-5 h-5 stroke-[2.5px]" />
               Create Session
             </Button>
           </div>
         </div>
 
         {eventStatus === 'COMPLETED' && (
-          <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
-            This event is <strong>completed</strong>. New sessions cannot be created.
+          <div className="rounded-2xl border border-amber-200 bg-amber-50/50 dark:bg-amber-900/10 dark:border-amber-900/20 p-4 flex items-center gap-3 text-amber-800 dark:text-amber-300 shadow-sm">
+            <div className="p-2 rounded-xl bg-amber-100 dark:bg-amber-900/30">
+              <Calendar className="w-5 h-5" />
+            </div>
+            <p className="text-sm font-medium">
+              This event is <span className="font-semibold text-amber-900 dark:text-amber-200">Completed</span>. New sessions cannot be created.
+            </p>
           </div>
         )}
 
         {/* Sessions List */}
-        <div className="bg-card rounded-xl border border-border p-6">
+        <div className="bg-[var(--color-card)] rounded-[2rem] border border-[var(--color-border)] p-6 sm:p-8 shadow-sm">
+          <div className="flex items-center justify-between mb-8 px-2">
+            <h3 className="text-xl font-bold text-foreground flex items-center gap-3">
+              <Calendar className="w-5 h-5 text-primary" />
+              Active Sessions
+              {!loading && sessions.length > 0 && (
+                <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                  {sessions.length}
+                </span>
+              )}
+            </h3>
+          </div>
+
           {loading ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map(i => (
-                <Skeleton key={i} className="h-32 w-full" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[1, 2, 3, 4].map(i => (
+                <Skeleton key={i} className="h-64 w-full rounded-2xl" />
               ))}
             </div>
           ) : sessions.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Clock className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-lg mb-2">No sessions yet</p>
-              <p className="text-sm">Create attendance sessions for this event</p>
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground bg-muted/20 rounded-[2rem] border border-dashed border-border/50">
+              <div className="w-20 h-20 rounded-full bg-background flex items-center justify-center mb-6 shadow-sm">
+                <Clock className="w-10 h-10 opacity-20" />
+              </div>
+              <p className="text-xl font-bold text-foreground">No sessions yet</p>
+              <p className="max-w-xs text-center mt-2 font-medium">
+                Create attendance sessions to track student participation for this event.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  resetForm();
+                  setShowDialog(true);
+                }}
+                className="mt-8 rounded-xl"
+                disabled={eventStatus === 'COMPLETED'}
+              >
+                Get Started
+              </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {sessions.map(session => (
                 <div
                   key={session.id}
-                  className="border border-border rounded-lg p-4 hover:bg-accent transition-colors"
+                  className="group relative bg-[var(--color-surface)] border border-[var(--color-border-light)] rounded-2xl p-6 hover:shadow-xl hover:border-primary/20 transition-all duration-300"
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="font-semibold text-lg text-foreground">
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="space-y-1">
+                      <h3 className="font-bold text-xl text-foreground group-hover:text-primary transition-colors">
                         {session.sessionName}
                       </h3>
-                      <Badge variant={session.isActive ? "default" : "secondary"} className="mt-1">
+                      <Badge className={`rounded-lg px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${session.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30' : 'bg-slate-100 text-slate-700 dark:bg-slate-900/30'}`}>
                         {session.isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </div>
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleEdit(session)}
-                        className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                        className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all active:scale-90"
                         title="Edit session"
                       >
-                        <Edit className="w-4 h-4 text-blue-600" />
+                        <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeactivate(session)}
-                        className={`p-2 rounded-lg transition-colors ${session.isActive
-                          ? 'hover:bg-red-100 dark:hover:bg-red-900/20'
-                          : 'hover:bg-green-100 dark:hover:bg-green-900/20'
+                        className={`p-2.5 rounded-xl transition-all active:scale-90 ${session.isActive
+                          ? 'bg-red-50 dark:bg-red-900/20 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30'
+                          : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
                           }`}
                         title={session.isActive ? 'Deactivate session' : 'Activate session'}
                       >
-                        <Clock className={`w-4 h-4 ${session.isActive ? 'text-red-600' : 'text-green-600'}`} />
+                        <Clock className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
 
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <MapPin className="w-4 h-4" />
-                      <span>{session.location}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div className="flex items-center gap-3 text-sm font-medium text-muted-foreground p-3 rounded-xl bg-muted/30">
+                      <MapPin className="w-4 h-4 text-primary/60" />
+                      <span className="truncate">{session.location}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Calendar className="w-4 h-4" />
+                    <div className="flex items-center gap-3 text-sm font-medium text-muted-foreground p-3 rounded-xl bg-muted/30">
+                      <Award className="w-4 h-4 text-amber-500/70" />
+                      <span>{session.credits} Credits</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm font-medium text-muted-foreground p-3 rounded-xl bg-muted/30 sm:col-span-2">
+                      <Calendar className="w-4 h-4 text-primary/60" />
                       <span>{formatDateTime(session.startTime)}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Award className="w-4 h-4" />
-                      <span>{session.credits} credits</span>
+                  </div>
+
+                  <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/10 p-4">
+                    <div className="flex justify-between items-center relative z-10">
+                      <div>
+                        <p className="text-[10px] font-semibold text-primary/60 uppercase tracking-wider mb-1">Attendance Code</p>
+                        <p className="font-mono font-bold text-2xl tracking-widest text-primary drop-shadow-sm">{session.code}</p>
+                      </div>
+                      <div className="p-2 rounded-xl bg-white/50 dark:bg-black/20 backdrop-blur-sm border border-white/20">
+                        <Plus className="w-5 h-5 text-primary" />
+                      </div>
                     </div>
-                    <div className="mt-3 p-2 bg-accent rounded">
-                      <p className="text-xs text-muted-foreground">Attendance Code:</p>
-                      <p className="font-mono font-bold text-lg">{session.code}</p>
-                    </div>
+                    {/* Decorative element */}
+                    <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-primary/10 rounded-full blur-2xl" />
                   </div>
                 </div>
               ))}
@@ -325,128 +373,148 @@ export default function SessionManagementPage({
 
       {/* Add/Edit Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editingSession ? 'Edit Session' : 'Create Session'}
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-[2rem] border-[var(--color-border)] bg-[var(--color-card)] shadow-2xl">
+          <DialogHeader className="p-8 pb-0">
+            <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-primary/10">
+                {editingSession ? <Edit className="w-6 h-6 text-primary" /> : <Plus className="w-6 h-6 text-primary" />}
+              </div>
+              {editingSession ? 'Edit Session' : 'Create New Session'}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Session Name</label>
-              <Input
-                value={formData.sessionName}
-                onChange={(e) => setFormData({ ...formData, sessionName: e.target.value })}
-                placeholder="e.g., Day 1 - Morning Session"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Location</label>
-              <Input
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="e.g., Auditorium A"
-              />
-            </div>
-
-            {/* <div>
-              <label className="block text-sm font-medium mb-2">Attendance Code</label>
-              <div className="flex gap-2">
+          <div className="p-8 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Session Name</label>
                 <Input
-                  value={formData.code}
-                  onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                  placeholder="e.g., ABC123"
-                  className="flex-1"
+                  value={formData.sessionName}
+                  onChange={(e) => setFormData({ ...formData, sessionName: e.target.value })}
+                  placeholder="e.g., Morning Workshop / Day 1 Intro"
+                  className="h-12 rounded-xl bg-muted/30 border-border/50 focus:ring-primary/20"
                 />
-                <Button type="button" onClick={generateCode} variant="outline">
-                  Generate
-                </Button>
               </div>
-            </div> */}
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Credits</label>
-              <Input
-                type="number"
-                value={formData.credits === 0 ? '' : formData.credits}
-                onChange={(e) => setFormData({ ...formData, credits: parseFloat(e.target.value) || 0 })}
-                placeholder="e.g., 1"
-                min="0"
-                step="0.5"
-              />
-            </div>
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Location</label>
+                <Input
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  placeholder="e.g., Main Auditorium"
+                  className="h-12 rounded-xl bg-muted/30 border-border/50 focus:ring-primary/20"
+                />
+              </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Start Time</label>
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Credits</label>
+                <Input
+                  type="number"
+                  value={formData.credits === 0 ? '' : formData.credits}
+                  onChange={(e) => setFormData({ ...formData, credits: parseFloat(e.target.value) || 0 })}
+                  placeholder="e.g., 2.0"
+                  min="0"
+                  step="0.5"
+                  className="h-12 rounded-xl bg-muted/30 border-border/50 focus:ring-primary/20"
+                />
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Attendance Code</label>
+                <div className="flex gap-2">
+                  <Input
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                    placeholder="Enter or generate code"
+                    className="h-12 rounded-xl bg-muted/30 border-border/50 focus:ring-primary/20 font-mono text-lg tracking-widest"
+                  />
+                  <Button
+                    type="button"
+                    onClick={generateCode}
+                    variant="outline"
+                    className="h-12 px-6 rounded-xl border-dashed hover:bg-primary/5 hover:text-primary transition-colors"
+                  >
+                    Generate
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Start Time</label>
                 <Input
                   type="datetime-local"
                   value={formData.startTime}
                   min={eventStartDate}
                   max={eventEndDate}
                   onChange={(e) => { setFormError(''); setFormData({ ...formData, startTime: e.target.value }); }}
+                  className="h-12 rounded-xl bg-muted/30 border-border/50"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">End Time (Optional)</label>
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">End Time (Optional)</label>
                 <Input
                   type="datetime-local"
                   value={formData.endTime}
                   min={formData.startTime || eventStartDate}
                   max={eventEndDate}
                   onChange={(e) => { setFormError(''); setFormData({ ...formData, endTime: e.target.value }); }}
+                  className="h-12 rounded-xl bg-muted/30 border-border/50"
                 />
               </div>
             </div>
 
             {/* Date range hint */}
             {eventStartDate && eventEndDate && (
-              <p className="text-xs text-muted-foreground">
-                Session times must be within event range:{' '}
-                <span className="font-medium">{eventStartDate.replace('T', ' ')}</span>
-                {' '}–{' '}
-                <span className="font-medium">{eventEndDate.replace('T', ' ')}</span>
-              </p>
+              <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20">
+                <p className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
+                  <Clock className="w-3 h-3" />
+                  Event Time Window
+                </p>
+                <p className="text-xs text-blue-600/70 dark:text-blue-400/60 mt-1 font-medium">
+                  Sessions must start between {eventStartDate.replace('T', ' ')} and {eventEndDate.replace('T', ' ')}
+                </p>
+              </div>
             )}
 
-            {/* Validation error */}
             {formError && (
-              <p className="text-sm text-red-500 font-medium">{formError}</p>
+              <div className="p-3 rounded-xl bg-red-50 text-red-600 text-xs font-semibold border border-red-100 animate-in fade-in slide-in-from-top-1">
+                {formError}
+              </div>
             )}
 
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="isActive"
-                checked={formData.isActive}
-                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                className="rounded"
-              />
-              <label htmlFor="isActive" className="text-sm">
-                Session is active (students can mark attendance)
+            <div className="flex items-center gap-3 p-4 rounded-2xl bg-muted/20 border border-border/50">
+              <div className="relative flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  className="w-5 h-5 rounded-lg accent-primary border-muted-foreground/30"
+                />
+              </div>
+              <label htmlFor="isActive" className="text-sm font-semibold text-foreground cursor-pointer">
+                Allow student check-ins for this session
               </label>
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="p-8 pt-0 flex gap-3">
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={() => {
                 setShowDialog(false);
                 resetForm();
               }}
+              className="rounded-xl px-8 h-12"
             >
               Cancel
             </Button>
-            <Button onClick={handleSubmit}>
-              {editingSession ? 'Update' : 'Create'} Session
+            <Button onClick={handleSubmit} className="rounded-xl px-8 h-12 shadow-md hover:shadow-lg transition-all active:scale-95">
+              {editingSession ? 'Save Changes' : 'Initialize Session'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </main>
+    </div>
   );
 }
 
