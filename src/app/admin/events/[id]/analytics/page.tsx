@@ -263,410 +263,400 @@ export default function EventAnalyticsPage({
 
 
   return (
-    <div className="min-h-screen p-6 bg-background">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <main className="min-h-screen bg-background p-4 md:p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 self-start px-3 py-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Events
-            </button>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                <BarChart3 className="w-8 h-8 text-primary" />
-                {loading ? <Skeleton className="h-10 w-64" /> : event?.title}
-              </h1>
-              <p className="text-muted-foreground mt-1 text-base font-medium">
-                Performance and engagement insights
-              </p>
+        <div>
+          <button
+            onClick={() => router.back()}
+            className="flex items-center text-blue-600 hover:text-blue-800 mb-4"
+          >
+            <ArrowLeft className="w-5 h-5 mr-1" />
+            Back
+          </button>
+
+          {loading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-64" />
+              <Skeleton className="h-5 w-96" />
             </div>
-          </div>
-          <div className="flex flex-wrap gap-3 items-center mt-3 md:mt-0">
-            <button
-              onClick={() => {
-                setLoading(true);
-                if (eventId) {
-                  Promise.all([
-                    fetchAnalytics(eventId),
-                    fetchRsvps(eventId)
-                  ]).then(() => setLoading(false));
-                }
-              }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-[var(--color-border-light)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] transition-all shadow-sm active:scale-95"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Refresh Data
-            </button>
-            {!loading && event?.status && (
-              <Badge className={`px-4 py-2.5 rounded-xl text-xs font-semibold ${getStatusColor(event.status)} shadow-sm border-0`}>
-                {event.status}
-              </Badge>
-            )}
-          </div>
+          ) : event ? (
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-3xl font-bold text-foreground">{event.title}</h1>
+                  <Badge className={getStatusColor(event.status)}>{event.status}</Badge>
+                </div>
+                <p className="text-muted-foreground">{event.description}</p>
+                <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    {formatDateTime(event.startDate)}
+                  </span>
+                  <span>📍 {event.location}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    setLoading(true);
+                    if (eventId) {
+                      Promise.all([
+                        fetchAnalytics(eventId),
+                        fetchRsvps(eventId)
+                      ]).then(() => setLoading(false));
+                    }
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950/20 rounded-lg transition-colors"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Refresh Data
+                </button>
+                <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-lg">
+                  <BarChart3 className="w-6 h-6 text-primary" />
+                  <span className="font-semibold text-foreground">Event Analytics</span>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
-            icon={<Users className="w-5 h-5" />}
+            icon={<Users className="w-6 h-6 text-blue-500" />}
             title="Total RSVPs"
             value={analytics?.totalRsvps ?? rsvps.length}
             subtitle={`${event?.maxCapacity ? `of ${event.maxCapacity} capacity` : 'registered'}`}
             loading={loading}
-            color="bg-blue-100/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+            color="bg-blue-50 dark:bg-blue-950/20"
           />
           <MetricCard
-            icon={<CheckCircle className="w-5 h-5" />}
+            icon={<CheckCircle className="w-6 h-6 text-green-500" />}
             title="Attendance"
             value={analytics?.totalAttendance ?? analytics?.attendanceList?.length ?? 0}
             subtitle={`${analytics?.attendanceRate ?? 0}% attendance rate`}
             loading={loading}
-            color="bg-green-100/50 dark:bg-green-900/20 text-green-600 dark:text-green-400"
+            color="bg-green-50 dark:bg-green-950/20"
           />
           <MetricCard
-            icon={<Award className="w-5 h-5" />}
+            icon={<Award className="w-6 h-6 text-yellow-500" />}
             title="Credits Distributed"
             value={analytics?.totalCreditsDistributed ?? 0}
             subtitle={`${analytics?.sessionsCount ?? 0} sessions`}
             loading={loading}
-            color="bg-amber-100/50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400"
+            color="bg-yellow-50 dark:bg-yellow-950/20"
           />
           <MetricCard
-            icon={<Star className="w-5 h-5" />}
+            icon={<Star className="w-6 h-6 text-purple-500" />}
             title="Average Rating"
             value={analytics?.averageRating?.toFixed(1) ?? '0.0'}
             subtitle={`${analytics?.reviewsCount ?? analytics?.reviews?.list?.length ?? 0} reviews`}
             loading={loading}
-            color="bg-purple-100/50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400"
+            color="bg-purple-50 dark:bg-purple-950/20"
           />
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Attendance Overview Card - Span 1 or 2 */}
-          <div className="lg:col-span-1 rounded-2xl sm:rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-card)] p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="font-bold text-xl text-foreground flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-primary" />
-                Attendance Overview
-              </h3>
+        {/* Attendance Progress */}
+        {analytics && analytics.totalRsvps > 0 && (
+          <div className="bg-card rounded-xl border border-border p-6">
+            <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-primary" />
+              Attendance Overview
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-muted-foreground">Attendance Rate</span>
+                  <span className="font-semibold text-foreground">{analytics.attendanceRate}%</span>
+                </div>
+                <Progress value={analytics.attendanceRate} className="h-3" />
+              </div>
+              <div className="grid grid-cols-3 gap-4 pt-4">
+                <div className="text-center p-4 bg-accent rounded-lg">
+                  <p className="text-2xl font-bold text-foreground">{analytics.totalRsvps}</p>
+                  <p className="text-xs text-muted-foreground">RSVPs</p>
+                </div>
+                <div className="text-center p-4 bg-accent rounded-lg">
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">{analytics.totalAttendance}</p>
+                  <p className="text-xs text-muted-foreground">Attended</p>
+                </div>
+                <div className="text-center p-4 bg-accent rounded-lg">
+                  <p className="text-2xl font-bold text-gray-600 dark:text-gray-400">{analytics.totalRsvps - analytics.totalAttendance}</p>
+                  <p className="text-xs text-muted-foreground">No-shows</p>
+                </div>
+              </div>
             </div>
-
-            {loading ? (
-              <div className="space-y-6">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-20 w-full" />
-                <div className="grid grid-cols-2 gap-4">
-                  <Skeleton className="h-16 w-full" />
-                  <Skeleton className="h-16 w-full" />
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-8">
-                <div>
-                  <div className="flex justify-between text-sm font-semibold mb-3 px-1">
-                    <span className="text-muted-foreground uppercase tracking-wider">Attendance Rate</span>
-                    <span className="text-primary">{analytics?.attendanceRate}%</span>
-                  </div>
-                  <div className="h-4 w-full bg-accent rounded-full overflow-hidden border border-[var(--color-border-light)] p-0.5">
-                    <div
-                      className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-1000 ease-out shadow-sm"
-                      style={{ width: `${analytics?.attendanceRate}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-900/20">
-                    <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{analytics?.totalRsvps}</p>
-                    <p className="text-xs font-medium text-blue-600/70 dark:text-blue-400/60 uppercase tracking-wider mt-1">RSVPs</p>
-                  </div>
-                  <div className="flex flex-col items-center justify-center p-5 rounded-2xl bg-green-50/50 dark:bg-green-900/10 border border-green-100/50 dark:border-green-900/20">
-                    <p className="text-3xl font-bold text-green-600 dark:text-green-400">{analytics?.totalAttendance}</p>
-                    <p className="text-xs font-medium text-green-600/70 dark:text-green-400/60 uppercase tracking-wider mt-1">Attended</p>
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-muted/30 border border-border/50 text-center">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    <span className="font-bold text-foreground">{analytics ? analytics.totalRsvps - analytics.totalAttendance : 0}</span> registered students did not attend.
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         )}
 
-          {/* RSVP List */}
-          <div className="bg-card rounded-xl border border-border p-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary" />
-                RSVPs ({filteredRsvps.length})
-              </h3>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setRsvpFilter('WAITLISTED')}
-                  className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${rsvpFilter === 'WAITLISTED' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-muted-foreground'}`}
-                >
-                  Waitlisted
-                </button>
-                <button
-                  onClick={() => setRsvpFilter('CONFIRMED')}
-                  className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${rsvpFilter === 'CONFIRMED' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-muted-foreground'}`}
-                >
-                  Confirmed
-                </button>
-                <button
-                  onClick={() => setRsvpFilter('ALL')}
-                  className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${rsvpFilter === 'ALL' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-muted-foreground'}`}
-                >
-                  All
-                </button>
-              </div>
+        {/* RSVP List */}
+        <div className="bg-card rounded-xl border border-border p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary" />
+              RSVPs ({filteredRsvps.length})
+            </h3>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setRsvpFilter('WAITLISTED')}
+                className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${rsvpFilter === 'WAITLISTED' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-muted-foreground'}`}
+              >
+                Waitlisted
+              </button>
+              <button
+                onClick={() => setRsvpFilter('CONFIRMED')}
+                className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${rsvpFilter === 'CONFIRMED' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-muted-foreground'}`}
+              >
+                Confirmed
+              </button>
+              <button
+                onClick={() => setRsvpFilter('ALL')}
+                className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${rsvpFilter === 'ALL' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-muted-foreground'}`}
+              >
+                All
+              </button>
             </div>
+          </div>
 
-            {loading ? (
-              <div className="space-y-3">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <Skeleton key={i} className="h-16 w-full" />
-                ))}
-              </div>
-            ) : filteredRsvps.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <Users className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p>No RSVPs found for this category</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-accent">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">#</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Student</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Department</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Year</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Status</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Registered At</th>
-                      <th className="px-4 py-3 text-right text-sm font-semibold">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {filteredRsvps.map((rsvp, index) => (
-                      <tr key={rsvp.id} className="hover:bg-accent/50 transition-colors">
-                        <td className="px-4 py-3 text-sm text-muted-foreground">{index + 1}</td>
-                        <td className="px-4 py-3">
-                          <div>
-                            <p className="font-medium text-foreground">{rsvp.user?.name || 'Unknown'}</p>
-                            <p className="text-xs text-muted-foreground">{rsvp.user?.email}</p>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">
-                          {rsvp.user?.department || '-'}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">
-                          {rsvp.user?.year ? `Year ${rsvp.user.year}` : '-'}
-                        </td>
-                        <td className="px-4 py-3">
-                          <Badge
-                            className={
-                              rsvp.status === 'CONFIRMED' || rsvp.status === 'ATTENDING'
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                : rsvp.status === 'WAITLISTED'
-                                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
-                                  : rsvp.status === 'REJECTED'
-                                    ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                                    : 'bg-gray-100 text-gray-800'
-                            }
-                          >
-                            {rsvp.status}
-                            {rsvp.waitlistPosition ? ` (#${rsvp.waitlistPosition})` : ''}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">
-                          {formatDateTime(rsvp.createdAt)}
-                        </td>
-                        <td className="px-4 py-3 text-right space-x-2">
-                          {rsvp.status === 'WAITLISTED' && (
-                            <>
-                              <button
-                                onClick={() => handleApproveRsvp(rsvp.id)}
-                                className="text-xs font-semibold px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                              >
-                                Accept
-                              </button>
-                              <button
-                                onClick={() => handleRejectRsvp(rsvp.id)}
-                                className="text-xs font-semibold px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-                              >
-                                Revoke
-                              </button>
-                            </>
-                          )}
-                          {(rsvp.status === 'CONFIRMED' || rsvp.status === 'ATTENDING') && (
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map(i => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          ) : filteredRsvps.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Users className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p>No RSVPs found for this category</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-accent">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">#</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Student</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Department</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Year</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Status</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Registered At</th>
+                    <th className="px-4 py-3 text-right text-sm font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filteredRsvps.map((rsvp, index) => (
+                    <tr key={rsvp.id} className="hover:bg-accent/50 transition-colors">
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{index + 1}</td>
+                      <td className="px-4 py-3">
+                        <div>
+                          <p className="font-medium text-foreground">{rsvp.user?.name || 'Unknown'}</p>
+                          <p className="text-xs text-muted-foreground">{rsvp.user?.email}</p>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {rsvp.user?.department || '-'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {rsvp.user?.year ? `Year ${rsvp.user.year}` : '-'}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge
+                          className={
+                            rsvp.status === 'CONFIRMED' || rsvp.status === 'ATTENDING'
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                              : rsvp.status === 'WAITLISTED'
+                                ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
+                                : rsvp.status === 'REJECTED'
+                                  ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                                  : 'bg-gray-100 text-gray-800'
+                          }
+                        >
+                          {rsvp.status}
+                          {rsvp.waitlistPosition ? ` (#${rsvp.waitlistPosition})` : ''}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {formatDateTime(rsvp.createdAt)}
+                      </td>
+                      <td className="px-4 py-3 text-right space-x-2">
+                        {rsvp.status === 'WAITLISTED' && (
+                          <>
+                            <button
+                              onClick={() => handleApproveRsvp(rsvp.id)}
+                              className="text-xs font-semibold px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                            >
+                              Accept
+                            </button>
                             <button
                               onClick={() => handleRejectRsvp(rsvp.id)}
-                              className="text-xs font-semibold px-2 py-1 text-red-600 hover:text-red-800 transition-colors"
+                              className="text-xs font-semibold px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
                             >
                               Revoke
                             </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                          </>
+                        )}
+                        {(rsvp.status === 'CONFIRMED' || rsvp.status === 'ATTENDING') && (
+                          <button
+                            onClick={() => handleRejectRsvp(rsvp.id)}
+                            className="text-xs font-semibold px-2 py-1 text-red-600 hover:text-red-800 transition-colors"
+                          >
+                            Revoke
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Credits & Attendance List */}
+        <div className="bg-card rounded-xl border border-border p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              <Award className="w-5 h-5 text-primary" />
+              Credits & Attendance ({analytics?.attendanceList?.length || 0})
+            </h3>
           </div>
 
-          {/* Bottom Grid for Lists */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Credits & Attendance List */}
-            <div className="rounded-2xl sm:rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-card)] p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
-              <h3 className="font-bold text-xl text-foreground flex items-center gap-2 mb-6">
-                <Award className="w-5 h-5 text-primary" />
-                Recent Attendance
-              </h3>
-
-              {loading ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
-                </div>
-              ) : !analytics?.attendanceList || analytics.attendanceList.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground bg-muted/20 rounded-2xl border border-dashed border-border/50">
-                  <Award className="w-12 h-12 opacity-20 mb-3" />
-                  <p className="font-medium">No attendance records yet</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          ) : !analytics?.attendanceList || analytics.attendanceList.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Award className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p>No attendance records yet</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-accent">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Student</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Department</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Session</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Credits</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Time</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
                   {analytics.attendanceList.map((record: any) => (
-                    <div key={record.id} className="p-4 rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface)]/35 hover:bg-[var(--color-surface)] transition-all">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600">
-                            <CheckCircle className="w-4 h-4" />
-                          </div>
-                          <div>
-                            <p className="font-bold text-sm text-foreground">{record.user?.name || 'Unknown'}</p>
-                            <p className="text-xs text-muted-foreground">{record.session?.name}</p>
-                          </div>
+                    <tr key={record.id} className="hover:bg-accent/50 transition-colors">
+                      <td className="px-4 py-3">
+                        <div>
+                          <p className="font-medium text-foreground">{record.user?.name || 'Unknown'}</p>
+                          <p className="text-xs text-muted-foreground">{record.user?.email}</p>
                         </div>
-                        <Badge variant="outline" className="font-bold text-primary border-primary/20 bg-primary/5">
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {record.user?.department || '-'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {record.session?.name}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge variant="outline" className="font-mono">
                           +{record.session?.credits}
                         </Badge>
-                      </div>
-                      <div className="flex items-center gap-4 mt-1 text-[10px] font-medium text-muted-foreground uppercase tracking-wider pl-10">
-                        <span>{record.user?.department || 'Dept N/A'}</span>
-                        <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-                        <span>{formatDateTime(record.attendedAt)}</span>
-                      </div>
-                    </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">
+                        {formatDateTime(record.attendedAt)}
+                      </td>
+                    </tr>
                   ))}
-                </div>
-              )}
+                </tbody>
+              </table>
             </div>
+          )}
+        </div>
 
-            {/* Reviews List */}
-            <div className="rounded-2xl sm:rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-card)] p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
-              <h3 className="font-bold text-xl text-foreground flex items-center gap-2 mb-6">
-                <Star className="w-5 h-5 text-primary" />
-                Student Reviews
-              </h3>
-
-              {loading ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map(i => <Skeleton key={i} className="h-28 w-full rounded-xl" />)}
-                </div>
-              ) : !analytics?.reviews?.list || analytics.reviews.list.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground bg-muted/20 rounded-2xl border border-dashed border-border/50">
-                  <Star className="w-12 h-12 opacity-20 mb-3" />
-                  <p className="font-medium">No reviews yet</p>
-                </div>
-              ) : (
-                <div className="space-y-5">
-                  {analytics.reviews.list.map((review: any) => (
-                    <div key={review.id} className="relative p-5 rounded-2xl border border-[var(--color-border-light)] bg-[var(--color-surface)]/35 hover:bg-[var(--color-surface)] transition-all overflow-hidden group">
-                      <div className="absolute top-0 right-0 p-3 flex gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-700'}`}
-                          />
-                        ))}
-                      </div>
-
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-400">
-                          {review.user?.name?.charAt(0) || 'A'}
-                        </div>
-                        <div>
-                          <p className="font-bold text-sm text-foreground">{review.user?.name || 'Anonymous'}</p>
-                          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{review.user?.department || 'Student'}</p>
-                        </div>
-                      </div>
-
-                      <p className="text-sm text-foreground/90 line-clamp-3 pl-3 border-l-2 border-primary/20 py-1">
-                        "{review.review}"
-                      </p>
-
-                      <p className="text-[10px] font-medium text-muted-foreground/60 mt-3 text-right uppercase tracking-wider group-hover:text-primary transition-colors">
-                        {formatDateTime(review.createdAt)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+        {/* Reviews List */}
+        <div className="bg-card rounded-xl border border-border p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              <Star className="w-5 h-5 text-primary" />
+              Student Reviews ({analytics?.reviews?.list?.length ?? analytics?.reviewsCount ?? 0})
+            </h3>
           </div>
+
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full" />)}
+            </div>
+          ) : !analytics?.reviews?.list || analytics.reviews.list.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Star className="w-16 h-16 mx-auto mb-4 opacity-50" />
+              <p>No reviews yet</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {analytics.reviews.list.map((review: any) => (
+                <div key={review.id} className="border border-border rounded-lg p-4 bg-accent/20">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="font-medium text-foreground">
+                        {review.user?.name || 'Anonymous'}
+                      </p>
+                      {review.user?.department && (
+                        <p className="text-xs text-muted-foreground">{review.user.department}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                      <span className="text-xl font-bold">{review.rating}</span>
+                      <span className="text-sm text-muted-foreground">/5</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-foreground/90">{review.review}</p>
+
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {formatDateTime(review.createdAt)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      );
+    </main >
+  );
 }
 
-      function MetricCard({
-        icon,
-        title,
-        value,
-        subtitle,
-        loading,
-        color,
-}: {
-        icon: React.ReactNode;
-      title: string;
-      value: number | string;
-      subtitle: string;
-      loading: boolean;
-      color: string;
-}) {
-  const baseCardClass = "rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col items-center justify-center";
+interface MetricCardProps {
+  icon: React.ReactNode;
+  title: string;
+  value: number | string;
+  subtitle: string;
+  loading: boolean;
+  color: string;
+}
 
-      if (loading) {
+function MetricCard({ icon, title, value, subtitle, loading, color }: MetricCardProps) {
+  if (loading) {
     return (
-      <div className={baseCardClass}>
-        <Skeleton className="h-10 w-10 mb-3 rounded-xl" />
+      <div className={`${color} rounded-xl p-6 border border-border`}>
+        <Skeleton className="h-6 w-6 mb-3" />
         <Skeleton className="h-4 w-24 mb-2" />
         <Skeleton className="h-8 w-16 mb-2" />
         <Skeleton className="h-3 w-20" />
       </div>
-      );
+    );
   }
 
-      return (
-      <div className={`bg-[var(--color-card)] ${baseCardClass}`}>
-        <div className="flex flex-row items-center justify-between w-full mb-3 sm:mb-4">
-          <span className="text-sm sm:text-base font-medium text-muted-foreground uppercase tracking-wider">{title}</span>
-          <div className={`p-2 rounded-xl ${color} shadow-sm`}>
-            {icon}
-          </div>
-        </div>
-        <div className="text-3xl sm:text-5xl font-bold tracking-tight text-foreground mb-1">{value}</div>
-        {subtitle && <p className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wider mt-2 px-2 py-1 bg-accent rounded-lg">{subtitle}</p>}
+  return (
+    <div className={`${color} rounded-xl p-6 border border-border`}>
+      <div className="flex items-center gap-3 mb-3">
+        {icon}
+        <h3 className="font-medium text-foreground">{title}</h3>
       </div>
-      );
+      <p className="text-3xl font-bold text-foreground mb-1">{value}</p>
+      <p className="text-sm text-muted-foreground">{subtitle}</p>
+    </div>
+  );
 }
-
