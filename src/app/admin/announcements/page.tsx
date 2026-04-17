@@ -204,7 +204,7 @@ export default function AdminAnnouncementsPage() {
         </div>
 
         {/* Announcements List */}
-        <div className="bg-card rounded-xl border border-border p-6">
+        <div className="mt-4">
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3].map(i => (
@@ -227,54 +227,69 @@ export default function AdminAnnouncementsPage() {
               <p className="text-sm">Create your first announcement</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {announcements.map(announcement => (
                 <div
                   key={announcement.id}
-                  className="border border-border rounded-lg p-4 hover:bg-accent transition-colors"
+                  className="transition-[background-color,box-shadow,border-color] p-4 md:p-5 rounded-2xl border border-[var(--color-border-light)] bg-[var(--color-card)] hover:bg-[var(--color-surface-hover)]/40 shadow-[0_2px_8px_rgba(15,23,42,0.04)] hover:shadow-[0_6px_16px_rgba(15,23,42,0.08)]"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg text-foreground">
-                          {announcement.title}
-                        </h3>
-                        <span className={`px-2 py-1 text-xs font-medium rounded ${getPriorityColor(announcement.priority)}`}>
-                          {announcement.priority}
-                        </span>
-                      </div>
-                      <p className="text-foreground whitespace-pre-wrap mb-3">
-                        {announcement.message}
-                      </p>
-                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                        <span>Created: {formatDateTime(announcement.createdAt)}</span>
-                        {announcement.expiresAt && (
-                          <span>Expires: {formatDateTime(announcement.expiresAt)}</span>
-                        )}
-                        {announcement.targetAudience && (
-                          <>
-                            {announcement.targetAudience.departments && Array.isArray(announcement.targetAudience.departments) && announcement.targetAudience.departments.length > 0 && (
-                              <span>Depts: {announcement.targetAudience.departments.join(', ')}</span>
-                            )}
-                            {announcement.targetAudience.years && Array.isArray(announcement.targetAudience.years) && announcement.targetAudience.years.length > 0 && (
-                              <span>Years: {announcement.targetAudience.years.join(', ')}</span>
-                            )}
-                          </>
-                        )}
+                  <div className="flex items-start justify-between gap-3 md:gap-4">
+                    <div className="flex-shrink-0 mt-1">
+                      <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
+                        <Megaphone className="w-5 h-5 text-orange-500" />
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex-1 min-w-0 flex flex-col">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <h4 className="text-[11px] md:text-xs font-semibold uppercase tracking-wider text-[var(--color-primary)]">
+                          {announcement.priority} PRIORITY
+                        </h4>
+                      </div>
+                      <h3 className={`text-[15px] md:text-base font-semibold leading-snug text-[var(--color-text-primary)]`}>
+                        {announcement.title}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1 mb-3">
+                        <p className="text-[11px] text-[var(--color-text-muted)] font-medium tracking-wide">
+                          {new Date(announcement.createdAt).toLocaleDateString('en-US', { weekday: 'long', hour: 'numeric', minute: 'numeric' })}
+                        </p>
+                      </div>
+
+                      <div className="bg-[var(--color-surface)]/70 border border-[var(--color-border-light)]/40 p-4 rounded-2xl rounded-tl-sm shadow-sm flex flex-col gap-3">
+                        <p className={`text-sm md:text-[15px] whitespace-pre-wrap leading-[1.6] text-[var(--color-text-secondary)]`}>
+                          {announcement.message}
+                        </p>
+                        
+                        <div className="flex flex-wrap items-center gap-4 text-[11px] text-[var(--color-text-muted)]/80 pt-3 border-t border-[var(--color-border-light)]/80 font-semibold uppercase tracking-wider">
+                          {announcement.expiresAt && (
+                            <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3" /> Expires: {formatDateTime(announcement.expiresAt)}</span>
+                          )}
+                          {announcement.targetAudience && (
+                            <>
+                              {announcement.targetAudience.departments && Array.isArray(announcement.targetAudience.departments) && announcement.targetAudience.departments.length > 0 && (
+                                <span>Depts: {announcement.targetAudience.departments.join(', ')}</span>
+                              )}
+                              {announcement.targetAudience.years && Array.isArray(announcement.targetAudience.years) && announcement.targetAudience.years.length > 0 && (
+                                <span>Years: {announcement.targetAudience.years.join(', ')}</span>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <div className="flex gap-2 flex-shrink-0 mt-1">
                       <button
                         onClick={() => handleEdit(announcement)}
-                        className="p-2 hover:bg-[var(--color-surface-hover)]/20 rounded-lg transition-colors"
+                        className="p-2 hover:bg-[var(--color-surface-hover)] rounded-xl transition-colors"
                       >
                         <Edit className="w-4 h-4 text-[var(--color-primary)]" />
                       </button>
                       <button
                         onClick={() => handleDelete(announcement.id)}
-                        className="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        className="p-2 hover:bg-red-500/10 rounded-xl transition-colors"
                       >
-                        <Trash2 className="w-4 h-4 text-red-600" />
+                        <Trash2 className="w-4 h-4 text-red-500" />
                       </button>
                     </div>
                   </div>

@@ -297,13 +297,6 @@ const AdminDashboard = () => {
               Refresh Data
             </button>
             <button
-              onClick={() => router.push("/admin/announcements")}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-[var(--color-border-light)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] transition-all shadow-sm active:scale-95"
-            >
-              <Megaphone className="h-4 w-4 text-orange-500" />
-              Announcements
-            </button>
-            <button
               onClick={() => router.push("/admin/createEvent")}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95"
             >

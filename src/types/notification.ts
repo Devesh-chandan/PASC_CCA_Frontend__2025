@@ -4,6 +4,8 @@ export type NotificationType =
     | 'EVENT_UPDATED'
     | 'EVENT_CANCELLED'
     | 'RSVP_CONFIRMED'
+    | 'RSVP_REJECTED'
+    | 'WAITLIST_ADDED'
     | 'WAITLIST_PROMOTED'
     | 'ATTENDANCE_MARKED'
     | 'ANNOUNCEMENT'

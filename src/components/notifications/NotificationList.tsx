@@ -11,7 +11,8 @@ export function NotificationList() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [view, setView] = useState<'all' | 'unread'>('all');
+    type ViewFilter = 'all' | 'unread' | 'event' | 'rsvp' | 'waitlist' | 'announcement';
+    const [view, setView] = useState<ViewFilter>('all');
     const role = useAuthStore((state) => state.role);
 
     useEffect(() => {
@@ -58,9 +59,14 @@ export function NotificationList() {
     };
 
     const unreadCount = notifications.filter((n) => !n.read).length;
-    const filteredNotifications = view === 'unread'
-        ? notifications.filter((n) => !n.read)
-        : notifications;
+    const filteredNotifications = notifications.filter((n) => {
+        if (view === 'unread') return !n.read;
+        if (view === 'event') return n.type.startsWith('EVENT_');
+        if (view === 'rsvp') return n.type.startsWith('RSVP_');
+        if (view === 'waitlist') return n.type.startsWith('WAITLIST_');
+        if (view === 'announcement') return n.type === 'ANNOUNCEMENT';
+        return true;
+    });
 
     if (loading) {
         return (
@@ -73,11 +79,20 @@ export function NotificationList() {
                         </div>
                     ))}
                 </div>
-                <div className="bg-[var(--color-card)] border border-[var(--color-border-light)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border-light)] shadow-[0_1px_3px_rgba(15,23,42,0.08),0_10px_24px_rgba(15,23,42,0.05)]">
+                <div className="space-y-3">
                     {[1, 2, 3, 4, 5].map(i => (
-                        <div key={i} className="p-4 animate-pulse">
-                            <div className="h-4 bg-[var(--color-surface)] w-1/4 mb-2 rounded" />
-                            <div className="h-3 bg-[var(--color-surface)] w-3/4 rounded" />
+                        <div key={i} className="p-4 md:p-5 animate-pulse bg-[var(--color-card)] border border-[var(--color-border-light)] rounded-2xl shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
+                            <div className="flex gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-[var(--color-surface)] flex-shrink-0" />
+                                <div className="flex-1 space-y-2.5 pt-1">
+                                    <div className="flex justify-between">
+                                        <div className="h-2.5 bg-[var(--color-surface)] w-1/4 rounded" />
+                                        <div className="h-2.5 bg-[var(--color-surface)] w-12 rounded" />
+                                    </div>
+                                    <div className="h-3.5 bg-[var(--color-surface)] w-3/4 rounded" />
+                                    <div className="h-2.5 bg-[var(--color-surface)] w-full rounded mt-2" />
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -113,29 +128,22 @@ export function NotificationList() {
             </div>
 
             <div className="bg-[var(--color-card)] border border-[var(--color-border-light)] rounded-2xl p-3 md:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-[0_1px_3px_rgba(15,23,42,0.08),0_10px_24px_rgba(15,23,42,0.05)]">
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => setView('all')}
-                        className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-                            view === 'all'
-                                ? 'bg-[var(--color-button-primary)] text-white'
-                                : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
-                        }`}
-                    >
-                        <Eye className="w-4 h-4" />
-                        All
-                    </button>
-                    <button
-                        onClick={() => setView('unread')}
-                        className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-                            view === 'unread'
-                                ? 'bg-[var(--color-button-primary)] text-white'
-                                : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
-                        }`}
-                    >
-                        <EyeOff className="w-4 h-4" />
-                        Unread
-                    </button>
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 hide-scrollbar">
+                    {(['all', 'unread', 'event', 'rsvp', 'waitlist', 'announcement'] as const).map((filterView) => (
+                        <button
+                            key={filterView}
+                            onClick={() => setView(filterView)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${
+                                view === filterView
+                                    ? 'bg-[var(--color-button-primary)] text-white'
+                                    : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+                            }`}
+                        >
+                            {filterView === 'all' && <Eye className="w-4 h-4" />}
+                            {filterView === 'unread' && <EyeOff className="w-4 h-4" />}
+                            {filterView.charAt(0).toUpperCase() + filterView.slice(1)}
+                        </button>
+                    ))}
                 </div>
 
                 {unreadCount > 0 && (
@@ -161,7 +169,7 @@ export function NotificationList() {
                     <p className="text-[var(--color-text-muted)] mt-1">Switch to All to review earlier updates.</p>
                 </div>
             ) : (
-                <div className="bg-[var(--color-card)] border border-[var(--color-border-light)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border-light)] shadow-[0_1px_3px_rgba(15,23,42,0.08),0_10px_24px_rgba(15,23,42,0.05)]">
+                <div className="space-y-3">
                     {filteredNotifications.map(notification => (
                         <NotificationItem
                             key={notification.id}

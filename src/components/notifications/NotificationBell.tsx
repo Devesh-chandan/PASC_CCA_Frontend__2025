@@ -134,6 +134,10 @@ export function NotificationBell() {
     }
   };
 
+  if (role === 'admin') {
+    return null;
+  }
+
   return (
     <div className='relative inline-flex overflow-visible'>
       <button

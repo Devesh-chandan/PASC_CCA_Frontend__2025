@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
-import { Sun, Moon, User, LayoutDashboard, Calendar, Trophy, Bell, Menu, X, LogIn, UserPlus } from "lucide-react";
+import { Sun, Moon, User, LayoutDashboard, Calendar, Trophy, Bell, Menu, X, LogIn, UserPlus, Megaphone } from "lucide-react";
 import ThemeSwitcher from "./ThemeSwitcher";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
@@ -164,6 +164,16 @@ const Navbar = () => {
             >
               <Calendar className="w-4 h-4" />
               Events
+            </Link>
+            <Link
+              href="/admin/announcements"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isActive("/admin/announcements")
+                ? "bg-[var(--color-nav-active-bg)] text-[var(--color-nav-active)] font-medium"
+                : "text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)]"
+                }`}
+            >
+              <Megaphone className="w-4 h-4" />
+              Announcements
             </Link>
           </div>
         )}
@@ -360,6 +370,17 @@ const Navbar = () => {
             >
               <Calendar className="w-5 h-5" />
               Events
+            </Link>
+            <Link
+              href="/admin/announcements"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive("/admin/announcements")
+                ? "bg-[var(--color-nav-active-bg)] text-[var(--color-nav-active)] font-medium"
+                : "text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)]"
+                }`}
+            >
+              <Megaphone className="w-5 h-5" />
+              Announcements
             </Link>
           </div>
         </div>

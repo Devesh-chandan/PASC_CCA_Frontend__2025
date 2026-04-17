@@ -72,9 +72,9 @@ export function useFetchEventsForStudentRsvp() {
             const raw2 = res.data?.data ?? res.data?.events ?? res.data;
             const events = Array.isArray(raw2) ? raw2 : [];
             setFetchedEvents(events);
-        } catch (err) {
+        } catch (err: any) {
             setError("Failed to fetch events");
-            console.error(err);
+            console.log("Failed to fetch events:", err?.response?.status || err?.message);
             setFetchedEvents([]);
         } finally {
             setLoading(false);

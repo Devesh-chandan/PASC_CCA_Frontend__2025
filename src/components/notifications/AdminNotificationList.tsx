@@ -58,11 +58,20 @@ export function AdminNotificationList() {
 
     if (loading) {
         return (
-            <div className='space-y-4'>
+            <div className="space-y-3">
                 {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className='bg-card p-4 rounded-lg border border-border animate-pulse'>
-                        <div className='h-4 bg-muted w-1/4 mb-2' />
-                        <div className='h-3 bg-muted w-3/4' />
+                    <div key={i} className="p-4 md:p-5 animate-pulse bg-[var(--color-card)] border border-[var(--color-border-light)] rounded-2xl shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
+                        <div className="flex gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-[var(--color-surface)] flex-shrink-0" />
+                            <div className="flex-1 space-y-2.5 pt-1">
+                                <div className="flex justify-between">
+                                    <div className="h-2.5 bg-[var(--color-surface)] w-1/4 rounded" />
+                                    <div className="h-2.5 bg-[var(--color-surface)] w-12 rounded" />
+                                </div>
+                                <div className="h-3.5 bg-[var(--color-surface)] w-3/4 rounded" />
+                                <div className="h-2.5 bg-[var(--color-surface)] w-full rounded mt-2" />
+                            </div>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -104,7 +113,7 @@ export function AdminNotificationList() {
                     </button>
                 </div>
             )}
-            <div className='bg-card border border-border rounded-lg overflow-hidden divide-y divide-border shadow-sm'>
+            <div className='space-y-3'>
                 {notifications.map((notification) => (
                     <NotificationItem
                         key={notification.id}

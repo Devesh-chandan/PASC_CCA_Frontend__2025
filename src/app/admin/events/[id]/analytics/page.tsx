@@ -263,13 +263,13 @@ export default function EventAnalyticsPage({
 
 
   return (
-    <main className="min-h-screen bg-background p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <main className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div>
           <button
             onClick={() => router.back()}
-            className="flex items-center text-blue-600 hover:text-blue-800 mb-4"
+            className="flex items-center text-muted-foreground hover:text-foreground mb-6 font-medium transition-colors"
           >
             <ArrowLeft className="w-5 h-5 mr-1" />
             Back
@@ -281,19 +281,21 @@ export default function EventAnalyticsPage({
               <Skeleton className="h-5 w-96" />
             </div>
           ) : event ? (
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-3xl font-bold text-foreground">{event.title}</h1>
-                  <Badge className={getStatusColor(event.status)}>{event.status}</Badge>
+                  <h1 className="text-3xl font-bold text-foreground tracking-tight">{event.title}</h1>
+                  <Badge className={getStatusColor(event.status)} variant="secondary">{event.status}</Badge>
                 </div>
-                <p className="text-muted-foreground">{event.description}</p>
-                <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
+                <p className="text-muted-foreground max-w-2xl">{event.description}</p>
+                <div className="flex flex-wrap gap-3 mt-4 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1.5 bg-[var(--color-surface)] px-3 py-1.5 rounded-lg border border-[var(--color-border-light)] shadow-sm">
                     <Calendar className="w-4 h-4" />
                     {formatDateTime(event.startDate)}
                   </span>
-                  <span>📍 {event.location}</span>
+                  <span className="flex items-center gap-1.5 bg-[var(--color-surface)] px-3 py-1.5 rounded-lg border border-[var(--color-border-light)] shadow-sm">
+                    📍 {event.location}
+                  </span>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -307,14 +309,14 @@ export default function EventAnalyticsPage({
                       ]).then(() => setLoading(false));
                     }
                   }}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950/20 rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-[var(--color-border-light)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] transition-all shadow-sm active:scale-95"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Refresh Data
                 </button>
-                <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-lg">
-                  <BarChart3 className="w-6 h-6 text-primary" />
-                  <span className="font-semibold text-foreground">Event Analytics</span>
+                <div className="flex items-center gap-3 px-4 py-2.5 bg-[var(--color-surface-hover)] rounded-xl border border-[var(--color-border-light)]">
+                  <BarChart3 className="w-5 h-5 text-[var(--color-info)]" />
+                  <span className="font-semibold text-foreground text-sm">Event Analytics</span>
                 </div>
               </div>
             </div>
@@ -345,7 +347,7 @@ export default function EventAnalyticsPage({
             value={analytics?.totalCreditsDistributed ?? 0}
             subtitle={`${analytics?.sessionsCount ?? 0} sessions`}
             loading={loading}
-            color="bg-yellow-50 dark:bg-yellow-950/20"
+            color="bg-yellow-500/10 text-yellow-500"
           />
           <MetricCard
             icon={<Star className="w-6 h-6 text-purple-500" />}
@@ -353,17 +355,19 @@ export default function EventAnalyticsPage({
             value={analytics?.averageRating?.toFixed(1) ?? '0.0'}
             subtitle={`${analytics?.reviewsCount ?? analytics?.reviews?.list?.length ?? 0} reviews`}
             loading={loading}
-            color="bg-purple-50 dark:bg-purple-950/20"
+            color="bg-purple-500/10 text-purple-500"
           />
         </div>
 
         {/* Attendance Progress */}
         {analytics && analytics.totalRsvps > 0 && (
-          <div className="bg-card rounded-xl border border-border p-6">
-            <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-primary" />
-              Attendance Overview
-            </h3>
+          <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-card p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center mb-6">
+              <h3 className="font-semibold text-xl flex items-center gap-2.5 text-foreground tracking-tight">
+                <TrendingUp className="w-5 h-5 text-[var(--color-info)]" />
+                Attendance Overview
+              </h3>
+            </div>
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-2">
@@ -373,17 +377,17 @@ export default function EventAnalyticsPage({
                 <Progress value={analytics.attendanceRate} className="h-3" />
               </div>
               <div className="grid grid-cols-3 gap-4 pt-4">
-                <div className="text-center p-4 bg-accent rounded-lg">
+                <div className="text-center p-4 bg-[var(--color-surface)] border border-[var(--color-border-light)] rounded-xl shadow-sm hover:shadow-md transition-shadow">
                   <p className="text-2xl font-bold text-foreground">{analytics.totalRsvps}</p>
-                  <p className="text-xs text-muted-foreground">RSVPs</p>
+                  <p className="text-xs text-muted-foreground font-medium mt-1">RSVPs</p>
                 </div>
-                <div className="text-center p-4 bg-accent rounded-lg">
+                <div className="text-center p-4 bg-green-50/50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/30 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                   <p className="text-2xl font-bold text-green-600 dark:text-green-400">{analytics.totalAttendance}</p>
-                  <p className="text-xs text-muted-foreground">Attended</p>
+                  <p className="text-xs text-muted-foreground font-medium mt-1">Attended</p>
                 </div>
-                <div className="text-center p-4 bg-accent rounded-lg">
+                <div className="text-center p-4 bg-gray-50/50 dark:bg-gray-800/20 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                   <p className="text-2xl font-bold text-gray-600 dark:text-gray-400">{analytics.totalRsvps - analytics.totalAttendance}</p>
-                  <p className="text-xs text-muted-foreground">No-shows</p>
+                  <p className="text-xs text-muted-foreground font-medium mt-1">No-shows</p>
                 </div>
               </div>
             </div>
@@ -391,28 +395,28 @@ export default function EventAnalyticsPage({
         )}
 
         {/* RSVP List */}
-        <div className="bg-card rounded-xl border border-border p-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-            <h3 className="font-semibold text-lg flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" />
+        <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-card p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+            <h3 className="font-semibold text-xl flex items-center gap-2.5 text-foreground tracking-tight">
+              <Users className="w-5 h-5 text-[var(--color-info)]" />
               RSVPs ({filteredRsvps.length})
             </h3>
-            <div className="flex gap-2">
+            <div className="flex gap-2 p-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full">
               <button
                 onClick={() => setRsvpFilter('WAITLISTED')}
-                className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${rsvpFilter === 'WAITLISTED' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-muted-foreground'}`}
+                className={`px-5 py-1.5 text-sm font-medium rounded-full transition-all ${rsvpFilter === 'WAITLISTED' ? 'bg-[var(--color-info)] text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 Waitlisted
               </button>
               <button
                 onClick={() => setRsvpFilter('CONFIRMED')}
-                className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${rsvpFilter === 'CONFIRMED' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-muted-foreground'}`}
+                className={`px-5 py-1.5 text-sm font-medium rounded-full transition-all ${rsvpFilter === 'CONFIRMED' ? 'bg-[var(--color-info)] text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 Confirmed
               </button>
               <button
                 onClick={() => setRsvpFilter('ALL')}
-                className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors ${rsvpFilter === 'ALL' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80 text-muted-foreground'}`}
+                className={`px-5 py-1.5 text-sm font-medium rounded-full transition-all ${rsvpFilter === 'ALL' ? 'bg-[var(--color-info)] text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 All
               </button>
@@ -433,20 +437,20 @@ export default function EventAnalyticsPage({
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-accent">
+                <thead className="bg-[var(--color-surface)] border-b border-[var(--color-border-light)]">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">#</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Student</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Department</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Year</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Status</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Registered At</th>
-                    <th className="px-4 py-3 text-right text-sm font-semibold">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">#</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Student</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Department</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Year</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Registered At</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-muted-foreground uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="">
                   {filteredRsvps.map((rsvp, index) => (
-                    <tr key={rsvp.id} className="hover:bg-accent/50 transition-colors">
+                    <tr key={rsvp.id} className="hover:bg-[var(--color-surface-hover)] transition-colors border-b border-[var(--color-border-light)] last:border-0">
                       <td className="px-4 py-3 text-sm text-muted-foreground">{index + 1}</td>
                       <td className="px-4 py-3">
                         <div>
@@ -484,13 +488,13 @@ export default function EventAnalyticsPage({
                           <>
                             <button
                               onClick={() => handleApproveRsvp(rsvp.id)}
-                              className="text-xs font-semibold px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                              className="text-xs font-bold px-3 py-1.5 bg-green-50 text-green-600 border border-green-200 dark:bg-green-500/10 dark:border-green-500/20 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-500/20 transition-colors shadow-sm"
                             >
                               Accept
                             </button>
                             <button
                               onClick={() => handleRejectRsvp(rsvp.id)}
-                              className="text-xs font-semibold px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                              className="text-xs font-bold px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors shadow-sm"
                             >
                               Revoke
                             </button>
@@ -499,7 +503,7 @@ export default function EventAnalyticsPage({
                         {(rsvp.status === 'CONFIRMED' || rsvp.status === 'ATTENDING') && (
                           <button
                             onClick={() => handleRejectRsvp(rsvp.id)}
-                            className="text-xs font-semibold px-2 py-1 text-red-600 hover:text-red-800 transition-colors"
+                            className="text-xs font-bold px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors shadow-sm"
                           >
                             Revoke
                           </button>
@@ -514,10 +518,10 @@ export default function EventAnalyticsPage({
         </div>
 
         {/* Credits & Attendance List */}
-        <div className="bg-card rounded-xl border border-border p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg flex items-center gap-2">
-              <Award className="w-5 h-5 text-primary" />
+        <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-card p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-semibold text-xl flex items-center gap-2.5 text-foreground tracking-tight">
+              <Award className="w-5 h-5 text-yellow-500" />
               Credits & Attendance ({analytics?.attendanceList?.length || 0})
             </h3>
           </div>
@@ -536,18 +540,18 @@ export default function EventAnalyticsPage({
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-accent">
+                <thead className="bg-[var(--color-surface)] border-b border-[var(--color-border-light)]">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Student</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Department</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Session</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Credits</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">Time</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Student</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Department</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Session</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Credits</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-muted-foreground uppercase tracking-wider">Time</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="">
                   {analytics.attendanceList.map((record: any) => (
-                    <tr key={record.id} className="hover:bg-accent/50 transition-colors">
+                    <tr key={record.id} className="hover:bg-[var(--color-surface-hover)] transition-colors border-b border-[var(--color-border-light)] last:border-0">
                       <td className="px-4 py-3">
                         <div>
                           <p className="font-medium text-foreground">{record.user?.name || 'Unknown'}</p>
@@ -577,10 +581,10 @@ export default function EventAnalyticsPage({
         </div>
 
         {/* Reviews List */}
-        <div className="bg-card rounded-xl border border-border p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg flex items-center gap-2">
-              <Star className="w-5 h-5 text-primary" />
+        <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-card p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-semibold text-xl flex items-center gap-2.5 text-foreground tracking-tight">
+              <Star className="w-5 h-5 text-purple-500" />
               Student Reviews ({analytics?.reviews?.list?.length ?? analytics?.reviewsCount ?? 0})
             </h3>
           </div>
@@ -597,7 +601,7 @@ export default function EventAnalyticsPage({
           ) : (
             <div className="space-y-4">
               {analytics.reviews.list.map((review: any) => (
-                <div key={review.id} className="border border-border rounded-lg p-4 bg-accent/20">
+                <div key={review.id} className="border border-[var(--color-border-light)] rounded-xl p-5 bg-[var(--color-surface)] shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <p className="font-medium text-foreground">
@@ -638,9 +642,11 @@ interface MetricCardProps {
 }
 
 function MetricCard({ icon, title, value, subtitle, loading, color }: MetricCardProps) {
+  const baseCardClass = "rounded-2xl sm:rounded-[1.5rem] border border-border p-5 sm:p-7 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-center bg-card relative overflow-hidden group";
+
   if (loading) {
     return (
-      <div className={`${color} rounded-xl p-6 border border-border`}>
+      <div className={baseCardClass}>
         <Skeleton className="h-6 w-6 mb-3" />
         <Skeleton className="h-4 w-24 mb-2" />
         <Skeleton className="h-8 w-16 mb-2" />
@@ -649,14 +655,20 @@ function MetricCard({ icon, title, value, subtitle, loading, color }: MetricCard
     );
   }
 
+  // Extract the light mode color to use for the blob (e.g. "bg-blue-50" from "bg-blue-50 dark:bg-blue-950/20")
+  const lightBgColor = color.split(' ')[0] || '';
+
   return (
-    <div className={`${color} rounded-xl p-6 border border-border`}>
-      <div className="flex items-center gap-3 mb-3">
-        {icon}
-        <h3 className="font-medium text-foreground">{title}</h3>
+    <div className={baseCardClass}>
+      <div className={`absolute -right-4 -top-4 w-24 h-24 ${lightBgColor} rounded-full opacity-40 dark:opacity-10 group-hover:scale-150 transition-transform duration-500 pointer-events-none`} />
+      <div className="flex flex-row items-center justify-between w-full mb-3 sm:mb-4 z-10">
+        <span className="text-sm sm:text-base font-medium text-muted-foreground">{title}</span>
+        <div className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl ${color} bg-opacity-20`}>
+          {icon}
+        </div>
       </div>
-      <p className="text-3xl font-bold text-foreground mb-1">{value}</p>
-      <p className="text-sm text-muted-foreground">{subtitle}</p>
+      <div className="text-3xl sm:text-4xl font-bold tracking-tight w-full text-left mb-1 z-10">{value}</div>
+      <p className="text-xs sm:text-sm text-muted-foreground w-full text-left z-10">{subtitle}</p>
     </div>
   );
 }

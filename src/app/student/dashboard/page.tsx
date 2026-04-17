@@ -243,7 +243,7 @@ export default function StudentDashboard() {
         if (userEntry) setUserRank(userEntry);
       }
     } catch (error: any) {
-      console.error('Error fetching dashboard data:', error);
+      console.log('Error fetching dashboard data:', error?.response?.status || error?.message);
     } finally {
       setLoading(false);
     }
@@ -480,12 +480,12 @@ export default function StudentDashboard() {
                         {/* Rank badge */}
                         <div
                           className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-[15px] font-extrabold border transition-all ${index === 0
-                              ? 'bg-[#ffe44d] border-[#e6be00] text-[#8a7200]' // 1st (Solid Gold Base)
-                              : index === 1
-                                ? 'bg-[#e2e8f0] border-[#cbd5e1] text-[#475569]' // 2nd (Solid Silver/Slate)
-                                : index === 2
-                                  ? 'bg-[#ffedd5] border-[#fdba74] text-[#9a3412]' // 3rd (Solid Bronze)
-                                  : 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-muted)] opacity-80' // Others (Subdued)
+                            ? 'bg-[#ffe44d] border-[#e6be00] text-[#8a7200]' // 1st (Solid Gold Base)
+                            : index === 1
+                              ? 'bg-[#e2e8f0] border-[#cbd5e1] text-[#475569]' // 2nd (Solid Silver/Slate)
+                              : index === 2
+                                ? 'bg-[#ffedd5] border-[#fdba74] text-[#9a3412]' // 3rd (Solid Bronze)
+                                : 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-muted)] opacity-80' // Others (Subdued)
                             }`}
                         >
                           {entry.rank}

@@ -94,7 +94,7 @@ export function NotificationDropdown({
             <p>No notifications yet</p>
           </div>
         ) : (
-          <div className='divide-y divide-[var(--color-border-light)]'>
+          <div className='p-3 space-y-2.5'>
             {notifications.map((notification) => (
               <NotificationItem
                 key={notification.id}
