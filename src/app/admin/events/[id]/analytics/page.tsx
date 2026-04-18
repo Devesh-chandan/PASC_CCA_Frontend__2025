@@ -262,9 +262,12 @@ export default function EventAnalyticsPage({
 
 
 
+  const adminHoverCardClass = 'shadow-sm hover:shadow-md transition-shadow duration-300';
+  const overviewHeroPanelClass = `rounded-2xl sm:rounded-[1.5rem] p-5 sm:p-7 flex flex-col bg-[var(--color-card)] border border-[var(--color-border)] ${adminHoverCardClass}`;
+
   return (
-    <main className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <main className="min-h-screen bg-background p-4 sm:p-6 md:p-8 lg:p-10">
+      <div className="max-w-7xl mx-auto space-y-8 md:space-y-10">
         {/* Header */}
         <div>
           <button
@@ -326,47 +329,47 @@ export default function EventAnalyticsPage({
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
-            icon={<Users className="w-6 h-6 text-blue-500" />}
+            icon={<Users className="w-5 h-5" />}
             title="Total RSVPs"
             value={analytics?.totalRsvps ?? rsvps.length}
             subtitle={`${event?.maxCapacity ? `of ${event.maxCapacity} capacity` : 'registered'}`}
             loading={loading}
-            color="bg-blue-50 dark:bg-blue-950/20"
           />
           <MetricCard
-            icon={<CheckCircle className="w-6 h-6 text-green-500" />}
+            icon={<CheckCircle className="w-5 h-5" />}
             title="Attendance"
             value={analytics?.totalAttendance ?? analytics?.attendanceList?.length ?? 0}
             subtitle={`${analytics?.attendanceRate ?? 0}% attendance rate`}
             loading={loading}
-            color="bg-green-50 dark:bg-green-950/20"
           />
           <MetricCard
-            icon={<Award className="w-6 h-6 text-yellow-500" />}
+            icon={<Award className="w-5 h-5" />}
             title="Credits Distributed"
             value={analytics?.totalCreditsDistributed ?? 0}
             subtitle={`${analytics?.sessionsCount ?? 0} sessions`}
             loading={loading}
-            color="bg-yellow-500/10 text-yellow-500"
           />
           <MetricCard
-            icon={<Star className="w-6 h-6 text-purple-500" />}
+            icon={<Star className="w-5 h-5" />}
             title="Average Rating"
             value={analytics?.averageRating?.toFixed(1) ?? '0.0'}
             subtitle={`${analytics?.reviewsCount ?? analytics?.reviews?.list?.length ?? 0} reviews`}
             loading={loading}
-            color="bg-purple-500/10 text-purple-500"
           />
         </div>
 
         {/* Attendance Progress */}
         {analytics && analytics.totalRsvps > 0 && (
-          <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-card p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className={overviewHeroPanelClass}>
             <div className="flex items-center mb-6">
-              <h3 className="font-semibold text-xl flex items-center gap-2.5 text-foreground tracking-tight">
-                <TrendingUp className="w-5 h-5 text-[var(--color-info)]" />
-                Attendance Overview
-              </h3>
+              <div className="flex items-center gap-2.5">
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#2BA6DF] border border-[#55B8E5]">
+                  <TrendingUp className="w-4 h-4 text-white" />
+                </span>
+                <h3 className="text-xl sm:text-[21px] font-semibold tracking-tight text-foreground">
+                  Attendance Overview
+                </h3>
+              </div>
             </div>
             <div className="space-y-4">
               <div>
@@ -395,12 +398,16 @@ export default function EventAnalyticsPage({
         )}
 
         {/* RSVP List */}
-        <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-card p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+        <div className={overviewHeroPanelClass}>
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-            <h3 className="font-semibold text-xl flex items-center gap-2.5 text-foreground tracking-tight">
-              <Users className="w-5 h-5 text-[var(--color-info)]" />
-              RSVPs ({filteredRsvps.length})
-            </h3>
+            <div className="flex items-center gap-2.5">
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#FDB811] border border-[#E5A50F]">
+                <Users className="w-4 h-4 text-[#6b4e00]" />
+              </span>
+              <h3 className="text-xl sm:text-[21px] font-semibold tracking-tight text-foreground">
+                RSVPs ({filteredRsvps.length})
+              </h3>
+            </div>
             <div className="flex gap-2 p-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full">
               <button
                 onClick={() => setRsvpFilter('WAITLISTED')}
@@ -518,12 +525,16 @@ export default function EventAnalyticsPage({
         </div>
 
         {/* Credits & Attendance List */}
-        <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-card p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+        <div className={overviewHeroPanelClass}>
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-semibold text-xl flex items-center gap-2.5 text-foreground tracking-tight">
-              <Award className="w-5 h-5 text-yellow-500" />
-              Credits & Attendance ({analytics?.attendanceList?.length || 0})
-            </h3>
+            <div className="flex items-center gap-2.5">
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500 border border-emerald-400">
+                <Award className="w-4 h-4 text-white" />
+              </span>
+              <h3 className="text-xl sm:text-[21px] font-semibold tracking-tight text-foreground">
+                Credits & Attendance ({analytics?.attendanceList?.length || 0})
+              </h3>
+            </div>
           </div>
 
           {loading ? (
@@ -581,12 +592,16 @@ export default function EventAnalyticsPage({
         </div>
 
         {/* Reviews List */}
-        <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-card p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+        <div className={overviewHeroPanelClass}>
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-semibold text-xl flex items-center gap-2.5 text-foreground tracking-tight">
-              <Star className="w-5 h-5 text-purple-500" />
-              Student Reviews ({analytics?.reviews?.list?.length ?? analytics?.reviewsCount ?? 0})
-            </h3>
+            <div className="flex items-center gap-2.5">
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-purple-500 border border-purple-400">
+                <Star className="w-4 h-4 text-white" />
+              </span>
+              <h3 className="text-xl sm:text-[21px] font-semibold tracking-tight text-foreground">
+                Student Reviews ({analytics?.reviews?.list?.length ?? analytics?.reviewsCount ?? 0})
+              </h3>
+            </div>
           </div>
 
           {loading ? (
@@ -638,37 +653,35 @@ interface MetricCardProps {
   value: number | string;
   subtitle: string;
   loading: boolean;
-  color: string;
+  color?: string;
 }
 
-function MetricCard({ icon, title, value, subtitle, loading, color }: MetricCardProps) {
-  const baseCardClass = "rounded-2xl sm:rounded-[1.5rem] border border-border p-5 sm:p-7 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-center bg-card relative overflow-hidden group";
+function MetricCard({ icon, title, value, subtitle, loading }: MetricCardProps) {
+  const baseCardClass = "rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col justify-center relative group";
 
   if (loading) {
     return (
       <div className={baseCardClass}>
-        <Skeleton className="h-6 w-6 mb-3" />
-        <Skeleton className="h-4 w-24 mb-2" />
+        <div className="flex flex-row items-center justify-between w-full mb-3 sm:mb-4">
+          <Skeleton className="h-5 w-24" />
+          <Skeleton className="h-5 w-5 rounded-full" />
+        </div>
         <Skeleton className="h-8 w-16 mb-2" />
         <Skeleton className="h-3 w-20" />
       </div>
     );
   }
 
-  // Extract the light mode color to use for the blob (e.g. "bg-blue-50" from "bg-blue-50 dark:bg-blue-950/20")
-  const lightBgColor = color.split(' ')[0] || '';
-
   return (
     <div className={baseCardClass}>
-      <div className={`absolute -right-4 -top-4 w-24 h-24 ${lightBgColor} rounded-full opacity-40 dark:opacity-10 group-hover:scale-150 transition-transform duration-500 pointer-events-none`} />
-      <div className="flex flex-row items-center justify-between w-full mb-3 sm:mb-4 z-10">
+      <div className="flex flex-row items-center justify-between w-full mb-3 sm:mb-4">
         <span className="text-sm sm:text-base font-medium text-muted-foreground">{title}</span>
-        <div className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl ${color} bg-opacity-20`}>
+        <div className="text-muted-foreground/80 group-hover:text-primary transition-colors">
           {icon}
         </div>
       </div>
-      <div className="text-3xl sm:text-4xl font-bold tracking-tight w-full text-left mb-1 z-10">{value}</div>
-      <p className="text-xs sm:text-sm text-muted-foreground w-full text-left z-10">{subtitle}</p>
+      <div className="text-3xl sm:text-4xl font-bold tracking-tight w-full text-left mb-1 text-foreground">{value}</div>
+      <p className="text-xs sm:text-sm text-muted-foreground w-full text-left">{subtitle}</p>
     </div>
   );
 }

@@ -335,7 +335,7 @@ export default function AdminAnnouncementsPage() {
               <div className="flex flex-wrap gap-2">
                 {[
                   { value: 'LOW', label: 'Low', color: 'bg-[var(--color-surface)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] border-[var(--color-border)]' },
-                  { value: 'NORMAL', label: 'Normal', color: 'bg-[var(--color-surface-hover)] text-[var(--color-primary)] hover:bg-[var(--color-surface-hover)] border-[var(--color-info)]/30' },
+                  { value: 'NORMAL', label: 'Normal', color: 'bg-transparent text-[var(--color-primary)] hover:bg-[var(--color-surface)] border-[var(--color-border)]' },
                   { value: 'HIGH', label: 'High', color: 'bg-orange-100 text-orange-800 hover:bg-orange-200 border-orange-200' },
                   { value: 'URGENT', label: 'Urgent', color: 'bg-red-100 text-red-800 hover:bg-red-200 border-red-200' }
                 ].map((priority) => (

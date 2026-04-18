@@ -4,8 +4,6 @@ import axios from "axios";
 import React, { useState } from 'react';
 import {
   Calendar,
-  Sun,
-  Moon,
   CheckCircle,
   AlertCircle,
   MapPin,
@@ -13,7 +11,6 @@ import {
   Award,
   Clock,
   FileText,
-  Sparkles,
   Plus,
   ArrowLeft
 } from 'lucide-react';
@@ -44,13 +41,8 @@ const Page: React.FC = () => {
     prerequisite: '',
   });
 
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<null | 'success' | 'error'>(null);
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(prev => !prev);
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -121,22 +113,6 @@ const Page: React.FC = () => {
       };
 
       console.log("📦 Payload being sent to backend:", payload);
-      console.log("📊 Payload types:", {
-        title: typeof payload.title,
-        description: typeof payload.description,
-        location: typeof payload.location,
-        credits: typeof payload.credits,
-        capacity: typeof payload.capacity,
-        numDays: typeof payload.numDays,
-        startDate: typeof payload.startDate,
-        endDate: typeof payload.endDate,
-      });
-      console.log("📋 Payload values:", {
-        credits: payload.credits,
-        capacity: payload.capacity,
-        numDays: payload.numDays,
-      });
-
       const res = await axios.post(`${apiUrl}/events`, payload, {
         headers: {
           'Content-Type': 'application/json',
@@ -184,323 +160,210 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen transition-all duration-500 ${isDarkMode
-      ? 'bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800'
-      : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'
-      }`}>
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-20">
-        <div className={`absolute inset-0 bg-grid-pattern ${isDarkMode ? 'opacity-30' : 'opacity-20'}`}></div>
-      </div>
-
-      <div className="relative container mx-auto px-4 py-8 max-w-5xl">
+    <div className="min-h-screen p-6 bg-background">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
         {/* Navigation Header */}
-        <div className="mb-6">
-          <button
-            className={`flex items-center text-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors ${isDarkMode ? 'text-[var(--color-info-light)] hover:text-[var(--color-info-lighter)]' : 'text-[var(--color-primary)] hover:text-[var(--color-primary)]'
-              }`}
-            onClick={() => router.push('/admin/dashboard')}
-          >
-            <ArrowLeft className="w-5 h-5 mr-1" />
-            <span>Back to Dashboard</span>
-          </button>
-        </div>
-
-        {/* Animated Header */}
-        <div className={`rounded-2xl shadow-2xl mb-8 overflow-hidden backdrop-blur-xl border transition-all duration-300 hover:shadow-3xl ${isDarkMode
-          ? 'bg-[var(--color-surface)]/60 border-[var(--color-border)]/50 shadow-black/20'
-          : 'bg-[var(--color-card)]/60 border-white/50 shadow-blue-500/10'
-          }`}>
-          <div className="p-8 lg:p-10">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 mb-2">
-
-                  <p className={`text-3xl lg:text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-[var(--color-text-primary)]'
-                    }`}>
-                    Create New Event
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={toggleDarkMode}
-                  className={`group p-3 rounded-xl transition-all duration-300 hover:scale-110 active:scale-95 ${isDarkMode
-                    ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-[var(--color-text-primary)] shadow-lg shadow-amber-400/25 hover:shadow-amber-400/40'
-                    : 'bg-gradient-to-r from-slate-700 to-gray-800 text-white shadow-lg shadow-gray-700/25 hover:shadow-gray-700/40'
-                    }`}
-                  title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                >
-                  {isDarkMode ? (
-                    <Sun className="w-5 h-5 group-hover:rotate-180 transition-transform duration-300" />
-                  ) : (
-                    <Moon className="w-5 h-5 group-hover:-rotate-12 transition-transform duration-300" />
-                  )}
-                </button>
-
-                <div className={`flex items-center gap-3 px-5 py-3 rounded-xl transition-all duration-300 ${isDarkMode
-                  ? 'bg-[var(--color-surface)]/30 text-[var(--color-info-lighter)] border border-[var(--color-info)]/40/30'
-                  : 'bg-[var(--color-surface-hover)] text-[var(--color-primary)] border border-[var(--color-info)]/30'
-                  }`}>
-                  <Calendar className="w-5 h-5" />
-                  <span className="font-semibold">ACM Student Chapter</span>
-                </div>
+        <div className="flex items-center gap-4 bg-[var(--color-card)] p-8 rounded-[2.5rem] border border-[var(--color-border)] shadow-sm">
+          <div className="flex-1 flex flex-col gap-2">
+            <button
+              className="flex items-center gap-2 self-start px-3 py-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => router.push('/admin/dashboard')}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to Dashboard</span>
+            </button>
+            <div>
+              <p className="text-3xl font-bold text-foreground">
+                Create New Event
+              </p>
+              <p className="text-muted-foreground mt-1 font-medium">
+                Set up a new event for students to RSVP and engage.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="px-5 py-3 rounded-2xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 flex items-center gap-3">
+              <Calendar className="w-5 h-5 text-primary" />
+              <div className="flex flex-col">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-primary/60 leading-tight">Organizer</span>
+                <span className="text-xs font-semibold text-primary">ACM Student Chapter</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Main Form Card */}
-        <div className={`rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl border transition-all duration-300 ${isDarkMode
-          ? 'bg-[var(--color-surface)]/60 border-[var(--color-border)]/50 shadow-black/20'
-          : 'bg-[var(--color-card)]/70 border-white/50 shadow-blue-500/10'
-          }`}>
-          <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="p-8 lg:p-10">
-            <div className="grid gap-8">
-              {/* Event Title */}
-              <div className="group space-y-3">
-                <label className={`flex items-center gap-3 text-sm font-bold uppercase tracking-wider transition-colors ${isDarkMode ? 'text-[var(--color-text-secondary)] group-hover:text-[var(--color-info-light)]' : 'text-[var(--color-text-secondary)] group-hover:text-[var(--color-primary)]'
-                  }`}>
-                  <div className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-500/10'}`}>
-                    <FileText className="w-4 h-4" />
-                  </div>
-                  Event Title
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  placeholder="Enter an engaging and memorable event title..."
-                  className={`w-full px-5 py-4 rounded-xl border-2 transition-all duration-300 focus:ring-4 focus:ring-[var(--color-input-focus)]/20 focus:border-[var(--color-input-focus)] focus:scale-[1.02] ${isDarkMode
-                    ? 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] hover:bg-[var(--color-surface-hover)] hover:border-[var(--color-border)]'
-                    : 'bg-[var(--color-card)]/70 border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-gray-500 hover:bg-[var(--color-card)]/90 hover:border-[var(--color-border)]'
-                    }`}
-                  required
-                />
-              </div>
+        <div className="bg-[var(--color-card)] rounded-[2.5rem] border border-[var(--color-border)] p-8 sm:p-10 shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32" />
+          
+          <h2 className="text-2xl font-bold text-foreground mb-8 flex items-center gap-3 relative z-10">
+            <FileText className="w-6 h-6 text-primary" />
+            Core Configuration
+          </h2>
 
-              {/* Description */}
-              <div className="group space-y-3">
-                <label className={`flex items-center gap-3 text-sm font-bold uppercase tracking-wider transition-colors ${isDarkMode ? 'text-[var(--color-text-secondary)] group-hover:text-purple-400' : 'text-[var(--color-text-secondary)] group-hover:text-purple-600'
-                  }`}>
-                  <div className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-500/10'}`}>
-                    <FileText className="w-4 h-4" />
-                  </div>
-                  Event Description
-                </label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  placeholder="Describe what makes this event special and why people should attend..."
-                  rows={5}
-                  className={`w-full px-5 py-4 rounded-xl border-2 transition-all duration-300 focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:scale-[1.01] resize-none ${isDarkMode
-                    ? 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] hover:bg-[var(--color-surface-hover)] hover:border-[var(--color-border)]'
-                    : 'bg-[var(--color-card)]/70 border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-gray-500 hover:bg-[var(--color-card)]/90 hover:border-[var(--color-border)]'
-                    }`}
-                  required
-                />
-              </div>
+          <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-8 relative z-10">
+            
+            {/* Event Title */}
+            <div className="space-y-3">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Event Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                placeholder="Enter an engaging and memorable event title..."
+                className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all text-lg font-semibold placeholder:font-medium"
+                required
+              />
+            </div>
 
-              {/* Date Range */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="group space-y-3">
-                  <label className={`flex items-center gap-3 text-sm font-bold uppercase tracking-wider transition-colors ${isDarkMode ? 'text-[var(--color-text-secondary)] group-hover:text-green-400' : 'text-[var(--color-text-secondary)] group-hover:text-green-600'
-                    }`}>
-                    <div className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-green-500/20' : 'bg-green-500/10'}`}>
-                      <Calendar className="w-4 h-4" />
-                    </div>
-                    Start Date
-                  </label>
+            {/* Description */}
+            <div className="space-y-3">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Event Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Describe what makes this event special and why people should attend..."
+                rows={5}
+                className="w-full p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all text-base font-medium leading-relaxed resize-y"
+                required
+              />
+            </div>
+
+            {/* Date Range */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Start Date</label>
+                <div className="relative">
                   <input
                     type="date"
                     name="startDate"
                     value={formData.startDate}
                     onChange={handleInputChange}
-                    className={`w-full px-5 py-4 rounded-xl border-2 transition-all duration-300 focus:ring-4 focus:ring-green-500/20 focus:border-green-500 focus:scale-[1.02] ${isDarkMode
-                      ? 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] hover:border-[var(--color-border)]'
-                      : 'bg-[var(--color-card)]/70 border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-card)]/90 hover:border-[var(--color-border)]'
-                      }`}
+                    className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
                     required
                   />
+                  <Calendar className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 </div>
+              </div>
 
-                <div className="group space-y-3">
-                  <label className={`flex items-center gap-3 text-sm font-bold uppercase tracking-wider transition-colors ${isDarkMode ? 'text-[var(--color-text-secondary)] group-hover:text-green-400' : 'text-[var(--color-text-secondary)] group-hover:text-green-600'
-                    }`}>
-                    <div className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-green-500/20' : 'bg-green-500/10'}`}>
-                      <Calendar className="w-4 h-4" />
-                    </div>
-                    End Date
-                  </label>
+              <div className="space-y-3">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">End Date</label>
+                <div className="relative">
                   <input
                     type="date"
                     name="endDate"
                     value={formData.endDate}
                     onChange={handleInputChange}
-                    className={`w-full px-5 py-4 rounded-xl border-2 transition-all duration-300 focus:ring-4 focus:ring-green-500/20 focus:border-green-500 focus:scale-[1.02] ${isDarkMode
-                      ? 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] hover:border-[var(--color-border)]'
-                      : 'bg-[var(--color-card)]/70 border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-card)]/90 hover:border-[var(--color-border)]'
-                      }`}
+                    className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
                     required
                   />
+                  <Calendar className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 </div>
               </div>
+            </div>
 
-              {/* Location */}
-              <div className="group space-y-3">
-                <label className={`flex items-center gap-3 text-sm font-bold uppercase tracking-wider transition-colors ${isDarkMode ? 'text-[var(--color-text-secondary)] group-hover:text-red-400' : 'text-[var(--color-text-secondary)] group-hover:text-red-600'
-                  }`}>
-                  <div className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-red-500/20' : 'bg-red-500/10'}`}>
-                    <MapPin className="w-4 h-4" />
-                  </div>
-                  Event Location
-                </label>
+            {/* Location */}
+            <div className="space-y-3">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Event Location</label>
+              <input
+                type="text"
+                name="location"
+                value={formData.location}
+                onChange={handleInputChange}
+                placeholder="Where will this amazing event take place?"
+                className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
+                required
+              />
+            </div>
+
+            {/* Credits and Capacity */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Academic Credits</label>
                 <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
+                  type="number"
+                  name="credits"
+                  value={formData.credits === 0 ? '' : formData.credits}
                   onChange={handleInputChange}
-                  placeholder="Where will this amazing event take place?"
-                  className={`w-full px-5 py-4 rounded-xl border-2 transition-all duration-300 focus:ring-4 focus:ring-red-500/20 focus:border-red-500 focus:scale-[1.02] ${isDarkMode
-                    ? 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] hover:bg-[var(--color-surface-hover)] hover:border-[var(--color-border)]'
-                    : 'bg-[var(--color-card)]/70 border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-gray-500 hover:bg-[var(--color-card)]/90 hover:border-[var(--color-border)]'
-                    }`}
+                  placeholder="e.g., 2.5"
+                  min="0"
+                  step="0.5"
+                  className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
                   required
                 />
               </div>
 
-              {/* Credits and Capacity */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="group space-y-3">
-                  <label className={`flex items-center gap-3 text-sm font-bold uppercase tracking-wider transition-colors ${isDarkMode ? 'text-[var(--color-text-secondary)] group-hover:text-yellow-400' : 'text-[var(--color-text-secondary)] group-hover:text-yellow-600'
-                    }`}>
-                    <div className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-yellow-500/20' : 'bg-yellow-500/10'}`}>
-                      <Award className="w-4 h-4" />
-                    </div>
-                    Academic Credits
-                  </label>
-                  <input
-                    type="number"
-                    name="credits"
-                    value={formData.credits === 0 ? '' : formData.credits}
-                    onChange={handleInputChange}
-                    placeholder="e.g., 2.5"
-                    min="0"
-                    step="0.5"
-                    className={`w-full px-5 py-4 rounded-xl border-2 transition-all duration-300 focus:ring-4 focus:ring-yellow-500/20 focus:border-yellow-500 focus:scale-[1.02] ${isDarkMode
-                      ? 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] hover:bg-[var(--color-surface-hover)] hover:border-[var(--color-border)]'
-                      : 'bg-[var(--color-card)]/70 border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-gray-500 hover:bg-[var(--color-card)]/90 hover:border-[var(--color-border)]'
-                      }`}
-                    required
-                  />
-                </div>
-
-                <div className="group space-y-3">
-                  <label className={`flex items-center gap-3 text-sm font-bold uppercase tracking-wider transition-colors ${isDarkMode ? 'text-[var(--color-text-secondary)] group-hover:text-indigo-400' : 'text-[var(--color-text-secondary)] group-hover:text-indigo-600'
-                    }`}>
-                    <div className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-indigo-500/20' : 'bg-indigo-500/10'}`}>
-                      <Users className="w-4 h-4" />
-                    </div>
-                    Event Capacity
-                  </label>
-                  <input
-                    type="number"
-                    name="capacity"
-                    value={formData.capacity === 0 ? '' : formData.capacity}
-                    onChange={handleInputChange}
-                    placeholder="e.g., 50"
-                    min="1"
-                    className={`w-full px-5 py-4 rounded-xl border-2 transition-all duration-300 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 focus:scale-[1.02] ${isDarkMode
-                      ? 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] hover:bg-[var(--color-surface-hover)] hover:border-[var(--color-border)]'
-                      : 'bg-[var(--color-card)]/70 border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-gray-500 hover:bg-[var(--color-card)]/90 hover:border-[var(--color-border)]'
-                      }`}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Prerequisites */}
-              <div className="group space-y-3">
-                <label className={`flex items-center gap-3 text-sm font-bold uppercase tracking-wider transition-colors ${isDarkMode ? 'text-[var(--color-text-secondary)] group-hover:text-pink-400' : 'text-[var(--color-text-secondary)] group-hover:text-pink-600'
-                  }`}>
-                  <div className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-pink-500/20' : 'bg-pink-500/10'}`}>
-                    <FileText className="w-4 h-4" />
-                  </div>
-                  Prerequisites (Optional)
-                </label>
-                <textarea
-                  name="prerequisite"
-                  value={formData.prerequisite}
+              <div className="space-y-3">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Event Capacity</label>
+                <input
+                  type="number"
+                  name="capacity"
+                  value={formData.capacity === 0 ? '' : formData.capacity}
                   onChange={handleInputChange}
-                  placeholder="Any requirements, skills, or knowledge needed for attendees..."
-                  rows={4}
-                  className={`w-full px-5 py-4 rounded-xl border-2 transition-all duration-300 focus:ring-4 focus:ring-pink-500/20 focus:border-pink-500 focus:scale-[1.01] resize-none ${isDarkMode
-                    ? 'bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] hover:bg-[var(--color-surface-hover)] hover:border-[var(--color-border)]'
-                    : 'bg-[var(--color-card)]/70 border-[var(--color-border)] text-[var(--color-text-primary)] placeholder-gray-500 hover:bg-[var(--color-card)]/90 hover:border-[var(--color-border)]'
-                    }`}
+                  placeholder="e.g., 50"
+                  min="1"
+                  className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
+                  required
                 />
               </div>
-
-              {/* Duration Display */}
-              {formData.startDate && formData.endDate && (
-                <Alert className={`border-2 rounded-xl transition-all duration-300 hover:scale-[1.01] ${isDarkMode
-                  ? 'bg-cyan-900/20 border-cyan-600/30 text-cyan-300'
-                  : 'bg-cyan-50 border-cyan-200 text-cyan-700'
-                  }`}>
-                  <Clock className="w-5 h-5" />
-                  <AlertDescription className="flex items-center gap-3 text-base">
-                    <span className="font-medium">Event Duration:</span>
-                    <span className={`font-bold text-lg px-3 py-1 rounded-lg ${isDarkMode ? 'bg-cyan-500/20 text-cyan-300' : 'bg-cyan-500/10 text-cyan-700'
-                      }`}>
-                      {calculateNumDays(formData.startDate, formData.endDate)} day(s)
-                    </span>
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {/* Status Messages */}
-              {submitStatus === 'success' && (
-                <Alert className="border-2 border-green-300 bg-green-50 text-green-800 rounded-xl animate-pulse">
-                  <CheckCircle className="w-5 h-5" />
-                  <AlertDescription className="font-bold text-base flex items-center gap-2">
-                    Event created successfully! 🎉 Redirecting to dashboard...
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {submitStatus === 'error' && (
-                <Alert className="border-2 border-red-300 bg-red-50 text-red-800 rounded-xl">
-                  <AlertCircle className="w-5 h-5" />
-                  <AlertDescription className="font-bold text-base">
-                    Failed to create event. Please check all fields and try again.
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                size="lg"
-                disabled={isSubmitting}
-                className="bg-blue-500 text-lg py-2 px-4 text-white hover:bg-[var(--color-button-primary)] w-full"
-              >
-                <Plus className="h-6 w-6 mr-2" />
-                {isSubmitting ? 'Creating Event...' : 'Create Event'}
-              </Button>
             </div>
+
+            {/* Prerequisites */}
+            <div className="space-y-3">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Prerequisites (Optional)</label>
+              <textarea
+                name="prerequisite"
+                value={formData.prerequisite}
+                onChange={handleInputChange}
+                placeholder="Any requirements, skills, or knowledge needed for attendees..."
+                rows={3}
+                className="w-full p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all text-base font-medium resize-y"
+              />
+            </div>
+
+            {/* Duration Display */}
+            {formData.startDate && formData.endDate && (
+              <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20">
+                <Clock className="w-5 h-5 text-blue-600" />
+                <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                  Computed Schedule: <span className="font-bold underline underline-offset-4">{calculateNumDays(formData.startDate, formData.endDate)} session days</span> planned.
+                </p>
+              </div>
+            )}
+
+            {/* Status Messages */}
+            {submitStatus === 'success' && (
+              <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+                <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                <p className="text-sm font-semibold">Event created successfully! 🎉 Redirecting to dashboard...</p>
+              </div>
+            )}
+
+            {submitStatus === 'error' && (
+              <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-red-50 text-red-600 border border-red-100 animate-in shake-in-1">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <p className="text-sm font-semibold">Failed to create event. Please check all fields and try again.</p>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <div className="pt-6 border-t border-[var(--color-border)]/50">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] h-14 rounded-2xl disabled:opacity-50 flex items-center justify-center gap-3 transition-all active:scale-95 font-bold text-lg shadow-sm"
+              >
+                {isSubmitting ? <Plus className="w-6 h-6 animate-spin" /> : <Plus className="w-6 h-6" />}
+                {isSubmitting ? 'Creating Event...' : 'Create Event'}
+              </button>
+            </div>
+            
           </form>
         </div>
       </div>
-
-      <style jsx>{`
-        .bg-grid-pattern {
-          background-image: radial-gradient(circle, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
-          background-size: 20px 20px;
-        }
-      `}</style>
     </div>
   );
 };

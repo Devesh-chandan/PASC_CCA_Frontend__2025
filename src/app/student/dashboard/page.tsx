@@ -400,20 +400,68 @@ export default function StudentDashboard() {
               </div>
 
               {/* Achievements Card */}
-              <div className={`lg:col-span-2 ${overviewHeroPanelClass} text-[var(--color-text-primary)]`}>
-                <div className="w-full space-y-3.5">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2.5">
-                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#FDB811] border border-[#E5A50F]">
-                        <Trophy className="w-4 h-4 text-[#6b4e00]" />
-                      </span>
-                      <h3 className="text-xl sm:text-[21px] font-semibold tracking-tight text-foreground">Achievements</h3>
-                    </div>
+              {/* Achievements Card */}
+              <div className={`lg:col-span-2 ${overviewHeroPanelClass} flex flex-col`}>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#FDB811] border border-[#E5A50F]">
+                      <Trophy className="w-4 h-4 text-[#6b4e00]" />
+                    </span>
+                    <h3 className="text-xl sm:text-[21px] font-semibold tracking-tight text-foreground">Achievements</h3>
                   </div>
+                </div>
 
-                  <p className="text-sm md:text-base text-[var(--color-text-muted)] leading-relaxed w-full">
-                    Track your milestones and unlock badges as you attend more events and earn credits.
-                  </p>
+                <p className="text-sm md:text-[14px] text-[var(--color-text-muted)] leading-snug w-full mb-3">
+                  Unlock specialized badges as you attend more events and rack up credits!
+                </p>
+
+                <div className="flex flex-wrap gap-4 xl:gap-5 mt-auto content-end py-2">
+                  {[
+                    { 
+                      id: 1, 
+                      title: "First Steps", 
+                      icon: "/first-steps.png", 
+                      isUnlocked: stats.eventsAttended >= 1
+                    },
+                    { 
+                      id: 2, 
+                      title: "Getting Started", 
+                      icon: "/getting-started.png", 
+                      isUnlocked: stats.totalCredits >= 5
+                    },
+                    { 
+                      id: 3, 
+                      title: "Dedicated", 
+                      icon: "/dedicated-learner.png", 
+                      isUnlocked: stats.eventsAttended >= 5
+                    },
+                    { 
+                      id: 4, 
+                      title: "Collector", 
+                      icon: "/credit-collector.png", 
+                      isUnlocked: stats.totalCredits >= 20
+                    },
+                    { 
+                      id: 5, 
+                      title: "Master", 
+                      icon: "/credit-master.png", 
+                      isUnlocked: stats.totalCredits >= 50
+                    }
+                  ].map((badge) => (
+                    <div 
+                      key={badge.id}
+                      title={badge.title}
+                      className={`relative w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] xl:w-[65px] xl:h-[65px] flex-shrink-0 flex items-center justify-center transition-transform hover:scale-110 cursor-pointer ${
+                        badge.isUnlocked ? 'filter drop-shadow-md' : 'opacity-40 grayscale'
+                      }`}
+                    >
+                      <img 
+                        src={badge.icon} 
+                        alt={badge.title} 
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

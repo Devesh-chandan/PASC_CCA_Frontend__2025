@@ -345,71 +345,161 @@ export default function ProfilePage() {
                   </Card>
                 )}
 
-                {/* Milestones */}
+                {/* Badges Showcase (LeetCode Style) */}
+                <Card className="border-none shadow-sm bg-[var(--color-card)] relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-primary)]/5 rounded-full blur-3xl -mr-32 -mt-32" />
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>Earned Badges</span>
+                      <span className="text-2xl font-bold">{
+                        [
+                          stats.sessionsAttended >= 1,
+                          stats.totalCredits >= 5,
+                          stats.sessionsAttended >= 5,
+                          stats.totalCredits >= 20,
+                          stats.totalCredits >= 50
+                        ].filter(Boolean).length
+                      }</span>
+                    </CardTitle>
+                    <p className="text-sm text-[var(--color-text-muted)] mt-1">Your most recently unlocked achievements</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-4 items-center min-h-[100px]">
+                      {(() => {
+                        const allBadges = [
+                          { title: "First Steps", icon: "/first-steps.png", unlocked: stats.sessionsAttended >= 1 },
+                          { title: "Getting Started", icon: "/getting-started.png", unlocked: stats.totalCredits >= 5 },
+                          { title: "Dedicated Learner", icon: "/dedicated-learner.png", unlocked: stats.sessionsAttended >= 5 },
+                          { title: "Credit Collector", icon: "/credit-collector.png", unlocked: stats.totalCredits >= 20 },
+                          { title: "Credit Master", icon: "/credit-master.png", unlocked: stats.totalCredits >= 50 },
+                        ];
+                        const unlocked = allBadges.filter(b => b.unlocked).reverse();
+
+                        if (unlocked.length === 0) {
+                          return (
+                            <div className="w-full py-6 flex flex-col items-center justify-center text-[var(--color-text-muted)]">
+                              <Star className="w-8 h-8 opacity-20 mb-2" />
+                              <p className="text-sm">No badges earned yet</p>
+                            </div>
+                          );
+                        }
+
+                        return unlocked.map((badge, idx) => (
+                          <div key={idx} className="flex flex-col items-center gap-2 group cursor-pointer">
+                            <div className="w-[80px] h-[80px] md:w-[90px] md:h-[90px] relative transition-transform group-hover:scale-110 drop-shadow-md">
+                              <img
+                                src={badge.icon}
+                                alt={badge.title}
+                                className="w-full h-full object-contain"
+                              />
+                              {idx === 0 && (
+                                <span className="absolute -top-2 -right-2 bg-yellow-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md shadow-sm border border-yellow-400">NEW</span>
+                              )}
+                            </div>
+                            <span className="text-[11px] font-semibold text-[var(--color-text-secondary)] text-center max-w-[90px] truncate">{badge.title}</span>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* All Milestones */}
                 <Card className="border-none shadow-sm">
                   <CardHeader>
-                    <CardTitle>Milestones</CardTitle>
+                    <CardTitle>All Milestones Tracker</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="divide-y divide-[var(--color-border-light)]">
-                      {/* First Session */}
-                      <div className={`flex items-center gap-4 py-4 rounded-lg px-2 ${stats.sessionsAttended >= 1 ? 'bg-green-50/50' : 'bg-transparent'}`}>
-                        <div className={`p-3 rounded-full ${stats.sessionsAttended >= 1 ? 'bg-green-100' : 'bg-[var(--color-surface-hover)]'}`}>
-                        <div className={`p-3 rounded-full ${stats.sessionsAttended >= 1 ? 'bg-green-100' : 'bg-[var(--color-profile-icon-bg)]'}`}>
-                          <Star className={`w-6 h-6 ${stats.sessionsAttended >= 1 ? 'text-green-600' : 'text-[var(--color-text-muted)]'}`} />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold">First Steps</h4>
-                          <p className="text-sm text-[var(--color-text-muted)]">Attend your first session</p>
-                        </div>
-                        {stats.sessionsAttended >= 1 && (
-                          <Badge className="bg-green-600 text-white">Unlocked!</Badge>
-                        )}
-                      </div>
+                      {[
+                        {
+                          id: 1,
+                          title: "First Steps",
+                          description: "Attend your first session",
+                          icon: "/first-steps.png",
+                          isUnlocked: stats.sessionsAttended >= 1,
+                          current: stats.sessionsAttended,
+                          target: 1,
+                          unit: "sessions"
+                        },
+                        {
+                          id: 2,
+                          title: "Getting Started",
+                          description: "Earn 5 academic credits",
+                          icon: "/getting-started.png",
+                          isUnlocked: stats.totalCredits >= 5,
+                          current: stats.totalCredits,
+                          target: 5,
+                          unit: "credits"
+                        },
+                        {
+                          id: 3,
+                          title: "Dedicated Learner",
+                          description: "Attend 5 active sessions",
+                          icon: "/dedicated-learner.png",
+                          isUnlocked: stats.sessionsAttended >= 5,
+                          current: stats.sessionsAttended,
+                          target: 5,
+                          unit: "sessions"
+                        },
+                        {
+                          id: 4,
+                          title: "Credit Collector",
+                          description: "Accumulate 20 total credits",
+                          icon: "/credit-collector.png",
+                          isUnlocked: stats.totalCredits >= 20,
+                          current: stats.totalCredits,
+                          target: 20,
+                          unit: "credits"
+                        },
+                        {
+                          id: 5,
+                          title: "Credit Master",
+                          description: "Accumulate 50 total credits",
+                          icon: "/credit-master.png",
+                          isUnlocked: stats.totalCredits >= 50,
+                          current: stats.totalCredits,
+                          target: 50,
+                          unit: "credits"
+                        }
+                      ].map((badge) => (
+                        <div key={badge.id} className={`flex items-center gap-4 py-4 rounded-lg px-2 transition-colors ${badge.isUnlocked ? 'bg-[var(--color-surface)]/40 hover:bg-[var(--color-surface)]/80' : 'bg-transparent'}`}>
+                          <div className={`relative w-[50px] h-[50px] flex-shrink-0 flex items-center justify-center filter ${badge.isUnlocked ? 'drop-shadow-sm' : 'grayscale opacity-50'}`}>
+                            <img
+                              src={badge.icon}
+                              alt={badge.title}
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
 
-                      {/* 5 Sessions */}
-                      <div className={`flex items-center gap-4 py-4 rounded-lg px-2 ${stats.sessionsAttended >= 5 ? 'bg-blue-50/50' : 'bg-transparent'}`}>
-                        <div className={`p-3 rounded-full ${stats.sessionsAttended >= 5 ? 'bg-[var(--color-profile-icon-bg)]' : 'bg-[var(--color-profile-icon-bg)]'}`}>
-                          <Award className={`w-6 h-6 ${stats.sessionsAttended >= 5 ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-muted)]'}`} />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold">Getting Started</h4>
-                          <p className="text-sm text-[var(--color-text-muted)]">Attend 5 sessions ({stats.sessionsAttended}/5)</p>
-                        </div>
-                        {stats.sessionsAttended >= 5 && (
-                          <Badge className="bg-[var(--color-button-primary)] text-white">Unlocked!</Badge>
-                        )}
-                      </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <h4 className={`font-bold tracking-tight ${badge.isUnlocked ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'}`}>{badge.title}</h4>
+                              <span className="text-[11px] font-semibold text-[var(--color-text-muted)]">
+                                {Math.min(badge.current, badge.target)} / {badge.target} {badge.unit}
+                              </span>
+                            </div>
+                            <p className="text-[13px] text-[var(--color-text-muted)] mb-2 truncate">{badge.description}</p>
 
-                      {/* 10 Sessions */}
-                      <div className={`flex items-center gap-4 py-4 rounded-lg px-2 ${stats.sessionsAttended >= 10 ? 'bg-purple-50/50' : 'bg-transparent'}`}>
-                        <div className={`p-3 rounded-full ${stats.sessionsAttended >= 10 ? 'bg-purple-100' : 'bg-[var(--color-profile-icon-bg)]'}`}>
-                          <Trophy className={`w-6 h-6 ${stats.sessionsAttended >= 10 ? 'text-purple-600' : 'text-[var(--color-text-muted)]'}`} />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold">Dedicated Learner</h4>
-                          <p className="text-sm text-[var(--color-text-muted)]">Attend 10 sessions ({stats.sessionsAttended}/10)</p>
-                        </div>
-                        {stats.sessionsAttended >= 10 && (
-                          <Badge className="bg-purple-600 text-white">Unlocked!</Badge>
-                        )}
-                      </div>
+                            <div className="w-full bg-[var(--color-border-light)] rounded-full h-1.5 overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all duration-1000 ${badge.isUnlocked ? 'bg-emerald-500' : 'bg-[var(--color-primary)]'}`}
+                                style={{ width: `${Math.min((badge.current / badge.target) * 100, 100)}%` }}
+                              />
+                            </div>
+                          </div>
 
-                      {/* 50 Credits */}
-                      <div className={`flex items-center gap-4 py-4 rounded-lg px-2 ${stats.totalCredits >= 50 ? 'bg-yellow-50/50' : 'bg-transparent'}`}>
-                        <div className={`p-3 rounded-full ${stats.totalCredits >= 50 ? 'bg-yellow-100' : 'bg-[var(--color-profile-icon-bg)]'}`}>
-                          <Award className={`w-6 h-6 ${stats.totalCredits >= 50 ? 'text-yellow-600' : 'text-[var(--color-text-muted)]'}`} />
+                          {badge.isUnlocked && (
+                            <div className="flex-shrink-0 ml-2">
+                              <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-none px-2 py-0.5 pointer-events-none">
+                                Unlocked
+                              </Badge>
+                            </div>
+                          )}
                         </div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold">Credit Master</h4>
-                          <p className="text-sm text-[var(--color-text-muted)]">Earn 50 credits ({stats.totalCredits}/50)</p>
-                        </div>
-                        {stats.totalCredits >= 50 && (
-                          <Badge className="bg-yellow-600 text-white">Unlocked!</Badge>
-                        )}
-                      </div>
+                      ))}
                     </div>
-                    </div>
+
                   </CardContent>
                 </Card>
               </div>

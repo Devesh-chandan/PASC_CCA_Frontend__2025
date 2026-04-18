@@ -52,7 +52,6 @@ const EditEventPage: React.FC = () => {
     prerequisite: '',
   });
 
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [submitStatus, setSubmitStatus] = useState<null | 'success' | 'error'>(null);
@@ -123,8 +122,6 @@ const EditEventPage: React.FC = () => {
 
     if (eventId) fetchEventData();
   }, [eventId]);
-
-  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -245,14 +242,7 @@ const EditEventPage: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={toggleDarkMode}
-              className="p-4 rounded-2xl bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground transition-all active:scale-95 shadow-inner"
-              title="Toggle theme"
-            >
-              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-            <div className="px-5 py-3 rounded-2xl bg-primary/10 border border-primary/20 flex items-center gap-3">
+            <div className="px-5 py-3 rounded-2xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 flex items-center gap-3">
               <Calendar className="w-5 h-5 text-primary" />
               <div className="flex flex-col">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-primary/60 leading-tight">Organizer</span>
@@ -290,7 +280,7 @@ const EditEventPage: React.FC = () => {
                     value={formData.title}
                     onChange={handleInputChange}
                     placeholder="Enter a compelling title..."
-                    className="w-full h-14 px-5 rounded-2xl bg-muted/30 border border-border/50 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-lg font-semibold placeholder:font-medium"
+                    className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all text-lg font-semibold placeholder:font-medium"
                     required
                   />
                 </div>
@@ -302,7 +292,7 @@ const EditEventPage: React.FC = () => {
                     value={formData.description}
                     onChange={handleInputChange}
                     placeholder="Write a detailed description of what students can expect..."
-                    className="w-full p-5 rounded-2xl bg-muted/30 border border-border/50 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-base font-medium leading-relaxed"
+                    className="w-full p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all text-base font-medium leading-relaxed"
                     rows={6}
                     required
                   />
@@ -317,7 +307,7 @@ const EditEventPage: React.FC = () => {
                         name="startDate"
                         value={formData.startDate}
                         onChange={handleInputChange}
-                        className="w-full h-14 px-5 rounded-2xl bg-muted/30 border border-border/50 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-semibold"
+                        className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
                         required
                       />
                       <Calendar className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -331,7 +321,7 @@ const EditEventPage: React.FC = () => {
                         name="endDate"
                         value={formData.endDate}
                         onChange={handleInputChange}
-                        className="w-full h-14 px-5 rounded-2xl bg-muted/30 border border-border/50 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-semibold"
+                        className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
                         required
                       />
                       <Calendar className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -346,7 +336,7 @@ const EditEventPage: React.FC = () => {
                     value={formData.location}
                     onChange={handleInputChange}
                     placeholder="Physical room or meeting URL"
-                    className="w-full h-14 px-5 rounded-2xl bg-muted/30 border border-border/50 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-semibold"
+                    className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
                     required
                   />
                 </div>
@@ -360,7 +350,7 @@ const EditEventPage: React.FC = () => {
                       value={formData.credits}
                       onChange={handleInputChange}
                       placeholder="e.g., 5"
-                      className="w-full h-14 px-5 rounded-2xl bg-muted/30 border border-border/50 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-semibold"
+                      className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
                       required
                     />
                   </div>
@@ -372,7 +362,7 @@ const EditEventPage: React.FC = () => {
                       value={formData.capacity}
                       onChange={handleInputChange}
                       placeholder="e.g., 100"
-                      className="w-full h-14 px-5 rounded-2xl bg-muted/30 border border-border/50 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-semibold"
+                      className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
                       required
                     />
                   </div>
@@ -385,7 +375,7 @@ const EditEventPage: React.FC = () => {
                     value={formData.prerequisite}
                     onChange={handleInputChange}
                     placeholder="List any software, knowledge, or tools required..."
-                    className="w-full p-5 rounded-2xl bg-muted/30 border border-border/50 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-base font-medium"
+                    className="w-full p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all text-base font-medium"
                     rows={3}
                   />
                 </div>
@@ -413,31 +403,31 @@ const EditEventPage: React.FC = () => {
                   </div>
                 )}
 
-                <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-border/50">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex-1 bg-primary text-white h-14 rounded-2xl hover:shadow-[0_0_20px_rgba(var(--color-primary-rgb),0.4)] disabled:opacity-50 flex items-center justify-center gap-3 transition-all active:scale-95 font-bold text-lg"
-                  >
-                    {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <CheckCircle className="w-6 h-6" />}
-                    {isSubmitting ? 'Pushing Updates...' : 'Publish Modifications'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => router.push('/admin/dashboard')}
-                    className="px-10 h-14 rounded-2xl border-2 border-border font-semibold text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all active:scale-95"
-                  >
-                    Discard Changes
-                  </button>
-                </div>
-              </form>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-[var(--color-border)]/50">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] h-14 rounded-2xl disabled:opacity-50 flex items-center justify-center gap-3 transition-all active:scale-95 font-bold text-lg shadow-sm"
+            >
+              {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <CheckCircle className="w-6 h-6" />}
+              {isSubmitting ? 'Pushing Updates...' : 'Publish Modifications'}
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push('/admin/dashboard')}
+              className="px-10 h-14 rounded-2xl border border-[var(--color-border)] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-all active:scale-95 bg-transparent"
+            >
+              Discard Changes
+            </button>
+          </div>
+        </form>
+      </div>
 
-            {/* Attendance Section */}
-            <div className="bg-[var(--color-card)] rounded-[2.5rem] border border-[var(--color-border)] p-8 sm:p-10 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-1 bg-primary h-full opacity-50 group-hover:opacity-100 transition-opacity" />
-              <SessionManager eventId={Number(eventId)} eventStartDate={formData.startDate} eventEndDate={formData.endDate} />
-            </div>
+      {/* Attendance Section */}
+      <div className="bg-[var(--color-card)] rounded-[2.5rem] border border-[var(--color-border)] p-8 sm:p-10 shadow-sm relative overflow-hidden group">
+        <div className="absolute top-0 left-0 w-1 bg-[var(--color-primary)] h-full opacity-50 group-hover:opacity-100 transition-opacity" />
+        <SessionManager eventId={Number(eventId)} eventStartDate={formData.startDate} eventEndDate={formData.endDate} />
+      </div>
           </div>
 
           {/* Management Sidebar */}
@@ -501,13 +491,13 @@ const EditEventPage: React.FC = () => {
               <div className="grid grid-cols-1 gap-3">
                 <button
                   onClick={() => router.push(`/admin/events/${eventId}/analytics`)}
-                  className="w-full p-4 rounded-2xl bg-muted/30 border border-border/50 hover:bg-primary/5 hover:border-primary/20 hover:text-primary transition-all flex items-center justify-between group"
+                  className="w-full p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border-light)] hover:bg-[var(--color-primary)]/10 text-[var(--color-text-primary)] hover:border-[var(--color-primary)]/20 hover:text-[var(--color-primary)] transition-all flex items-center justify-between group"
                 >
                   <span className="font-bold">Real-time Analytics</span>
                   <ArrowLeft className="w-4 h-4 rotate-180 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
-                  className="w-full p-4 rounded-2xl bg-muted/30 border border-border/50 hover:bg-red-50 hover:border-red-100 hover:text-red-500 transition-all flex items-center justify-between group"
+                  className="w-full p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border-light)] hover:bg-red-500/10 text-red-600 dark:text-red-400 hover:border-red-500/20 transition-all flex items-center justify-between group"
                   onClick={() => alert("Permanent deletion requires higher clearance.")}
                 >
                   <span className="font-bold">Archive This Event</span>

@@ -85,53 +85,43 @@ export const EventCard = ({ onRefresh, ...event }: EventCardProps) => {
   };
 
   return (
-    <div className="mb-4 rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+    <div className="mb-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex-1 w-full lg:w-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-            <h3 className="font-bold text-[20px] md:text-[22px] text-foreground leading-tight tracking-tight">
+          <div className="flex items-center flex-wrap gap-2.5">
+            <h3 className="font-bold text-lg md:text-xl text-foreground leading-tight tracking-tight">
               {event.title}
             </h3>
             <div className="w-fit">{getStatusBadge(event.status)}</div>
           </div>
           
-          <div className="flex flex-col gap-2.5">
-            <div className="flex items-center gap-2.5 text-[14px] md:text-[15px] text-muted-foreground">
-              <div className="w-7 h-7 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
-                <Calendar className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
-              </div>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 mt-3">
+            <div className="flex items-center gap-1.5 text-sm md:text-[14.5px] text-muted-foreground">
+              <Calendar className="w-4 h-4 text-[var(--color-primary)] stroke-[2.5]" />
               <span className="font-medium text-[var(--color-text-secondary)]">
                 {formatDate(event.startDate)} - {formatDate(event.endDate)}
               </span>
             </div>
             
-            <div className="flex items-center gap-2.5 text-[14px] md:text-[15px] text-muted-foreground">
-              <div className="w-7 h-7 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
-                <MapPin className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
-              </div>
+            <div className="flex items-center gap-1.5 text-sm md:text-[14.5px] text-muted-foreground">
+              <MapPin className="w-4 h-4 text-[var(--color-primary)] stroke-[2.5]" />
               <span className="font-medium text-[var(--color-text-secondary)]">
                 {event.location}
               </span>
             </div>
             
-            <div className="flex flex-wrap items-center gap-4 mt-1">
-              <div className="flex items-center gap-2.5 text-[14px] md:text-[15px] text-muted-foreground">
-                <div className="w-7 h-7 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
-                  <Award className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
-                </div>
-                <span className="font-medium text-[var(--color-text-secondary)]">
-                  {event.credits} Credits
-                </span>
-              </div>
-              
-              <div className="flex items-center gap-2.5 text-[14px] md:text-[15px] text-muted-foreground">
-                <div className="w-7 h-7 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
-                  <Users className="w-4 h-4 text-[var(--color-primary)] shrink-0" />
-                </div>
-                <span className="font-medium text-[var(--color-text-secondary)]">
-                  Capacity: {event.capacity <= 0 ? 'Full' : event.capacity}
-                </span>
-              </div>
+            <div className="flex items-center gap-1.5 text-sm md:text-[14.5px] text-muted-foreground">
+              <Award className="w-4 h-4 text-[var(--color-primary)] stroke-[2.5]" />
+              <span className="font-medium text-[var(--color-text-secondary)]">
+                {event.credits} Credits
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-1.5 text-sm md:text-[14.5px] text-muted-foreground">
+              <Users className="w-4 h-4 text-[var(--color-primary)] stroke-[2.5]" />
+              <span className="font-medium text-[var(--color-text-secondary)]">
+                Capacity: {event.capacity <= 0 ? 'Full' : event.capacity}
+              </span>
             </div>
           </div>
         </div>
