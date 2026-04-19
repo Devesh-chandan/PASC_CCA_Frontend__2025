@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { formatDateTime } from '@/lib/utils';
+import { useToast } from '@/components/ui/toast';
 
 interface AttendanceSession {
   id: number;
@@ -31,6 +32,7 @@ export default function SessionManagementPage({
   const router = useRouter();
   const [eventId, setEventId] = useState<number>(0);
   const [eventTitle, setEventTitle] = useState<string>('');
+  const { success, error, info } = useToast();
   const [eventStartDate, setEventStartDate] = useState<string>(''); // ISO string
   const [eventEndDate, setEventEndDate] = useState<string>('');   // ISO string
   const [eventStatus, setEventStatus] = useState<string>('');
@@ -163,9 +165,13 @@ export default function SessionManagementPage({
     try {
       await attendanceAPI.updateSession(session.id, { isActive: !session.isActive });
       fetchSessions(eventId);
-    } catch (error) {
-      console.error('Error updating session:', error);
-      alert('Failed to update session.');
+      info(
+        !session.isActive ? 'Session Activated' : 'Session Deactivated',
+        !session.isActive ? 'Students can now mark attendance.' : 'Attendance recording has been stopped.'
+      );
+    } catch (sessionErr) {
+      console.error('Error updating session:', sessionErr);
+      error('Update Failed', 'Failed to update session. Please try again.');
     }
   };
 

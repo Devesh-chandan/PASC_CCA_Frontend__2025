@@ -24,6 +24,7 @@ import { AttendeeList } from "@/components/admin/AttendeeList";
 import { ResourceManager } from "@/components/admin/ResourceManager";
 import { GalleryManager } from "@/components/admin/GalleryManager";
 import { SessionManager } from "@/components/admin/SessionManager";
+import { useToast } from "@/components/ui/toast";
 
 interface FormData {
   title: string;
@@ -53,10 +54,11 @@ const EditEventPage: React.FC = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
-  const [submitStatus, setSubmitStatus] = useState<null | 'success' | 'error'>(null);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const { success, error: toastError, warning } = useToast();
 
   // Prevent duplicate fetches
   const hasFetchedRef = useRef(false);
@@ -114,7 +116,7 @@ const EditEventPage: React.FC = () => {
           setErrorMessage('Failed to load event data. Please try again.');
         }
 
-        setSubmitStatus('error');
+        // setSubmitStatus('error');
       } finally {
         setIsLoading(false);
       }
@@ -143,13 +145,12 @@ const EditEventPage: React.FC = () => {
 
     const { title, description, startDate, endDate, location, credits, capacity } = formData;
     if (!title.trim() || !description.trim() || !startDate || !endDate || !location.trim() || credits <= 0 || capacity <= 0) {
-      setSubmitStatus('error');
-      alert('Please fill in all the fields correctly before submitting.');
+      warning('Incomplete Form', 'Please fill in all the fields correctly before submitting.');
       return;
     }
 
     setIsSubmitting(true);
-    setSubmitStatus(null);
+    // setSubmitStatus(null);
 
     try {
       const numDays = calculateNumDays(startDate, endDate);
@@ -179,11 +180,11 @@ const EditEventPage: React.FC = () => {
       );
 
       console.log("✅ Event updated:", response.data);
-      setSubmitStatus('success');
+      success('Changes Saved!', 'Event details have been updated successfully. Redirecting...');
       setTimeout(() => router.push('/admin/dashboard'), 1500);
     } catch (err: any) {
       console.error('❌ Error updating event:', err);
-      setSubmitStatus('error');
+      toastError('Update Failed', 'Unable to sync changes. Please verify your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -389,45 +390,31 @@ const EditEventPage: React.FC = () => {
                   </div>
                 )}
 
-                {submitAttempted && submitStatus === 'error' && (
-                  <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-red-50 text-red-600 border border-red-100 animate-in shake-in-1">
-                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    <p className="text-sm font-semibold">Unable to sync changes. Please verify connection and try again.</p>
-                  </div>
-                )}
+                <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-[var(--color-border)]/50">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] h-14 rounded-2xl disabled:opacity-50 flex items-center justify-center gap-3 transition-all active:scale-95 font-bold text-lg shadow-sm"
+                  >
+                    {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <CheckCircle className="w-6 h-6" />}
+                    {isSubmitting ? 'Pushing Updates...' : 'Publish Modifications'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => router.push('/admin/dashboard')}
+                    className="px-10 h-14 rounded-2xl border border-[var(--color-border)] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-all active:scale-95 bg-transparent"
+                  >
+                    Discard Changes
+                  </button>
+                </div>
+              </form>
+            </div>
 
-                {submitStatus === 'success' && (
-                  <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100">
-                    <CheckCircle className="w-5 h-5 flex-shrink-0" />
-                    <p className="text-sm font-semibold">All modifications successfully pushed to registry.</p>
-                  </div>
-                )}
-
-          <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-[var(--color-border)]/50">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] h-14 rounded-2xl disabled:opacity-50 flex items-center justify-center gap-3 transition-all active:scale-95 font-bold text-lg shadow-sm"
-            >
-              {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <CheckCircle className="w-6 h-6" />}
-              {isSubmitting ? 'Pushing Updates...' : 'Publish Modifications'}
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push('/admin/dashboard')}
-              className="px-10 h-14 rounded-2xl border border-[var(--color-border)] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-all active:scale-95 bg-transparent"
-            >
-              Discard Changes
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* Attendance Section */}
-      <div className="bg-[var(--color-card)] rounded-[2.5rem] border border-[var(--color-border)] p-8 sm:p-10 shadow-sm relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-1 bg-[var(--color-primary)] h-full opacity-50 group-hover:opacity-100 transition-opacity" />
-        <SessionManager eventId={Number(eventId)} eventStartDate={formData.startDate} eventEndDate={formData.endDate} />
-      </div>
+            {/* Attendance Section */}
+            <div className="bg-[var(--color-card)] rounded-[2.5rem] border border-[var(--color-border)] p-8 sm:p-10 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 left-0 w-1 bg-[var(--color-primary)] h-full opacity-50 group-hover:opacity-100 transition-opacity" />
+              <SessionManager eventId={Number(eventId)} eventStartDate={formData.startDate} eventEndDate={formData.endDate} />
+            </div>
           </div>
 
           {/* Management Sidebar */}
@@ -498,7 +485,7 @@ const EditEventPage: React.FC = () => {
                 </button>
                 <button
                   className="w-full p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border-light)] hover:bg-red-500/10 text-red-600 dark:text-red-400 hover:border-red-500/20 transition-all flex items-center justify-between group"
-                  onClick={() => alert("Permanent deletion requires higher clearance.")}
+                  onClick={() => warning('Access Restricted', 'Permanent deletion requires higher clearance.')}
                 >
                   <span className="font-bold">Archive This Event</span>
                   <Trash2 className="w-4 h-4 group-hover:scale-110 transition-transform" />

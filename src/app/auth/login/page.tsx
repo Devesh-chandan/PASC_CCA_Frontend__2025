@@ -175,6 +175,7 @@ import { RoleToggle } from "@/components/auth/RoleToggle";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/lib/store";
 import { authAPI } from "@/lib/api";
+import { useToast } from "@/components/ui/toast";
 
 export default function Login() {
   const router = useRouter();
@@ -186,6 +187,7 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
   const { setAuth } = useAuthStore();
+  const { success } = useToast();
 
   // Redirect already-authenticated users away from the login page
   useEffect(() => {
@@ -269,6 +271,8 @@ export default function Login() {
           "role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT;";
       }
 
+      const name = role === 'student' ? authResponse.user?.name : authResponse.admin?.name;
+      success('Welcome back!', name ? `Hello, ${name}!` : 'Logged in successfully.');
       router.push(role === "admin" ? "/admin/dashboard" : "/student/events");
     } catch (err: any) {
       const res = err.response;

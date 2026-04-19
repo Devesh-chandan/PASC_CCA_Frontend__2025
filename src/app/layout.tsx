@@ -3,6 +3,7 @@ import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "../../components/layout/Navbar";
 import ThemeProvider from "../../components/ThemProvider";
+import { ToastProvider } from "@/components/ui/toast";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -31,10 +32,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${dmSans.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         <ThemeProvider>
-          <Navbar />
-          <div className="pt-0">
-            {children}
-          </div>
+          <ToastProvider>
+            <Navbar />
+            <div className="pt-0">
+              {children}
+            </div>
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

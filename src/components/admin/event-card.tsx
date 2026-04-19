@@ -5,6 +5,7 @@ import { BarChart3, Edit, Users, Clock, FolderOpen, Image, Trash2, Loader2, Cale
 import { useState } from "react";
 import { eventAPI } from "@/lib/api";
 import { getStatusBadgeVariant, getStatusColor, formatDate } from "@/lib/utils";
+import { useToast } from "@/components/ui/toast";
 
 
 interface EventCardProps extends Event {
@@ -14,6 +15,7 @@ interface EventCardProps extends Event {
 export const EventCard = ({ onRefresh, ...event }: EventCardProps) => {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
+  const { success, error } = useToast();
 
   const getStatusBadge = (status: Event["status"]) => {
     const variants: Record<string, string> = {
@@ -73,12 +75,13 @@ export const EventCard = ({ onRefresh, ...event }: EventCardProps) => {
     setIsDeleting(true);
     try {
       await eventAPI.delete(event.id);
+      success('Event Deleted', `"${event.title}" has been removed successfully.`);
       if (onRefresh) {
         onRefresh();
       }
-    } catch (error) {
-      console.error("Failed to delete event:", error);
-      alert("Failed to delete event. Please try again.");
+    } catch (deleteErr) {
+      console.error("Failed to delete event:", deleteErr);
+      error('Deletion Failed', 'Failed to delete event. Please try again.');
     } finally {
       setIsDeleting(false);
     }

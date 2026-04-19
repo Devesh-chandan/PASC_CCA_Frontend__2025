@@ -17,6 +17,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { apiUrl } from "@/lib/utils";
+import { useToast } from '@/components/ui/toast';
 interface FormData {
   title: string;
   description: string;
@@ -42,7 +43,7 @@ const Page: React.FC = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<null | 'success' | 'error'>(null);
+  const { success, error, warning } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -90,13 +91,12 @@ const Page: React.FC = () => {
       credits <= 0 ||
       capacity <= 0
     ) {
-      setSubmitStatus('error');
-      alert('Please fill in all the fields correctly before submitting.');
+      warning('Incomplete Form', 'Please fill in all the fields correctly before submitting.');
       return;
     }
 
     setIsSubmitting(true);
-    setSubmitStatus(null);
+    // setSubmitStatus(null);
 
     try {
       const numDays = calculateNumDays(startDate, endDate);
@@ -122,7 +122,7 @@ const Page: React.FC = () => {
 
       console.log("✅ Event created successfully:", res.data);
 
-      setSubmitStatus('success');
+      success('Event Created!', 'The event was created successfully. Redirecting to dashboard...', 5000);
 
       setFormData({
         title: '',
@@ -142,17 +142,16 @@ const Page: React.FC = () => {
     } catch (err: any) {
       console.error('❌ Error creating event:', err);
       console.error('Error response:', err.response?.data);
-      setSubmitStatus('error');
 
       // Show detailed validation errors if available
       if (err.response?.data?.details) {
         const validationErrors = err.response.data.details
           .map((detail: any) => `${detail.field}: ${detail.message}`)
-          .join('\n');
-        alert(`Validation failed:\n\n${validationErrors}`);
+          .join('. ');
+        error('Validation Failed', validationErrors);
       } else {
         const errorMessage = err.response?.data?.message || err.response?.data?.error || 'Failed to create event. Please try again.';
-        alert(errorMessage);
+        error('Creation Failed', errorMessage);
       }
     } finally {
       setIsSubmitting(false);
@@ -162,7 +161,7 @@ const Page: React.FC = () => {
   return (
     <div className="min-h-screen p-6 bg-background">
       <div className="max-w-7xl mx-auto space-y-8">
-        
+
         {/* Navigation Header */}
         <div className="flex items-center gap-4 bg-[var(--color-card)] p-8 rounded-[2.5rem] border border-[var(--color-border)] shadow-sm">
           <div className="flex-1 flex flex-col gap-2">
@@ -196,14 +195,14 @@ const Page: React.FC = () => {
         {/* Main Form Card */}
         <div className="bg-[var(--color-card)] rounded-[2.5rem] border border-[var(--color-border)] p-8 sm:p-10 shadow-sm relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32" />
-          
+
           <h2 className="text-2xl font-bold text-foreground mb-8 flex items-center gap-3 relative z-10">
             <FileText className="w-6 h-6 text-primary" />
             Core Configuration
           </h2>
 
           <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-8 relative z-10">
-            
+
             {/* Event Title */}
             <div className="space-y-3">
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Event Title</label>
@@ -334,22 +333,7 @@ const Page: React.FC = () => {
               </div>
             )}
 
-            {/* Status Messages */}
-            {submitStatus === 'success' && (
-              <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100">
-                <CheckCircle className="w-5 h-5 flex-shrink-0" />
-                <p className="text-sm font-semibold">Event created successfully! 🎉 Redirecting to dashboard...</p>
-              </div>
-            )}
 
-            {submitStatus === 'error' && (
-              <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-red-50 text-red-600 border border-red-100 animate-in shake-in-1">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <p className="text-sm font-semibold">Failed to create event. Please check all fields and try again.</p>
-              </div>
-            )}
-
-            {/* Submit Button */}
             <div className="pt-6 border-t border-[var(--color-border)]/50">
               <button
                 type="submit"
@@ -360,7 +344,7 @@ const Page: React.FC = () => {
                 {isSubmitting ? 'Creating Event...' : 'Create Event'}
               </button>
             </div>
-            
+
           </form>
         </div>
       </div>

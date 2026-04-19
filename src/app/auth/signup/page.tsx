@@ -10,6 +10,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/lib/store";
 import { Department } from "@/types/auth";
 import { authAPI } from "@/lib/api";
+import { useToast } from "@/components/ui/toast";
 
 export default function Signup() {
   const router = useRouter();
@@ -30,6 +31,7 @@ export default function Signup() {
   const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
 
   const { clearAuth } = useAuthStore();
+  const { success, error: toastError } = useToast();
 
   // Redirect already-authenticated users away from the signup page
   useEffect(() => {
@@ -116,6 +118,7 @@ export default function Signup() {
         document.cookie =
           "role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT;";
 
+        success('Account Created!', 'Your account was created successfully. Please sign in to continue.');
         // Strictly force manual login after signup
         router.push("/auth/login");
       } else {
