@@ -7,6 +7,7 @@ import { EventReview, ReviewStats, ReviewCreateInput } from '@/types/review';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
 import { formatDistanceToNow } from '@/lib/utils';
+import { useToast } from '@/components/ui/toast';
 
 interface ReviewSectionProps {
   eventId: number;
@@ -23,6 +24,7 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [myReview, setMyReview] = useState<EventReview | null>(null);
+  const { success, error: toastError, info } = useToast();
 
   const [formData, setFormData] = useState<ReviewCreateInput>({
     eventId,
@@ -194,17 +196,17 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
         if (msg.includes('already reviewed')) {
           const review = await fetchMyReview();
           if (review) {
-            alert("You have already reviewed this event. We loaded your review so you can edit it.");
+            info('Review Found', 'You have already reviewed this event. Your existing review has been loaded for editing.');
             handleEditReview(review as EventReview);
           } else {
             // Fallback if we can't fetch it (e.g. backend route issue)
-            alert(`Error: ${msg}. Please refresh the page.`);
+            toastError('Review Error', `${msg}. Please refresh the page.`);
           }
         } else {
-          alert(`Error: ${msg}`);
+          toastError('Review Error', msg);
         }
       } else {
-        alert('Failed to submit review. Please try again.');
+        toastError('Submission Failed', 'Failed to submit review. Please try again.');
       }
     } finally {
       setSubmitting(false);

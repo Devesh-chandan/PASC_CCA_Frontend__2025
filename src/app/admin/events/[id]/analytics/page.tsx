@@ -19,6 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { formatDateTime } from '@/lib/utils';
+import { useToast } from '@/components/ui/toast';
 
 // Mapper function to transform backend API response to EventAnalytics interface
 function mapEventAnalytics(apiData: any, reviewsList: any[] = []): EventAnalytics {
@@ -113,6 +114,7 @@ export default function EventAnalyticsPage({
   const [rsvps, setRsvps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [rsvpFilter, setRsvpFilter] = useState<'WAITLISTED' | 'CONFIRMED' | 'ALL'>('WAITLISTED');
+  const { success, error: toastError, warning } = useToast();
 
   const filteredRsvps = rsvps.filter(rsvp => {
     if (rsvpFilter === 'WAITLISTED') return rsvp.status === 'WAITLISTED';
@@ -210,27 +212,26 @@ export default function EventAnalyticsPage({
     try {
       const response = await rsvpAPI.approve(rsvpId, force);
       if (response.data?.success) {
+        success('RSVP Approved', 'The student has been approved to attend the event.');
         // Refresh everything
         await Promise.all([
           fetchAnalytics(eventId),
           fetchRsvps(eventId)
         ]);
       } else if (response.data?.message?.includes('capacity') && !force) {
-        if (confirm('Event is at full capacity. Do you want to force-approve (override capacity)?')) {
-          handleApproveRsvp(rsvpId, true);
-        }
+        warning('At Full Capacity', 'Event is at full capacity. Retrying with force-approve...');
+        handleApproveRsvp(rsvpId, true);
       } else {
-        alert(response.data?.message || 'Failed to approve RSVP');
+        toastError('Approval Failed', response.data?.message || 'Failed to approve RSVP');
       }
-    } catch (error: any) {
-      console.error('Error approving RSVP:', error);
-      const errorMsg = error.response?.data?.message || 'Error occurred while approving';
+    } catch (approveErr: any) {
+      console.error('Error approving RSVP:', approveErr);
+      const errorMsg = approveErr.response?.data?.message || 'Error occurred while approving';
       if (errorMsg.includes('capacity') && !force) {
-        if (confirm('Event is at full capacity. Do you want to force-approve (override capacity)?')) {
-          handleApproveRsvp(rsvpId, true);
-        }
+        warning('At Full Capacity', 'Event is at full capacity. Retrying with force-approve...');
+        handleApproveRsvp(rsvpId, true);
       } else {
-        alert(errorMsg);
+        toastError('Approval Failed', errorMsg);
       }
     }
   };

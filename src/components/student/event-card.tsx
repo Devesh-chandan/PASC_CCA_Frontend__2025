@@ -2,6 +2,7 @@ import { EventWithRsvp } from '@/types/events';
 import { Calendar, MapPin, Users, Award } from 'lucide-react';
 import Link from 'next/link';
 import { rsvpAPI } from '@/lib/api';
+import { useToast } from '@/components/ui/toast';
 
 /* ──── Status badge colours ──── */
 const statusConfig: Record<string, { bg: string; text: string; dot: string }> = {
@@ -26,6 +27,7 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
   const event = eventWithRsvp.event;
   const status = statusConfig[event.status] ?? statusConfig.UPCOMING;
   const statusLabel = event.status.charAt(0) + event.status.slice(1).toLowerCase();
+  const { success, error } = useToast();
 
   const formatDateInIST = (value: string | Date) => {
     return new Intl.DateTimeFormat('en-IN', {
@@ -40,29 +42,30 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('Please login first');
+        error('Authentication Required', 'Please log in to RSVP for events.');
         return;
       }
       await rsvpAPI.create(event.id);
-      alert('RSVP successful!');
+      success('RSVP Confirmed!', `You are now registered for "${event.title}".`);
       window.location.reload();
-    } catch (error: any) {
+    } catch (err: any) {
       const errorMessage =
-        error.response?.data?.error || error.response?.data?.message || 'Failed to RSVP. Please try again.';
-      alert(errorMessage);
+        err.response?.data?.error || err.response?.data?.message || 'Failed to RSVP. Please try again.';
+      error('RSVP Failed', errorMessage);
     }
   }
 
   async function handleRsvpCancel() {
     try {
       if (!eventWithRsvp.rsvp?.id) {
-        alert('No RSVP found to cancel');
+        error('Cancellation Failed', 'No RSVP found to cancel.');
         return;
       }
       await rsvpAPI.cancel(eventWithRsvp.rsvp.id);
+      success('RSVP Cancelled', `Your registration for "${event.title}" has been cancelled.`);
       window.location.reload();
-    } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to cancel RSVP. Please try again.');
+    } catch (err: any) {
+      error('Cancellation Failed', err.response?.data?.error || 'Failed to cancel RSVP. Please try again.');
     }
   }
 

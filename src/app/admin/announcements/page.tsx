@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { formatDateTime, cn } from '@/lib/utils';
+import { useToast } from '@/components/ui/toast';
 
 const departments = ['CE', 'IT', 'ENTC', 'ECE', 'AIDS'];
 const years = [1, 2, 3, 4];
@@ -21,6 +22,7 @@ export default function AdminAnnouncementsPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const { success, error: toastError } = useToast();
   const [formData, setFormData] = useState<AnnouncementCreateInput>({
     title: '',
     message: '',
@@ -115,10 +117,11 @@ export default function AdminAnnouncementsPage() {
 
     try {
       await announcementAPI.delete(id);
+      success('Announcement Deleted', 'The announcement has been removed.');
       fetchAnnouncements();
-    } catch (error: any) {
-      console.error('Error deleting announcement:', error);
-      alert(error.response?.data?.error || 'Failed to delete announcement');
+    } catch (deleteErr: any) {
+      console.error('Error deleting announcement:', deleteErr);
+      toastError('Deletion Failed', deleteErr.response?.data?.error || 'Failed to delete announcement');
     }
   };
 

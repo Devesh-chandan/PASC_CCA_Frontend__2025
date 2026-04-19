@@ -16,6 +16,7 @@ import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { apiUrl } from '@/lib/utils';
 import { attendanceAPI } from '@/lib/api';
+import { useToast } from '@/components/ui/toast';
 
 interface Session {
   id: number;
@@ -35,6 +36,7 @@ const AttendanceManagement: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const eventId = params.eventId;
+  const { success, error, info } = useToast();
   const [sessions, setSessions] = useState<Session[]>([]); // Start with no sessions
   const [activeSession, setActiveSession] = useState<number | null>(null);
   const [editingSession, setEditingSession] = useState<number | null>(null);
@@ -124,7 +126,7 @@ const AttendanceManagement: React.FC = () => {
   const handleAddSession = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!eventId) {
-      alert('Event ID not found in URL.');
+      error('Event Not Found', 'Event ID not found in URL.');
       return;
     }
     try {
@@ -162,9 +164,10 @@ const AttendanceManagement: React.FC = () => {
       ]);
     } catch (err) {
       console.log(err);
-      alert('Failed to add session.');
+      error('Session Creation Failed', 'Failed to add session. Please try again.');
       return;
     }
+    success('Session Added', 'The new attendance session has been created successfully.');
     handleCloseAddModal();
   };
 
@@ -187,12 +190,13 @@ const AttendanceManagement: React.FC = () => {
             s.id === session.id ? { ...s, ...payload, endTime: payload.endTime || '' } : s
           )
         );
+        success('Session Updated', 'Session details have been saved successfully.');
       } else {
-        alert(res.data?.message || 'Failed to update session.');
+        error('Update Failed', res.data?.message || 'Failed to update session.');
       }
     } catch (err) {
       console.error('Failed to update session:', err);
-      alert('Failed to update session.');
+      error('Update Failed', 'Could not update session. Please try again.');
     }
   };
 
@@ -219,9 +223,13 @@ const AttendanceManagement: React.FC = () => {
             : session
         )
       );
+      info(
+        newIsActive ? 'Session Activated' : 'Session Deactivated',
+        newIsActive ? 'Students can now mark attendance.' : 'Attendance recording has been stopped.'
+      );
     } catch (err) {
       console.error('Failed to update session status:', err);
-      alert('Failed to update session status.');
+      error('Status Update Failed', 'Failed to update session status. Please try again.');
     }
   };
 
@@ -287,9 +295,10 @@ const AttendanceManagement: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error exporting sessions:', error);
-      alert('Failed to export sessions. Please try again.');
+      success('Export Successful', 'Attendance data exported to Excel.');
+    } catch (exportErr) {
+      console.error('Error exporting sessions:', exportErr);
+      error('Export Failed', 'Failed to export sessions. Please try again.');
     }
   };
 
@@ -305,11 +314,11 @@ const AttendanceManagement: React.FC = () => {
           )
         );
       } else {
-        alert(res.data?.message || 'Failed to update session.');
+        error('Update Failed', res.data?.message || 'Failed to update session.');
       }
     } catch (err) {
       console.error('Failed to update session:', err);
-      alert('Failed to update session.');
+      error('Update Failed', 'Could not update session. Please try again.');
     }
   };
 
