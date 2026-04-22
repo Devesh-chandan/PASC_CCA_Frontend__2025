@@ -160,7 +160,8 @@ export default function StudentDashboard() {
           ...prev,
           eventsAttended: overview.eventsAttended || 0,
           upcomingEvents: data.upcomingEvents?.length || 0,
-          completionRate: overview.attendanceRate || 0,
+          // completionRate is intentionally NOT set here — it comes from
+          // attendanceData.completionRate (fetchAttendanceData) as the single source of truth.
         }));
       }
 
@@ -417,47 +418,46 @@ export default function StudentDashboard() {
 
                 <div className="flex flex-wrap gap-4 xl:gap-5 mt-auto content-end py-2">
                   {[
-                    { 
-                      id: 1, 
-                      title: "First Steps", 
-                      icon: "/first-steps.png", 
+                    {
+                      id: 1,
+                      title: "First Steps",
+                      icon: "/first-steps.png",
                       isUnlocked: stats.eventsAttended >= 1
                     },
-                    { 
-                      id: 2, 
-                      title: "Getting Started", 
-                      icon: "/getting-started.png", 
+                    {
+                      id: 2,
+                      title: "Getting Started",
+                      icon: "/getting-started.png",
                       isUnlocked: stats.totalCredits >= 5
                     },
-                    { 
-                      id: 3, 
-                      title: "Dedicated", 
-                      icon: "/dedicated-learner.png", 
+                    {
+                      id: 3,
+                      title: "Dedicated",
+                      icon: "/dedicated-learner.png",
                       isUnlocked: (attendanceData?.sessionsAttended ?? stats.eventsAttended) >= 10
                     },
-                    { 
-                      id: 4, 
-                      title: "Collector", 
-                      icon: "/credit-collector.png", 
+                    {
+                      id: 4,
+                      title: "Collector",
+                      icon: "/credit-collector.png",
                       isUnlocked: stats.totalCredits >= 25
                     },
-                    { 
-                      id: 5, 
-                      title: "Master", 
-                      icon: "/credit-master.png", 
+                    {
+                      id: 5,
+                      title: "Master",
+                      icon: "/credit-master.png",
                       isUnlocked: stats.totalCredits >= 50
                     }
                   ].map((badge) => (
-                    <div 
+                    <div
                       key={badge.id}
                       title={badge.title}
-                      className={`relative w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] xl:w-[65px] xl:h-[65px] flex-shrink-0 flex items-center justify-center transition-transform hover:scale-110 cursor-pointer ${
-                        badge.isUnlocked ? 'filter drop-shadow-md' : 'opacity-40 grayscale'
-                      }`}
+                      className={`relative w-[50px] h-[50px] sm:w-[60px] sm:h-[60px] xl:w-[65px] xl:h-[65px] flex-shrink-0 flex items-center justify-center transition-transform hover:scale-110 cursor-pointer ${badge.isUnlocked ? 'filter drop-shadow-md' : 'opacity-40 grayscale'
+                        }`}
                     >
-                      <img 
-                        src={badge.icon} 
-                        alt={badge.title} 
+                      <img
+                        src={badge.icon}
+                        alt={badge.title}
                         className="w-full h-full object-contain"
                       />
                     </div>
@@ -494,7 +494,9 @@ export default function StudentDashboard() {
                   <span className="text-sm sm:text-base font-medium text-muted-foreground">Completion Rate</span>
                   <Target className="w-5 h-5 text-muted-foreground" />
                 </div>
-                <div className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">{Math.floor(stats.completionRate)}%</div>
+                <div className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
+                  {attendanceLoading ? '…' : `${Math.floor(attendanceData?.completionRate ?? 0)}%`}
+                </div>
               </div>
             </div>
 
@@ -650,7 +652,7 @@ export default function StudentDashboard() {
                           <p className="text-sm text-[#b88700]/80 font-semibold uppercase tracking-wide">Events</p>
                         </div>
                         <div className="text-center p-3 bg-[#16b78b]/11 border border-[#16b78b]/24 rounded-xl">
-                          <p className="text-xl font-bold text-[#138e6d] dark:text-[#72ddbf]">{rankStats.topPercent}%</p>
+                          <p className="text-xl font-bold text-[#138e6d] dark:text-[#72ddbf]">{100 - rankStats.topPercent}</p>
                           <p className="text-sm text-[#138e6d]/80 dark:text-[#72ddbf]/80 font-semibold uppercase tracking-wide">Percentile</p>
                         </div>
                       </div>
