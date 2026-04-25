@@ -82,13 +82,17 @@
     --color-badge-completed: #37474F;
 
     /* button colors */
-    --color-button-primary: #134467;
-    --color-button-primary-hover: #263238;
+    --color-button-primary: #2BA6DF;
+    --color-button-primary-hover: #2190C6;
     --color-button-accent: #FDB811;
     --color-button-accent-hover: #E5A50F;
     --color-button-rsvp: #134467;
     --color-button-cancel: #FDB811;
     --color-button-disabled: #CCCCCC;
+
+    /* benefit / success context */
+    --color-benefit-bg: rgba(16, 185, 129, 0.10);
+    --color-benefit-text: #059669;
 
     /* nav colors */
     --color-nav-active: #134467;
@@ -138,32 +142,32 @@
     --chart-5: 197 56% 67%;
 
     /* bg colors */
-    --color-background: #000000;
-    --color-card: #212121;
-    --color-surface: #3e3e3e;
-    --color-surface-hover: #0746f2;
-    --color-achievement-progress-bg: #37474F;
+    --color-background: #0B1120; /* Deep Navy-Black */
+    --color-card: #111827; /* Very dark slate-navy */
+    --color-surface: #1F2937; /* Dark slate */
+    --color-surface-hover: #374151; /* Interactive hover slate */
+    --color-achievement-progress-bg: #1F2937;
     /* achievement progress bg */
     --color-podium-1: #4a3c10;
     /* 1st place dark gold base bg */
-    --color-podium-2: #334155;
+    --color-podium-2: #1e293b;
     /* 2nd place dark silver bg */
     --color-podium-3: #4a2c10;
     /* 3rd place dark bronze base bg */
-    --color-podium-avatar-bg: #1e293b;
-    --color-podium-avatar-icon: #cbd5e1;
-    --color-profile: #37474F;
-    --color-profile-icon-bg: #37474F;
+    --color-podium-avatar-bg: #0f172a;
+    --color-podium-avatar-icon: #94a3b8;
+    --color-profile: #1F2937;
+    --color-profile-icon-bg: #1F2937;
     /* background for small profile/avatar icons (dark) */
-    --color-profile-icon-bg-hover: #0746f2;
+    --color-profile-icon-bg-hover: #38BDF8;
     /* hover state for profile icon (dark) */
-    --color-navbar: #212121;
-    --color-border: #37474F;
-    --color-border-light: #263238;
-    --color-tabs: #212121;
-    --color-primary: #0746f2;
-    --color-primary-hover: #55B8E5;
-    --color-primary-light: #6BC1E9;
+    --color-navbar: #0B1120;
+    --color-border: #374151;
+    --color-border-light: #1F2937;
+    --color-tabs: #0B1120;
+    --color-primary: #38BDF8; /* Neon/Vibe Blue matching the brand */
+    --color-primary-hover: #7DD3FC; /* Lighter glow */
+    --color-primary-light: #BAE6FD;
     --color-secondary: #34d399;
     --color-secondary-dark: #10b981;
     --color-accent: #FDB811;
@@ -173,9 +177,9 @@
     --color-info-lighter: #6BC1E9;
 
     /* text colors */
-    --color-text-primary: #FFFFFF;
-    --color-text-secondary: #ECEFF1;
-    --color-text-muted: #CCCCCC;
+    --color-text-primary: #F8FAFC;
+    --color-text-secondary: #E2E8F0;
+    --color-text-muted: #94A3B8;
     --mini-text: var(--color-text-secondary);
 
     /* badge colors */
@@ -184,32 +188,36 @@
     --color-badge-completed: #CCCCCC;
 
     /* button colors */
-    --color-button-primary: #0746f2;
-    --color-button-primary-hover: #55B8E5;
+    --color-button-primary: #2BA6DF;
+    --color-button-primary-hover: #2190C6;
     --color-button-accent: #FDB811;
     --color-button-accent-hover: #FFD54F;
-    --color-button-rsvp: #0746f2;
+    --color-button-rsvp: #0284C7;
     --color-button-cancel: #FDB811;
-    --color-button-disabled: #37474F;
+    --color-button-disabled: #374151;
+
+    /* benefit / success context */
+    --color-benefit-bg: rgba(52, 211, 153, 0.12);
+    --color-benefit-text: #34d399;
 
     /* nav colors */
-    --color-nav-active: #0746f2;
-    --color-nav-active-bg: #263238;
-    --color-nav-text: #ECEFF1;
-    --color-nav-hover-bg: #263238;
+    --color-nav-active: #38BDF8;
+    --color-nav-active-bg: #1F2937;
+    --color-nav-text: #E2E8F0;
+    --color-nav-hover-bg: #1F2937;
 
     /* input colors */
-    --color-input-border: #37474F;
-    --color-input-focus: #0746f2;
-    --color-input-focus-ring: rgba(7, 70, 242, 0.3);
+    --color-input-border: #374151;
+    --color-input-focus: #38BDF8;
+    --color-input-focus-ring: rgba(56, 189, 248, 0.25);
 
     /* link colors */
-    --color-link: #55B8E5;
-    --color-link-hover: #6BC1E9;
+    --color-link: #38BDF8;
+    --color-link-hover: #7DD3FC;
 
     /* shadows */
-    --shadow-light: 0 2px 6px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
-    --shadow-dark: 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    --shadow-light: 0 4px 14px 0 rgba(0, 0, 0, 0.1);
+    --shadow-dark: 0 4px 14px 0 rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
   }
 
   body {
@@ -389,4 +397,14 @@
   .bg-pure-white-feature {
     background-color: var(--color-pure-white-feature);
   }
+}
+
+/* Landing page gradient animation (Issue 19) */
+@keyframes gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient {
+  animation: gradient 3s ease infinite;
 }

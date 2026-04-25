@@ -112,78 +112,80 @@ export default function LeaderboardPage() {
       <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
 
         {/* ─── Header ─── */}
-        <header className="flex flex-col gap-6 pb-2">
-          {/* Row 1: Title */}
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
-              <Trophy className="w-6 h-6 text-[var(--color-primary)]" />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight">Leaderboard</h1>
-              <p className="text-sm md:text-base text-[var(--color-text-muted)]">Compete with your peers and climb the ranks</p>
-            </div>
-          </div>
-
-          {/* Row 2: Controls */}
-          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-            {/* Left side: Period pills */}
-            <div className="grid grid-cols-5 gap-1 xl:flex xl:items-center justify-start xl:gap-1.5 bg-[var(--color-surface)]/50 p-1.5 rounded-xl border border-[var(--color-border-light)] w-full xl:w-auto mb-1">
-              {periods.map((period) => (
-                <button
-                  key={period.value}
-                  onClick={() => setSelectedPeriod(period.value)}
-                  className={`text-center px-1 py-2 sm:px-4 rounded-lg text-[10px] xs:text-[11px] sm:text-sm font-medium transition-all ${selectedPeriod === period.value
-                    ? 'bg-[var(--color-button-primary)] text-white shadow-sm'
-                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)]'
-                    }`}
-                >
-                  {period.label}
-                </button>
-              ))}
+        <header className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="flex flex-col gap-6">
+            {/* Row 1: Title */}
+            <div className="flex items-center gap-4">
+              <div className="w-11 h-11 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-border-light)] flex items-center justify-center shrink-0">
+                <Trophy className="w-5 h-5 text-[var(--color-primary)]" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight">Leaderboard</h1>
+                <p className="text-sm md:text-base text-[var(--color-text-muted)] mt-0.5">Compete with your peers and climb the ranks</p>
+              </div>
             </div>
 
-            {/* Right side: Scope toggle + Division picker */}
-            <div className="grid grid-cols-3 items-center gap-1.5 sm:gap-2.5 w-full xl:w-auto">
-              {/* Scope Toggles grouped in 2/3 of the space */}
-              <div className="col-span-2 grid grid-cols-2 rounded-xl bg-[var(--color-surface)] p-1 border border-[var(--color-border-light)] relative">
-                <button
-                  type="button"
-                  onClick={() => setScope('global')}
-                  className={`flex items-center justify-center gap-1.5 px-2 py-2 sm:px-4 text-[12px] sm:text-sm font-medium rounded-lg transition-all ${scope === 'global'
-                    ? 'bg-[var(--color-button-primary)] text-white shadow-sm'
-                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
-                    }`}
-                >
-                  <Users className="w-3.5 h-3.5 hidden sm:block" />
-                  Global
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setScope('division')}
-                  className={`flex items-center justify-center gap-1.5 px-2 py-2 sm:px-4 text-[12px] sm:text-sm font-medium rounded-lg transition-all ${scope === 'division'
-                    ? 'bg-[var(--color-button-primary)] text-white shadow-sm'
-                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
-                    }`}
-                >
-                  <Star className="w-3.5 h-3.5 hidden sm:block" />
-                  Division
-                </button>
+            {/* Row 2: Controls */}
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+              {/* Left side: Period pills */}
+              <div className="grid grid-cols-5 gap-1 xl:flex xl:items-center justify-start xl:gap-1.5 bg-[var(--color-surface)]/50 p-1.5 rounded-xl border border-[var(--color-border-light)] w-full xl:w-auto mb-1">
+                {periods.map((period) => (
+                  <button
+                    key={period.value}
+                    onClick={() => setSelectedPeriod(period.value)}
+                    className={`text-center px-1 py-2 sm:px-4 rounded-lg text-[10px] xs:text-[11px] sm:text-sm font-semibold tracking-[0.01em] transition-all ${selectedPeriod === period.value
+                      ? 'bg-[var(--color-button-primary)] text-white shadow-sm'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)]'
+                      }`}
+                  >
+                    {period.label}
+                  </button>
+                ))}
               </div>
 
-              {/* Division Select in 1/3 of the space */}
-              <div className={`col-span-1 transition-all duration-300 ${scope === 'division' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-                <div className="relative">
-                  <select
-                    value={selectedDivision}
-                    onChange={(e) => setSelectedDivision(Number(e.target.value))}
-                    tabIndex={scope === 'global' ? -1 : 0}
-                    className="appearance-none h-[38px] sm:h-[42px] w-full pl-2 sm:pl-3.5 pr-6 sm:pr-8 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-primary)] text-[12px] sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-input-focus)] cursor-pointer"
+              {/* Right side: Scope toggle + Division picker */}
+              <div className="grid grid-cols-3 items-center gap-1.5 sm:gap-2.5 w-full xl:w-auto">
+                {/* Scope Toggles grouped in 2/3 of the space */}
+                <div className="col-span-2 grid grid-cols-2 rounded-xl bg-[var(--color-surface)] p-1 border border-[var(--color-border-light)] relative">
+                  <button
+                    type="button"
+                    onClick={() => setScope('global')}
+                    className={`flex items-center justify-center gap-1.5 px-2 py-2 sm:px-4 text-[12px] sm:text-sm font-semibold rounded-lg transition-all ${scope === 'global'
+                      ? 'bg-[var(--color-button-primary)] text-white shadow-sm'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+                      }`}
                   >
-                    {Array.from({ length: TOTAL_DIVISIONS }, (_, i) => i + 1).map((div) => (
-                      <option key={div} value={div}>Div {div}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-1.5 sm:right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)] pointer-events-none" />
+                    <Users className="w-3.5 h-3.5 hidden sm:block" />
+                    Global
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setScope('division')}
+                    className={`flex items-center justify-center gap-1.5 px-2 py-2 sm:px-4 text-[12px] sm:text-sm font-semibold rounded-lg transition-all ${scope === 'division'
+                      ? 'bg-[var(--color-button-primary)] text-white shadow-sm'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+                      }`}
+                  >
+                    <Star className="w-3.5 h-3.5 hidden sm:block" />
+                    Division
+                  </button>
+                </div>
+
+                {/* Division Select in 1/3 of the space */}
+                <div className={`col-span-1 transition-all duration-300 ${scope === 'division' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+                  <div className="relative">
+                    <select
+                      value={selectedDivision}
+                      onChange={(e) => setSelectedDivision(Number(e.target.value))}
+                      tabIndex={scope === 'global' ? -1 : 0}
+                      className="appearance-none h-[38px] sm:h-[42px] w-full pl-2 sm:pl-3.5 pr-6 sm:pr-8 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-text-primary)] text-[12px] sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-input-focus)] cursor-pointer"
+                    >
+                      {Array.from({ length: TOTAL_DIVISIONS }, (_, i) => i + 1).map((div) => (
+                        <option key={div} value={div}>Div {div}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-1.5 sm:right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)] pointer-events-none" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -209,7 +211,7 @@ export default function LeaderboardPage() {
 
         {/* ─── Your Rank Card ─── */}
         {scope === 'global' && userRank && (
-          <div className="relative overflow-hidden bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl">
+          <div className="relative overflow-hidden bg-[var(--color-button-primary)]/5 border border-[var(--color-button-primary)]/30 border-l-4 border-l-[var(--color-button-primary)] rounded-2xl">
             <div className="flex items-center justify-between p-5">
               <div className="flex items-center gap-5">
                 <div className="w-14 h-14 rounded-2xl bg-[var(--color-primary)]/10 flex items-center justify-center">
@@ -238,7 +240,7 @@ export default function LeaderboardPage() {
         )}
 
         {showMyRankCard && userRank && (
-          <div className="relative overflow-hidden bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl">
+          <div className="relative overflow-hidden bg-[var(--color-button-primary)]/5 border border-[var(--color-button-primary)]/30 border-l-4 border-l-[var(--color-button-primary)] rounded-2xl">
             <div className="flex items-center justify-between p-5">
               <div className="flex items-center gap-5">
                 <div className="w-14 h-14 rounded-2xl bg-[var(--color-primary)]/10 flex items-center justify-center">

@@ -112,7 +112,9 @@ const Page: React.FC = () => {
         numDays
       };
 
-      console.log("📦 Payload being sent to backend:", payload);
+      if (process.env.NODE_ENV === 'development') {
+        console.log("📦 Payload being sent to backend:", payload);
+      }
       const res = await axios.post(`${apiUrl}/events`, payload, {
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +122,9 @@ const Page: React.FC = () => {
         },
       });
 
-      console.log("✅ Event created successfully:", res.data);
+      if (process.env.NODE_ENV === 'development') {
+        console.log("✅ Event created successfully:", res.data);
+      }
 
       success('Event Created!', 'The event was created successfully. Redirecting to dashboard...', 5000);
 
@@ -163,7 +167,7 @@ const Page: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* Navigation Header */}
-        <div className="flex items-center gap-4 bg-[var(--color-card)] p-8 rounded-[2.5rem] border border-[var(--color-border)] shadow-sm">
+        <div className="flex items-center gap-4 bg-[var(--color-card)] p-8 rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] shadow-sm">
           <div className="flex-1 flex flex-col gap-2">
             <button
               className="flex items-center gap-2 self-start px-3 py-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -193,7 +197,7 @@ const Page: React.FC = () => {
         </div>
 
         {/* Main Form Card */}
-        <div className="bg-[var(--color-card)] rounded-[2.5rem] border border-[var(--color-border)] p-8 sm:p-10 shadow-sm relative overflow-hidden">
+        <div className="bg-[var(--color-card)] rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] p-8 sm:p-10 shadow-sm relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32" />
 
           <h2 className="text-2xl font-bold text-foreground mb-8 flex items-center gap-3 relative z-10">

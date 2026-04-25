@@ -56,14 +56,14 @@ export default function EventsPage() {
       <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
 
         {/* ─── Header ─── */}
-        <header className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-3.5 sm:p-4 shadow-[0_2px_8px_rgba(15,23,42,0.08),0_8px_18px_rgba(15,23,42,0.05)]">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-start gap-2.5">
-              <div className="w-9 h-9 rounded-lg bg-[var(--color-primary)]/10 border border-[var(--color-border-light)] flex items-center justify-center shrink-0">
-                <Calendar className="w-4.5 h-4.5 text-[var(--color-primary)]" />
+        <header className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-11 h-11 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-border-light)] flex items-center justify-center shrink-0 mt-0.5">
+                <Calendar className="w-5 h-5 text-[var(--color-primary)]" />
               </div>
               <div className="space-y-1">
-                <h1 className="text-lg sm:text-xl font-semibold text-[var(--color-text-primary)] tracking-tight leading-tight">
+                <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] tracking-tight leading-tight">
                   CCA Events
                 </h1>
                 <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">

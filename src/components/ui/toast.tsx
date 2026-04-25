@@ -76,43 +76,35 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* ── Design tokens for each variant ─────────────────────── */
+/* ── Design tokens per variant ───────────────────────────── */
 const VARIANTS = {
   success: {
-    bar: '#10b981',           // emerald green
-    bg: 'rgba(16,185,129,0.08)',
-    border: 'rgba(16,185,129,0.25)',
-    icon: CheckCircle2,
+    accentBar: '#10b981',
+    iconBg: 'rgba(16,185,129,0.10)',
     iconColor: '#10b981',
-    titleColor: '#065f46',
-    titleColorDark: '#34d399',
+    icon: CheckCircle2,
+    label: 'Success',
   },
   error: {
-    bar: '#ef4444',           // red
-    bg: 'rgba(239,68,68,0.08)',
-    border: 'rgba(239,68,68,0.25)',
-    icon: XCircle,
+    accentBar: '#ef4444',
+    iconBg: 'rgba(239,68,68,0.10)',
     iconColor: '#ef4444',
-    titleColor: '#991b1b',
-    titleColorDark: '#f87171',
+    icon: XCircle,
+    label: 'Error',
   },
   warning: {
-    bar: '#FDB811',           // site gold
-    bg: 'rgba(253,184,17,0.08)',
-    border: 'rgba(253,184,17,0.30)',
+    accentBar: '#FDB811',
+    iconBg: 'rgba(253,184,17,0.12)',
+    iconColor: '#c98d00',
     icon: AlertTriangle,
-    iconColor: '#FDB811',
-    titleColor: '#92400e',
-    titleColorDark: '#FDB811',
+    label: 'Warning',
   },
   info: {
-    bar: '#2BA6DF',           // site blue
-    bg: 'rgba(43,166,223,0.08)',
-    border: 'rgba(43,166,223,0.25)',
-    icon: Info,
+    accentBar: '#2BA6DF',
+    iconBg: 'rgba(43,166,223,0.10)',
     iconColor: '#2BA6DF',
-    titleColor: '#134467',    // site navy
-    titleColorDark: '#55B8E5',
+    icon: Info,
+    label: 'Info',
   },
 } as const;
 
@@ -155,63 +147,49 @@ function ToastItem({
       role="alert"
       aria-live="polite"
       style={{
-        /* Slide-in from right + fade */
         transform: visible && !leaving ? 'translateX(0)' : 'translateX(calc(100% + 24px))',
         opacity: visible && !leaving ? 1 : 0,
         transition: 'transform 0.32s cubic-bezier(0.34,1.26,0.64,1), opacity 0.28s ease',
         willChange: 'transform, opacity',
         position: 'relative',
-        background: `var(--toast-bg, ${variant.bg})`,
-        border: `1px solid ${variant.border}`,
-        borderRadius: '0.75rem',
+        /* Solid card — matches var(--color-card) system */
+        backgroundColor: 'var(--color-card)',
+        border: `1px solid var(--color-border)`,
+        borderLeft: `3px solid ${variant.accentBar}`,
+        borderRadius: '0.875rem',
         overflow: 'hidden',
         minWidth: '300px',
         maxWidth: '400px',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08)',
-        backdropFilter: 'blur(8px)',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.06)',
       }}
     >
-      {/* Accent bar */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '4px',
-          height: '100%',
-          background: variant.bar,
-          borderRadius: '0.75rem 0 0 0.75rem',
-        }}
-      />
-
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '14px 14px 14px 18px' }}>
-        {/* Icon */}
-        <div style={{ flexShrink: 0, marginTop: '1px' }}>
-          <Icon size={20} color={variant.iconColor} strokeWidth={2.2} />
+      {/* Body */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '13px 13px 13px 16px' }}>
+        {/* Icon square — matches site's icon-square pattern */}
+        <div
+          style={{
+            flexShrink: 0,
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            background: variant.iconBg,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: '1px',
+          }}
+        >
+          <Icon size={17} color={variant.iconColor} strokeWidth={2.3} />
         </div>
 
         {/* Text */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <p
-            className="dark:hidden"
             style={{
               margin: 0,
               fontWeight: 700,
               fontSize: '0.875rem',
-              color: variant.titleColor,
-              lineHeight: 1.4,
-              fontFamily: 'var(--font-dm-sans, system-ui, sans-serif)',
-            }}
-          >
-            {toast.title}
-          </p>
-          <p
-            className="hidden dark:block"
-            style={{
-              margin: 0,
-              fontWeight: 700,
-              fontSize: '0.875rem',
-              color: variant.titleColorDark,
+              color: 'var(--color-text-primary)',
               lineHeight: 1.4,
               fontFamily: 'var(--font-dm-sans, system-ui, sans-serif)',
             }}
@@ -221,8 +199,8 @@ function ToastItem({
           {toast.message && (
             <p
               style={{
-                margin: '4px 0 0',
-                fontSize: '0.8125rem',
+                margin: '3px 0 0',
+                fontSize: '0.8rem',
                 color: 'var(--color-text-muted)',
                 lineHeight: 1.5,
                 fontFamily: 'var(--font-dm-sans, system-ui, sans-serif)',
@@ -242,19 +220,25 @@ function ToastItem({
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            padding: '2px',
-            borderRadius: '4px',
+            padding: '3px',
+            borderRadius: '6px',
             color: 'var(--color-text-muted)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            opacity: 0.7,
-            transition: 'opacity 0.15s',
+            opacity: 0.6,
+            transition: 'opacity 0.15s, background 0.15s',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '1';
+            e.currentTarget.style.background = 'var(--color-surface-hover)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '0.6';
+            e.currentTarget.style.background = 'none';
+          }}
         >
-          <X size={16} />
+          <X size={15} />
         </button>
       </div>
 
@@ -263,11 +247,11 @@ function ToastItem({
         style={{
           position: 'absolute',
           bottom: 0,
-          left: '4px',
+          left: 0,
           right: 0,
           height: '2px',
-          background: variant.bar,
-          opacity: 0.3,
+          background: variant.accentBar,
+          opacity: 0.35,
           transformOrigin: 'left',
           animation: `toast-progress-shrink ${duration}ms linear forwards`,
         }}

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "../../components/layout/Navbar";
+import NavbarWrapper from "../../components/layout/NavbarWrapper";
 import ThemeProvider from "../../components/ThemProvider";
 import { ToastProvider } from "@/components/ui/toast";
 
@@ -33,7 +33,7 @@ export default function RootLayout({
       <body className={`${dmSans.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         <ThemeProvider>
           <ToastProvider>
-            <Navbar />
+            <NavbarWrapper />
             <div className="pt-0">
               {children}
             </div>

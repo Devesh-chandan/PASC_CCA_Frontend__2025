@@ -328,8 +328,7 @@ export default function StudentDashboard() {
           </div>
         </header>
 
-        {/* Tabs */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5 bg-[var(--color-surface)]/50 p-1.5 rounded-xl border border-[var(--color-border-light)]">
           {([
             { key: 'overview', label: 'Overview', icon: LayoutDashboard },
             { key: 'attendance', label: 'Attendance History', icon: Clock },
@@ -338,10 +337,11 @@ export default function StudentDashboard() {
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeTab === key
-                ? 'bg-[var(--color-nav-active-bg)] text-[var(--color-nav-active)] font-medium'
-                : 'text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)]'
-                }`}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold tracking-[0.01em] transition-all ${
+                activeTab === key
+                  ? 'bg-[var(--color-button-primary)] text-white shadow-sm'
+                  : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
+              }`}
             >
               <Icon className="w-4 h-4" />
               <span className="hidden sm:inline">{label}</span>
@@ -682,182 +682,305 @@ export default function StudentDashboard() {
 
         {/* ═══════════════ ATTENDANCE HISTORY TAB ═══════════════ */}
         {activeTab === 'attendance' && (
-          <div className="space-y-7">
-            {attendanceLoading ? (
-              <div className="text-center py-16">
-                <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent mx-auto" />
-                <p className="text-sm text-muted-foreground mt-4">Loading attendance data&hellip;</p>
-              </div>
-            ) : attendanceData?.sessions?.length > 0 ? (
-              <>
-                {/* Stats Summary */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  {[
-                    { icon: Award, label: 'Total Credits', value: attendanceData.totalCredits || 0, sub: 'Earned across all sessions', accent: 'border-l-primary' },
-                    { icon: Calendar, label: 'Sessions Attended', value: attendanceData.sessionsAttended || 0, sub: 'Unique sessions completed', accent: 'border-l-emerald-500 dark:border-l-emerald-400' },
-                    { icon: TrendingUp, label: 'Completion Rate', value: `${Math.floor(attendanceData.completionRate || 0)}%`, sub: 'Of registered sessions attended', accent: 'border-l-amber-500 dark:border-l-amber-400' },
-                  ].map((stat) => (
-                    <div key={stat.label} className={`bg-[var(--color-card)] border border-[var(--color-border)] border-l-4 ${stat.accent} p-6 rounded-xl ${adminHoverCardClass}`}>
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 rounded-lg bg-muted/60">
-                          <stat.icon className="w-4 h-4 text-foreground/70" />
-                        </div>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{stat.label}</p>
-                      </div>
-                      <p className="text-3xl font-bold text-foreground tracking-tight">{stat.value}</p>
-                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{stat.sub}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Sessions List */}
-                <div className={`bg-[var(--color-card)] rounded-xl border border-[var(--color-border)] ${adminHoverCardClass}`}>
-                  <div className="flex items-center justify-between px-7 pt-7 pb-5">
-                    <div>
-                      <h3 className="text-base font-semibold text-foreground">Session History</h3>
-                      <p className="text-sm text-muted-foreground mt-0.5">{attendanceData.sessions.length} session{attendanceData.sessions.length !== 1 ? 's' : ''} recorded</p>
-                    </div>
+          <div className="space-y-6">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-[var(--color-text-muted)] mb-1">Total Credits</p>
+                    <p className="text-3xl font-bold text-[var(--color-text-primary)]">{attendanceData?.totalCredits ?? 0}</p>
                   </div>
-                  <div className="divide-y divide-border">
-                    {attendanceData.sessions.map((session: any, idx: number) => (
-                      <div key={session.id} className="flex items-center gap-4 px-7 py-5 hover:bg-muted/30 transition-colors">
-                        {/* Index badge */}
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                          <span className="text-xs font-bold text-muted-foreground">{idx + 1}</span>
-                        </div>
-                        {/* Details */}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{session.sessionName}</p>
-                          <div className="flex items-center gap-3 mt-1">
-                            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                              <Clock className="w-3 h-3" />
-                              {new Date(session.startTime).toLocaleDateString('en-GB', {
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric',
-                                timeZone: 'UTC',
-                              })}
-                            </span>
-                            {session.location && (
-                              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                                <Target className="w-3 h-3" />
-                                {session.location}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        {/* Credits pill */}
-                        <span className="flex-shrink-0 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold">
-                          +{session.credits}
-                        </span>
+                  <Award className="w-12 h-12 text-[var(--color-primary)] opacity-30" />
+                </div>
+              </div>
+              <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-[var(--color-text-muted)] mb-1">Sessions</p>
+                    <p className="text-3xl font-bold text-[var(--color-text-primary)]">{attendanceData?.sessionsAttended ?? 0}</p>
+                  </div>
+                  <Calendar className="w-12 h-12 text-[var(--color-success)] opacity-30" />
+                </div>
+              </div>
+              <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-[var(--color-text-muted)] mb-1">Completion</p>
+                    <p className="text-3xl font-bold text-[var(--color-text-primary)]">{Math.floor(attendanceData?.completionRate ?? 0)}%</p>
+                  </div>
+                  <TrendingUp className="w-12 h-12 text-[var(--color-info)] opacity-30" />
+                </div>
+              </div>
+            </div>
+
+            {/* All Attended Sessions */}
+            <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm">
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-[var(--color-text-primary)]">All Attended Sessions</h3>
+                <p className="text-sm text-[var(--color-text-muted)] mt-1">
+                  {!attendanceData?.sessions?.length
+                    ? 'No sessions attended yet'
+                    : `Complete history of ${attendanceData.sessions.length} attended session${attendanceData.sessions.length !== 1 ? 's' : ''}`}
+                </p>
+              </div>
+              <div>
+                {attendanceLoading ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="animate-pulse">
+                        <div className="h-24 bg-[var(--color-surface-hover)] rounded-lg"></div>
                       </div>
                     ))}
                   </div>
-                </div>
-              </>
-            ) : (
-              <div className={`text-center py-16 bg-[var(--color-card)] rounded-xl border border-[var(--color-border)] ${adminHoverCardClass}`}>
-                <div className="w-16 h-16 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
-                  <Calendar className="w-8 h-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground mb-1">No Attendance Records Yet</h3>
-                <p className="text-sm text-muted-foreground mb-5 max-w-xs mx-auto">
-                  Start attending sessions to build your history and earn credits.
-                </p>
-                <button
-                  onClick={() => router.push('/student/events')}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors"
-                >
-                  Browse Events <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                ) : !attendanceData?.sessions?.length ? (
+                  <div className="text-center py-12">
+                    <Calendar className="w-16 h-16 text-[var(--color-text-secondary)] mx-auto mb-4" />
+                    <p className="text-[var(--color-text-muted)] mb-2">No sessions attended yet</p>
+                    <p className="text-sm text-[var(--color-text-muted)]">Start attending events to earn credits!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {attendanceData.sessions.map((session: any) => (
+                      <div
+                        key={session.id}
+                        className="border rounded-lg p-4 hover:shadow-md transition-all bg-[var(--color-card)] hover:border-[var(--color-info)]/40"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg text-[var(--color-text-primary)]">
+                              {session.sessionName}
+                            </h3>
+                            <div className="flex items-center gap-2 mt-2">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 hover:bg-green-100">
+                                ✓ Attended
+                              </span>
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[var(--color-button-primary)]/10 text-[var(--color-button-primary)]">
+                                {session.credits} {session.credits === 1 ? 'Credit' : 'Credits'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-[var(--color-text-muted)]">
+                          <div className="flex items-center gap-2">
+                            <Target className="w-4 h-4 text-[var(--color-text-muted)]" />
+                            <span>{session.location || 'N/A'}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-[var(--color-text-muted)]" />
+                            <span>{session.startTime ? new Date(session.startTime).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : 'N/A'}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-[var(--color-text-muted)]" />
+                            <span>
+                              {session.startTime && new Date(session.startTime).toLocaleTimeString('en-US', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                              {session.endTime &&
+                                ` - ${new Date(session.endTime).toLocaleTimeString('en-US', {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}`}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         )}
 
         {/* ═══════════════ ACHIEVEMENTS TAB ═══════════════ */}
         {activeTab === 'achievements' && (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-              {/* Personal Best */}
-              {attendanceData?.userPersonalBest?.credits > 0 && (
-                <div className={`lg:col-span-2 relative overflow-hidden bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl ${adminHoverCardClass}`}>
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-primary/5" />
-                  <div className="relative p-6">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                      <Trophy className="w-3.5 h-3.5 text-primary" />
-                      Personal Best
-                    </p>
-                    <p className="text-4xl font-bold text-foreground mt-2 tracking-tight leading-none">
-                      {attendanceData.userPersonalBest.credits}
-                    </p>
-                    <p className="text-sm font-medium text-muted-foreground mt-1">credits in one session</p>
-                    <div className="mt-5 w-11 h-11 rounded-xl bg-primary/12 flex items-center justify-center">
-                      <Award className="w-5 h-5 text-primary" />
-                    </div>
-                  </div>
+            {/* Personal Best */}
+            {(attendanceData?.userPersonalBest?.credits ?? 0) > 0 ? (
+              <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm">
+                <div className="mb-6 flex items-center gap-2">
+                  <Trophy className="w-6 h-6 text-orange-500" />
+                  <h3 className="text-xl font-bold text-[var(--color-text-primary)]">Personal Best Session</h3>
                 </div>
-              )}
-
-              {/* Progress summary */}
-              <div className={`${attendanceData?.userPersonalBest?.credits > 0 ? 'lg:col-span-3' : 'lg:col-span-5'} bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl p-7 ${adminHoverCardClass}`}>
-                <div className="flex items-start justify-between gap-4 mb-4">
+                <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">Milestone Progress</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {unlockedMilestones} of {milestones.length} milestones unlocked
+                    <p className="text-sm text-[var(--color-text-muted)] mb-2">Highest credits earned in a single session</p>
+                    <p className="text-4xl font-bold text-[var(--color-text-primary)] mb-2">
+                      {attendanceData?.userPersonalBest?.credits} credits
+                    </p>
+                    <p className="text-sm text-[var(--color-text-secondary)]">
+                      From: {attendanceData?.sessions?.find((s: any) => s.id === attendanceData?.userPersonalBest?.sessionId)?.sessionName || 'Unknown Session'}
                     </p>
                   </div>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-sm font-bold text-primary">
-                    {milestoneProgressPercent}%
-                  </span>
+                  <Award className="w-20 h-20 text-orange-500 opacity-30" />
                 </div>
-                <div className="h-3 rounded-full bg-[var(--color-achievement-progress-bg)] overflow-hidden border border-[var(--color-border)]">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-700"
-                    style={{ width: `${milestoneProgressPercent}%` }}
-                  />
+              </div>
+            ) : (
+              <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm text-center py-12">
+                <Trophy className="w-16 h-16 text-[var(--color-text-secondary)] mx-auto mb-4 opacity-50" />
+                <p className="text-[var(--color-text-muted)] font-medium">No achievements yet</p>
+                <p className="text-sm text-[var(--color-text-muted)] mt-2">Attend sessions to unlock achievements!</p>
+              </div>
+            )}
+
+            {/* Badges Showcase (LeetCode Style) */}
+            <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-primary)]/5 rounded-full blur-3xl -mr-32 -mt-32" />
+              <div className="mb-6 relative z-10">
+                <h3 className="text-xl font-bold text-[var(--color-text-primary)] flex items-center justify-between">
+                  <span>Earned Badges</span>
+                  <span className="text-2xl font-bold">{
+                    [
+                      (attendanceData?.sessionsAttended ?? 0) >= 1,
+                      (attendanceData?.totalCredits ?? 0) >= 5,
+                      (attendanceData?.sessionsAttended ?? 0) >= 10,
+                      (attendanceData?.totalCredits ?? 0) >= 25,
+                      (attendanceData?.totalCredits ?? 0) >= 50
+                    ].filter(Boolean).length
+                  }</span>
+                </h3>
+                <p className="text-sm text-[var(--color-text-muted)] mt-1">Your most recently unlocked achievements</p>
+              </div>
+              <div className="relative z-10">
+                <div className="flex flex-wrap gap-4 items-center min-h-[100px]">
+                  {(() => {
+                    const allBadges = [
+                      { title: "First Steps", icon: "/first-steps.png", unlocked: (attendanceData?.sessionsAttended ?? 0) >= 1 },
+                      { title: "Getting Started", icon: "/getting-started.png", unlocked: (attendanceData?.totalCredits ?? 0) >= 5 },
+                      { title: "Dedicated Learner", icon: "/dedicated-learner.png", unlocked: (attendanceData?.sessionsAttended ?? 0) >= 10 },
+                      { title: "Credit Collector", icon: "/credit-collector.png", unlocked: (attendanceData?.totalCredits ?? 0) >= 25 },
+                      { title: "Credit Master", icon: "/credit-master.png", unlocked: (attendanceData?.totalCredits ?? 0) >= 50 },
+                    ];
+                    const unlocked = allBadges.filter(b => b.unlocked).reverse();
+
+                    if (unlocked.length === 0) {
+                      return (
+                        <div className="w-full py-6 flex flex-col items-center justify-center text-[var(--color-text-muted)]">
+                          <Star className="w-8 h-8 opacity-20 mb-2" />
+                          <p className="text-sm">No badges earned yet</p>
+                        </div>
+                      );
+                    }
+
+                    return unlocked.map((badge, idx) => (
+                      <div key={idx} className="flex flex-col items-center gap-2 group cursor-pointer">
+                        <div className="w-[80px] h-[80px] md:w-[90px] md:h-[90px] relative transition-transform group-hover:scale-110 drop-shadow-md">
+                          <img
+                            src={badge.icon}
+                            alt={badge.title}
+                            className="w-full h-full object-contain"
+                          />
+                          {idx === 0 && (
+                            <span className="absolute -top-2 -right-2 bg-yellow-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md shadow-sm border border-yellow-400">NEW</span>
+                          )}
+                        </div>
+                        <span className="text-[11px] font-semibold text-[var(--color-text-secondary)] text-center max-w-[90px] truncate">{badge.title}</span>
+                      </div>
+                    ));
+                  })()}
                 </div>
               </div>
             </div>
 
-            {/* Milestones */}
-            <div className={`bg-[var(--color-card)] rounded-xl border border-[var(--color-border)] ${adminHoverCardClass}`}>
-              <div className="px-6 pt-6 pb-4 flex items-center justify-between gap-3 border-b border-[var(--color-border-light)]">
-                <h3 className="text-base font-semibold text-foreground">All Milestones</h3>
-                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {milestones.length - unlockedMilestones} remaining
-                </span>
+            {/* All Milestones */}
+            <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm">
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-[var(--color-text-primary)]">All Milestones Tracker</h3>
               </div>
-              <div className="divide-y divide-[var(--color-border-light)]">
-                {milestones.map((m) => {
-                  const Icon = m.icon;
-                  return (
-                    <div
-                      key={m.title}
-                      className={`flex items-center gap-4 px-6 py-4 transition-colors ${m.done ? 'hover:bg-primary/5' : 'hover:bg-[var(--color-surface)]'
-                        }`}
-                    >
-                      <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border ${m.done ? 'bg-primary/10 border-primary/20' : 'bg-muted border-[var(--color-border)]'
-                        }`}>
-                        <Icon className={`w-5 h-5 ${m.done ? 'text-primary' : 'text-muted-foreground'}`} />
+              <div>
+                <div className="divide-y divide-[var(--color-border-light)]">
+                  {[
+                    {
+                      id: 1,
+                      title: "First Steps",
+                      description: "Attend your first session",
+                      icon: "/first-steps.png",
+                      isUnlocked: (attendanceData?.sessionsAttended ?? 0) >= 1,
+                      current: attendanceData?.sessionsAttended ?? 0,
+                      target: 1,
+                      unit: "sessions"
+                    },
+                    {
+                      id: 2,
+                      title: "Getting Started",
+                      description: "Earn 5 academic credits",
+                      icon: "/getting-started.png",
+                      isUnlocked: (attendanceData?.totalCredits ?? 0) >= 5,
+                      current: attendanceData?.totalCredits ?? 0,
+                      target: 5,
+                      unit: "credits"
+                    },
+                    {
+                      id: 3,
+                      title: "Dedicated Learner",
+                      description: "Attend 10 active sessions",
+                      icon: "/dedicated-learner.png",
+                      isUnlocked: (attendanceData?.sessionsAttended ?? 0) >= 10,
+                      current: attendanceData?.sessionsAttended ?? 0,
+                      target: 10,
+                      unit: "sessions"
+                    },
+                    {
+                      id: 4,
+                      title: "Credit Collector",
+                      description: "Accumulate 25 total credits",
+                      icon: "/credit-collector.png",
+                      isUnlocked: (attendanceData?.totalCredits ?? 0) >= 25,
+                      current: attendanceData?.totalCredits ?? 0,
+                      target: 25,
+                      unit: "credits"
+                    },
+                    {
+                      id: 5,
+                      title: "Credit Master",
+                      description: "Accumulate 50 total credits",
+                      icon: "/credit-master.png",
+                      isUnlocked: (attendanceData?.totalCredits ?? 0) >= 50,
+                      current: attendanceData?.totalCredits ?? 0,
+                      target: 50,
+                      unit: "credits"
+                    }
+                  ].map((badge) => (
+                    <div key={badge.id} className={`flex items-center gap-4 py-4 rounded-lg px-2 transition-colors ${badge.isUnlocked ? 'bg-[var(--color-surface)]/40 hover:bg-[var(--color-surface)]/80' : 'bg-transparent'}`}>
+                      <div className={`relative w-[50px] h-[50px] flex-shrink-0 flex items-center justify-center filter ${badge.isUnlocked ? 'drop-shadow-sm' : 'grayscale opacity-50'}`}>
+                        <img
+                          src={badge.icon}
+                          alt={badge.title}
+                          className="w-full h-full object-contain"
+                        />
                       </div>
+
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-semibold ${m.done ? 'text-foreground' : 'text-muted-foreground'}`}>{m.title}</p>
-                        <p className="text-sm text-muted-foreground mt-0.5 leading-relaxed">{m.desc}</p>
+                        <div className="flex items-center justify-between mb-1">
+                          <h4 className={`font-bold tracking-tight ${badge.isUnlocked ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'}`}>{badge.title}</h4>
+                          <span className="text-[11px] font-semibold text-[var(--color-text-muted)]">
+                            {Math.min(badge.current, badge.target)} / {badge.target} {badge.unit}
+                          </span>
+                        </div>
+                        <p className="text-[13px] text-[var(--color-text-muted)] mb-2 truncate">{badge.description}</p>
+
+                        <div className="w-full bg-[var(--color-border-light)] rounded-full h-1.5 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-1000 ${badge.isUnlocked ? 'bg-emerald-500' : 'bg-[var(--color-primary)]'}`}
+                            style={{ width: `${Math.min((badge.current / badge.target) * 100, 100)}%` }}
+                          />
+                        </div>
                       </div>
-                      {m.done ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Done
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[var(--color-surface)] text-muted-foreground border border-[var(--color-border)]">
-                          Locked
-                        </span>
+
+                      {badge.isUnlocked && (
+                        <div className="flex-shrink-0 ml-2">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-none pointer-events-none">
+                            Unlocked
+                          </span>
+                        </div>
                       )}
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
+
               </div>
             </div>
           </div>

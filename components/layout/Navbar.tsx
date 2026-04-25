@@ -89,6 +89,38 @@ const Navbar = () => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [showUserMenu]);
 
+  if (isAuthPage) {
+    return (
+      <div className="absolute top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 pointer-events-none">
+        <Link href="/" className="pointer-events-auto">
+          <Image src="/logo.png" width={120} height={80} alt="logo" priority />
+        </Link>
+        <div className="flex items-center gap-4 pointer-events-auto">
+          {pathname === "/auth/login" ? (
+            <Link
+              href="/auth/signup"
+              className="flex items-center gap-2 px-4 py-2.5 bg-[#2BA6DF] text-white rounded-xl font-semibold hover:bg-[#208bc0] hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span className="hidden sm:inline">Sign Up</span>
+            </Link>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="flex items-center gap-2 px-4 py-2.5 bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-md text-slate-700 dark:text-slate-200 rounded-xl font-semibold border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transition-all text-sm"
+            >
+              <LogIn className="w-4 h-4" />
+              <span className="hidden sm:inline">Login</span>
+            </Link>
+          )}
+          <div className="pointer-events-auto backdrop-blur-md rounded-full bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center">
+            <ThemeSwitcher />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <nav className="w-full sticky top-0 z-50 bg-[var(--color-navbar)] border-b border-[var(--color-border)] transition-colors">
       <div className="flex justify-between items-center mx-auto px-5 py-3">
@@ -226,39 +258,39 @@ const Navbar = () => {
                   e.stopPropagation();
                   setShowUserMenu(!showUserMenu);
                 }}
-                className="bg-[var(--color-profile-icon-bg)] p-2 rounded-full cursor-pointer hover:bg-[var(--color-profile-icon-bg-hover)] transition-colors"
+                className="bg-[var(--color-profile-icon-bg)] p-2 rounded-full cursor-pointer hover:bg-[var(--color-primary)] hover:shadow-[0_0_15px_rgba(43,166,223,0.4)] dark:hover:bg-[#0284c7] dark:hover:shadow-[0_0_15px_rgba(2,132,199,0.4)] hover:scale-105 active:scale-95 transition-all duration-300 group"
               >
-                <User className="h-6 w-6 text-white" />
+                <User className="h-6 w-6 text-white group-hover:text-white transition-colors" />
               </button>
 
               {/* User Dropdown Menu */}
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-72 bg-[var(--color-card)] rounded-lg shadow-lg border border-[var(--color-border)] z-50">
-                  {/* User Info */}
-                  <div className="p-4 border-b border-[var(--color-border)]">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="bg-[var(--color-nav-active-bg)] p-3 rounded-full">
-                        <User className="h-6 w-6 text-[var(--color-primary)]" />
+                <div className="absolute right-0 mt-2 w-[19rem] bg-[var(--color-card)] border border-[var(--color-border-light)] rounded-2xl shadow-[0_1px_3px_rgba(15,23,42,0.1),0_14px_30px_rgba(15,23,42,0.12)] z-50 transition-all duration-200 origin-top-right flex flex-col p-2">
+                  {/* User Info Card */}
+                  <div className="p-4 rounded-xl bg-[var(--color-surface)]/50 border border-[var(--color-border-light)] mb-2 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
+                        <User className="h-5 w-5 text-[var(--color-primary)]" />
                       </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-[var(--color-text-primary)]">{user?.name || admin?.name || 'User'}</p>
-                        <p className="text-sm text-[var(--color-text-muted)]">{user?.email || admin?.email}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-[var(--color-text-primary)] truncate leading-tight">{user?.name || admin?.name || 'User'}</p>
+                        <p className="text-xs text-[var(--color-text-muted)] truncate mt-0.5">{user?.email || admin?.email}</p>
                       </div>
                     </div>
                     {user && (
-                      <div className="space-y-1 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-[var(--color-text-muted)]">Department:</span>
-                          <span className="font-medium text-[var(--color-text-primary)]">{user.department}</span>
+                      <div className="space-y-1.5 text-xs mt-4 pt-3 border-t border-[var(--color-border-light)]">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[var(--color-text-muted)] font-medium">Department:</span>
+                          <span className="font-semibold text-[var(--color-text-primary)]">{user.department}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-[var(--color-text-muted)]">Year:</span>
-                          <span className="font-medium text-[var(--color-text-primary)]">{user.year}</span>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[var(--color-text-muted)] font-medium">Year:</span>
+                          <span className="font-semibold text-[var(--color-text-primary)]">{user.year}</span>
                         </div>
                         {user.roll && (
-                          <div className="flex justify-between">
-                            <span className="text-[var(--color-text-muted)]">Roll No:</span>
-                            <span className="font-medium text-[var(--color-text-primary)]">{user.roll}</span>
+                          <div className="flex justify-between items-center">
+                            <span className="text-[var(--color-text-muted)] font-medium">Roll No:</span>
+                            <span className="font-semibold text-[var(--color-text-primary)]">{user.roll}</span>
                           </div>
                         )}
                       </div>
@@ -266,20 +298,20 @@ const Navbar = () => {
                   </div>
 
                   {/* Menu Items */}
-                  <div className="p-2">
+                  <div className="flex flex-col gap-1">
                     <button
                       onClick={() => {
                         setShowUserMenu(false);
                         router.push(effectiveRole === "admin" ? "/admin/dashboard" : "/student/dashboard");
                       }}
-                      className="w-full text-left px-3 py-2 rounded-md hover:bg-[var(--color-nav-hover-bg)] transition-colors flex items-center gap-2 text-[var(--color-text-secondary)]"
+                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors duration-200 flex items-center gap-3 text-[var(--color-text-secondary)] font-medium text-sm hover:bg-[var(--color-primary)]/10 hover:text-[var(--color-primary)]"
                     >
                       <LayoutDashboard className="w-4 h-4" />
                       <span>Dashboard</span>
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 dark:text-red-400 transition-colors flex items-center gap-2"
+                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors duration-200 flex items-center gap-3 text-red-600 dark:text-red-400 font-medium text-sm hover:bg-red-50 dark:hover:bg-red-500/15"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -296,7 +328,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && isLoggedIn && effectiveRole === "student" && (
-        <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div className="md:hidden border-t border-[var(--color-border)] bg-[var(--color-navbar)] text-[var(--color-text-primary)] transition-colors">
           <div className="flex flex-col p-4 space-y-2">
             <Link
               href="/student/dashboard"
@@ -347,7 +379,7 @@ const Navbar = () => {
       )}
 
       {mobileMenuOpen && isLoggedIn && effectiveRole === "admin" && (
-        <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div className="md:hidden border-t border-[var(--color-border)] bg-[var(--color-navbar)] text-[var(--color-text-primary)] transition-colors">
           <div className="flex flex-col p-4 space-y-2">
             <Link
               href="/admin/dashboard"

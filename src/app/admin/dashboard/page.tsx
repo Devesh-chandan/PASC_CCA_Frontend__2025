@@ -16,6 +16,7 @@ import {
   Star,
   Award,
   RefreshCw,
+  LayoutDashboard,
 } from "lucide-react";
 import { StatsCard } from "@/components/admin/stats-card";
 import { analyticsAPI } from "@/lib/api";
@@ -124,10 +125,10 @@ function DonutChart({
         ) : (
           <>
             {centerValue && (
-              <span className="text-2xl font-extrabold text-foreground tracking-tight drop-shadow-sm">{centerValue}</span>
+              <span className="text-2xl font-extrabold text-[var(--color-text-primary)] tracking-tight drop-shadow-sm">{centerValue}</span>
             )}
             {centerLabel && (
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">{centerLabel}</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] mt-0.5">{centerLabel}</span>
             )}
           </>
         )}
@@ -171,11 +172,11 @@ function MetricCard({
   return (
     <div className={`${color} ${baseCardClass}`}>
       <div className="flex flex-row items-center justify-between w-full mb-3 sm:mb-4">
-        <span className="text-sm sm:text-base font-medium text-muted-foreground">{title}</span>
+        <span className="text-sm sm:text-base font-medium text-[var(--color-text-muted)]">{title}</span>
         {icon}
       </div>
-      <div className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-1">{value}</div>
-      {subtitle && <p className="text-sm text-muted-foreground mt-2">{subtitle}</p>}
+      <div className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--color-text-primary)] mb-1">{value}</div>
+      {subtitle && <p className="text-sm text-[var(--color-text-muted)] mt-2">{subtitle}</p>}
     </div>
   );
 }
@@ -215,27 +216,24 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen p-6">
+      <div className="min-h-screen p-6 bg-background">
         <div className="max-w-7xl mx-auto space-y-6">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-5 w-96" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-32 w-full" />
+              <Skeleton key={i} className="h-32 w-full rounded-2xl" />
             ))}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-32 w-full" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {[1, 2].map((i) => (
+              <Skeleton key={i} className="h-48 w-full rounded-2xl" />
             ))}
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-28 w-full" />
+              <Skeleton key={i} className="h-40 w-full rounded-2xl" />
             ))}
           </div>
-          <Skeleton className="h-64 w-full" />
-          <Skeleton className="h-64 w-full" />
         </div>
       </div>
     );
@@ -279,32 +277,39 @@ const AdminDashboard = () => {
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* ── Header ── */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Admin Dashboard
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Comprehensive insights into CCA activities
-            </p>
+        <header className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="w-11 h-11 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-border-light)] flex items-center justify-center shrink-0 mt-0.5">
+                <LayoutDashboard className="w-5 h-5 text-[var(--color-primary)]" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight">
+                  Admin Dashboard
+                </h1>
+                <p className="text-sm md:text-base text-[var(--color-text-muted)] mt-1">
+                  Comprehensive insights into CCA activities
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-3 items-center">
+              <button
+                onClick={fetchAnalytics}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-[var(--color-border-light)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] transition-all shadow-sm active:scale-95"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Refresh Data
+              </button>
+              <button
+                onClick={() => router.push("/admin/createEvent")}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95"
+              >
+                <Plus className="h-4 w-4" />
+                Create Event
+              </button>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-3 items-center mt-3 md:mt-0">
-            <button
-              onClick={fetchAnalytics}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-[var(--color-border-light)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] transition-all shadow-sm active:scale-95"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Refresh Data
-            </button>
-            <button
-              onClick={() => router.push("/admin/createEvent")}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95"
-            >
-              <Plus className="h-4 w-4" />
-              Create Event
-            </button>
-          </div>
-        </div>
+        </header>
 
         {/* ── Top Stats Row ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -335,9 +340,9 @@ const AdminDashboard = () => {
           {/* Chart Panel */}
           <div className="lg:col-span-1 rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-6 shadow-sm flex flex-col hover:shadow-md transition-shadow duration-300">
             <div className="w-full flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-lg text-foreground tracking-tight">Event Distribution</h3>
+              <h3 className="font-semibold text-lg text-[var(--color-text-primary)] tracking-tight">Event Distribution</h3>
               <div className="p-1.5 bg-[var(--color-surface-hover)]/30 rounded-lg hidden sm:block">
-                <Activity className="w-4 h-4 text-muted-foreground" />
+                <Activity className="w-4 h-4 text-[var(--color-text-muted)]" />
               </div>
             </div>
 
@@ -358,11 +363,11 @@ const AdminDashboard = () => {
                   <div key={seg.label} className="flex items-center justify-between group">
                     <div className="flex items-center gap-2.5">
                       <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shadow-sm group-hover:scale-110 transition-transform" style={{ backgroundColor: seg.color }} />
-                      <span className="text-muted-foreground text-[13px] sm:text-sm font-medium group-hover:text-foreground transition-colors">
+                      <span className="text-[var(--color-text-muted)] text-[13px] sm:text-sm font-medium group-hover:text-[var(--color-text-primary)] transition-colors">
                         {seg.label}
                       </span>
                     </div>
-                    <span className="text-foreground font-bold text-xs sm:text-[13px] bg-[var(--color-surface)]/50 px-2 sm:px-2.5 py-0.5 rounded-md border border-[var(--color-border-light)] shadow-sm">
+                    <span className="text-[var(--color-text-primary)] font-bold text-xs sm:text-[13px] bg-[var(--color-surface)]/50 px-2 sm:px-2.5 py-0.5 rounded-md border border-[var(--color-border-light)] shadow-sm">
                       {seg.value}
                     </span>
                   </div>
@@ -375,48 +380,48 @@ const AdminDashboard = () => {
           <div className="lg:col-span-1 grid grid-cols-2 gap-4 h-full">
             <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-300">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-sm text-muted-foreground">Ongoing</h3>
+                <h3 className="font-semibold text-sm text-[var(--color-text-muted)]">Ongoing</h3>
                 <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
                   <Activity className="w-4 h-4 text-green-600 dark:text-green-400" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-foreground">
+              <p className="text-3xl font-bold text-[var(--color-text-primary)]">
                 {analytics?.ongoingEvents ?? 0}
               </p>
             </div>
 
             <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-300">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-sm text-muted-foreground">Upcoming</h3>
+                <h3 className="font-semibold text-sm text-[var(--color-text-muted)]">Upcoming</h3>
                 <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
                   <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-foreground">
+              <p className="text-3xl font-bold text-[var(--color-text-primary)]">
                 {analytics?.upcomingEvents ?? 0}
               </p>
             </div>
 
             <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-300">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-sm text-muted-foreground">Completed</h3>
+                <h3 className="font-semibold text-sm text-[var(--color-text-muted)]">Completed</h3>
                 <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
                   <CheckCircle className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-foreground">
+              <p className="text-3xl font-bold text-[var(--color-text-primary)]">
                 {analytics?.completedEvents ?? 0}
               </p>
             </div>
 
             <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-300">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-sm text-muted-foreground">Active</h3>
+                <h3 className="font-semibold text-sm text-[var(--color-text-muted)]">Active</h3>
                 <div className="w-8 h-8 bg-[var(--color-info)]/10 rounded-lg flex items-center justify-center">
                   <BarChart3 className="w-4 h-4 text-[var(--color-info)]" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-foreground">
+              <p className="text-3xl font-bold text-[var(--color-text-primary)]">
                 {activeEventsCount}
               </p>
             </div>
@@ -429,10 +434,10 @@ const AdminDashboard = () => {
           <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">
+                <p className="text-sm font-medium text-[var(--color-text-muted)] mb-1">
                   Average Rating
                 </p>
-                <p className="text-4xl font-bold text-foreground">
+                <p className="text-4xl font-bold text-[var(--color-text-primary)]">
                   {(analytics?.averageEventRating ?? 0).toFixed(1)}
                 </p>
                 <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-2">
@@ -447,10 +452,10 @@ const AdminDashboard = () => {
           <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">
+                <p className="text-sm font-medium text-[var(--color-text-muted)] mb-1">
                   Credits Distributed
                 </p>
-                <p className="text-4xl font-bold text-foreground">
+                <p className="text-4xl font-bold text-[var(--color-text-primary)]">
                   {analytics?.totalCreditsDistributed ?? 0}
                 </p>
                 <p className="text-sm font-medium text-amber-600 dark:text-amber-400 mt-2">
@@ -491,10 +496,10 @@ const AdminDashboard = () => {
                     </div>
                     <div className="flex-1 min-w-0 flex items-center justify-between gap-4">
                       <div className="min-w-0">
-                        <p className="text-[15px] sm:text-base font-semibold text-foreground truncate leading-tight">
+                        <p className="text-[15px] sm:text-base font-semibold text-[var(--color-text-primary)] truncate leading-tight">
                           {event.title}
                         </p>
-                        <div className="flex items-center gap-3 mt-1 text-[13px] sm:text-sm font-medium text-muted-foreground">
+                        <div className="flex items-center gap-3 mt-1 text-[13px] sm:text-sm font-medium text-[var(--color-text-muted)]">
                           <div className="flex items-center gap-1.5">
                             <Users className="w-3.5 h-3.5" />
                             {event.attendanceCount} Attendees
@@ -513,7 +518,7 @@ const AdminDashboard = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-8 text-[var(--color-text-muted)]">
                 No event data available
               </div>
             )}
@@ -531,12 +536,12 @@ const AdminDashboard = () => {
                 {analytics.recentActivity.map((activity: any, index: number) => (
                   <div
                     key={index}
-                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors"
+                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-[var(--color-surface-hover)] transition-colors"
                   >
                     <div className="w-2 h-2 bg-[var(--color-info)] rounded-full mt-2 flex-shrink-0" />
                     <div className="flex-1">
-                      <p className="text-foreground">{activity.description}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-[var(--color-text-primary)]">{activity.description}</p>
+                      <p className="text-xs text-[var(--color-text-muted)] mt-1">
                         {formatDate(activity.timestamp)}
                       </p>
                     </div>
@@ -544,7 +549,7 @@ const AdminDashboard = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-8 text-[var(--color-text-muted)]">
                 No recent activity
               </div>
             )}

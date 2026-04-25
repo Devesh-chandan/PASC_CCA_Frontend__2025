@@ -51,7 +51,7 @@ export function NotificationDropdown({
   return (
     <div
       ref={dropdownRef}
-      className='absolute right-0 mt-2 w-[26rem] max-w-[calc(100vw-1.25rem)] bg-[var(--color-card)] border border-[var(--color-border-light)] rounded-2xl shadow-[0_1px_3px_rgba(15,23,42,0.1),0_14px_30px_rgba(15,23,42,0.12)] z-50 max-h-[520px] overflow-hidden flex flex-col'
+      className='absolute top-full w-[calc(100vw-2rem)] right-[-60px] sm:right-0 sm:w-[26rem] mt-2 bg-[var(--color-card)] border border-[var(--color-border-light)] rounded-2xl shadow-[0_1px_3px_rgba(15,23,42,0.1),0_14px_30px_rgba(15,23,42,0.12)] z-50 max-h-[520px] max-w-[400px] sm:max-w-none overflow-hidden flex flex-col'
     >
       {/* Header */}
       <div className='p-4 border-b border-[var(--color-border-light)] flex items-center gap-3'>

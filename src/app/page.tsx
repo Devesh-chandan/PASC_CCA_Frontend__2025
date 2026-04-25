@@ -224,13 +224,12 @@ export default function Home() {
               >
                 <button
                   onClick={() => router.push('/auth/signup')}
-                  className="group relative px-8 py-4 bg-gradient-to-r from-[#134467] to-[#2BA6DF] text-white rounded-xl font-semibold text-lg overflow-hidden shadow-lg shadow-[#134467]/25 hover:shadow-xl hover:shadow-[#134467]/30 transition-all duration-300 hover:scale-[1.02]"
+                  className="group relative px-8 py-4 bg-[#2BA6DF] hover:bg-[#2190C6] text-white rounded-xl font-semibold text-lg overflow-hidden shadow-lg shadow-[#2BA6DF]/25 hover:shadow-xl hover:shadow-[#2BA6DF]/30 transition-all duration-300 hover:scale-[1.02]"
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     Get Started Free
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#2BA6DF] to-[#134467] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </button>
                 
                 <button
@@ -386,7 +385,7 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-[var(--color-card)]/80/60 backdrop-blur-sm border-y border-[var(--color-border-light)]">
+      <section className="py-16 bg-[var(--color-card)]/60 backdrop-blur-sm border-y border-[var(--color-border-light)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => {
@@ -407,7 +406,7 @@ export default function Home() {
                   <div className="text-4xl font-bold text-[var(--color-text-primary)] mb-1">
                     {count}{stat.suffix}
                   </div>
-                  <div className="-400 text-400 text-[hsl(var(--mini-text))] font-medium">
+                  <div className="text-[hsl(var(--mini-text))] font-medium">
                     {stat.label}
                   </div>
                 </motion.div>
@@ -429,7 +428,7 @@ export default function Home() {
             <span className="inline-block px-4 py-2 bg-[var(--color-surface-hover)]/30 text-[var(--color-primary)] rounded-full text-sm font-semibold mb-4">
               Features
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[var(--color-text-primary)] mb-4">
               Everything You Need to{" "}
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#134467] to-[#2BA6DF]">
                 Excel in Activities
@@ -482,7 +481,7 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <span className="inline-block px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-[#10B981] dark:text-[#34D399] rounded-full text-sm font-semibold mb-4">
+              <span className="inline-block px-4 py-2 bg-[var(--color-benefit-bg)] text-[var(--color-benefit-text)] rounded-full text-sm font-semibold mb-4">
                 Why PASC CCA?
               </span>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[var(--color-text-primary)] mb-6 leading-tight">
@@ -505,7 +504,7 @@ export default function Home() {
                     transition={{ delay: index * 0.08 }}
                     className="flex items-center gap-3 p-3 bg-[var(--color-card)] rounded-xl shadow-sm border border-[var(--color-border-light)]"
                   >
-                    <div className="flex-shrink-0 w-10 h-10 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center text-[#10B981] dark:text-[#34D399]">
+                    <div className="flex-shrink-0 w-10 h-10 bg-[var(--color-benefit-bg)] rounded-lg flex items-center justify-center text-[var(--color-benefit-text)]">
                       {benefit.icon}
                     </div>
                     <span className="text-[var(--color-text-secondary)] font-medium text-sm">
@@ -672,16 +671,16 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4 text-[#ECEFF1]">Connect</h4>
               <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 bg-[#37474F] hover:bg-[#2BA6DF] rounded-lg flex items-center justify-center transition-colors">
+                <a href="#" className="w-10 h-10 bg-[#37474F] hover:bg-[#1DA1F2] rounded-lg flex items-center justify-center transition-colors">
                   <Twitter className="w-5 h-5" />
                 </a>
-                <a href="#" className="w-10 h-10 bg-[#37474F] hover:bg-[#FDB811] rounded-lg flex items-center justify-center transition-colors">
+                <a href="#" className="w-10 h-10 bg-[#37474F] hover:bg-[#E1306C] rounded-lg flex items-center justify-center transition-colors">
                   <Instagram className="w-5 h-5" />
                 </a>
-                <a href="#" className="w-10 h-10 bg-[#37474F] hover:bg-[#263238] rounded-lg flex items-center justify-center transition-colors">
+                <a href="#" className="w-10 h-10 bg-[#37474F] hover:bg-[#24292e] rounded-lg flex items-center justify-center transition-colors">
                   <Github className="w-5 h-5" />
                 </a>
-                <a href="#" className="w-10 h-10 bg-[#37474F] hover:bg-[#55B8E5] rounded-lg flex items-center justify-center transition-colors">
+                <a href="#" className="w-10 h-10 bg-[#37474F] hover:bg-[#2BA6DF] rounded-lg flex items-center justify-center transition-colors">
                   <Mail className="w-5 h-5" />
                 </a>
               </div>
@@ -700,17 +699,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-
-      {/* Custom CSS for gradient animation */}
-      <style jsx>{`
-        @keyframes gradient {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        .animate-gradient {
-          animation: gradient 3s ease infinite;
-        }
-      `}</style>
     </div>
   );
 }

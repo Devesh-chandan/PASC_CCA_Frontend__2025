@@ -142,7 +142,7 @@ export function NotificationBell() {
     <div className='relative inline-flex overflow-visible'>
       <button
         onClick={handleOpen}
-        className='relative p-2 rounded-full hover:bg-accent transition-colors'
+        className='relative p-2 rounded-full hover:bg-[var(--color-surface-hover)] hover:scale-110 active:scale-95 transition-all duration-300'
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} new)` : ''}`}
       >
         <Bell className='w-6 h-6 text-foreground' />

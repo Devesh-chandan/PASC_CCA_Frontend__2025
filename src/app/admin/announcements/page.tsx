@@ -22,6 +22,8 @@ export default function AdminAnnouncementsPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
   const { success, error: toastError } = useToast();
   const [formData, setFormData] = useState<AnnouncementCreateInput>({
     title: '',
@@ -87,7 +89,9 @@ export default function AdminAnnouncementsPage() {
           : undefined
       };
 
-      console.log('Creating announcement with payload:', payload);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Creating announcement with payload:', payload);
+      }
 
       if (editingAnnouncement) {
         const response = await announcementAPI.update(editingAnnouncement.id, payload);
@@ -112,16 +116,19 @@ export default function AdminAnnouncementsPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this announcement?')) return;
-
+  const handleDeleteConfirm = async () => {
+    if (deleteTargetId == null) return;
+    setDeleteSubmitting(true);
     try {
-      await announcementAPI.delete(id);
+      await announcementAPI.delete(deleteTargetId);
       success('Announcement Deleted', 'The announcement has been removed.');
       fetchAnnouncements();
     } catch (deleteErr: any) {
       console.error('Error deleting announcement:', deleteErr);
       toastError('Deletion Failed', deleteErr.response?.data?.error || 'Failed to delete announcement');
+    } finally {
+      setDeleteSubmitting(false);
+      setDeleteTargetId(null);
     }
   };
 
@@ -184,27 +191,28 @@ export default function AdminAnnouncementsPage() {
     <main className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <Megaphone className="w-8 h-8 text-primary" />
-              Announcements
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Create and manage announcements for students
-            </p>
+        <header className="bg-[var(--color-card)] border border-[var(--color-border-light)] rounded-2xl p-5 md:p-6 shadow-[0_1px_3px_rgba(15,23,42,0.08),0_10px_24px_rgba(15,23,42,0.05)]">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-11 h-11 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0 mt-0.5">
+                <Megaphone className="w-5 h-5 text-[var(--color-primary)]" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight">Announcements</h1>
+                <p className="text-sm md:text-base text-[var(--color-text-muted)] mt-1">
+                  Create and manage announcements for students
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => { resetForm(); setShowDialog(true); }}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap self-start sm:self-center"
+            >
+              <Plus className="w-4 h-4" />
+              New Announcement
+            </button>
           </div>
-          <Button
-            onClick={() => {
-              resetForm();
-              setShowDialog(true);
-            }}
-            className="flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            New Announcement
-          </Button>
-        </div>
+        </header>
 
         {/* Announcements List */}
         <div className="mt-4">
@@ -261,7 +269,7 @@ export default function AdminAnnouncementsPage() {
                         <p className={`text-sm md:text-[15px] whitespace-pre-wrap leading-[1.6] text-[var(--color-text-secondary)]`}>
                           {announcement.message}
                         </p>
-                        
+
                         <div className="flex flex-wrap items-center gap-4 text-[11px] text-[var(--color-text-muted)]/80 pt-3 border-t border-[var(--color-border-light)]/80 font-semibold uppercase tracking-wider">
                           {announcement.expiresAt && (
                             <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3" /> Expires: {formatDateTime(announcement.expiresAt)}</span>
@@ -289,7 +297,7 @@ export default function AdminAnnouncementsPage() {
                         <Edit className="w-4 h-4 text-[var(--color-primary)]" />
                       </button>
                       <button
-                        onClick={() => handleDelete(announcement.id)}
+                        onClick={() => setDeleteTargetId(announcement.id)}
                         className="p-2 hover:bg-red-500/10 rounded-xl transition-colors"
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />
@@ -327,7 +335,7 @@ export default function AdminAnnouncementsPage() {
               <textarea
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2.5 border border-[var(--color-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-input-focus)] bg-[var(--color-card)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] resize-none text-sm transition-shadow"
                 rows={5}
                 placeholder="Announcement message"
               />
@@ -349,7 +357,7 @@ export default function AdminAnnouncementsPage() {
                     className={cn(
                       "px-3 py-1.5 rounded-lg text-sm font-medium border transition-all",
                       formData.priority === priority.value
-                        ? `${priority.color} ring-2 ring-offset-1 ring-gray-400 border-transparent`
+                        ? `${priority.color} ring-2 ring-offset-1 ring-current border-transparent`
                         : "bg-transparent border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]"
                     )}
                   >
@@ -432,8 +440,32 @@ export default function AdminAnnouncementsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </main>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteTargetId != null} onOpenChange={(open) => { if (!open) setDeleteTargetId(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete Announcement?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">
+            This action cannot be undone. The announcement will be permanently removed for all students.
+          </p>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteTargetId(null)} disabled={deleteSubmitting}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              disabled={deleteSubmitting}
+              className="bg-red-600 hover:bg-red-700 text-white border-transparent"
+            >
+              {deleteSubmitting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </main >
+
+
   );
 }
-
-

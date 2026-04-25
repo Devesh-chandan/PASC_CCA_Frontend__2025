@@ -23,35 +23,41 @@ export function RoleToggle({
   };
 
   return (
-    <div className="flex justify-center mb-6">
-      <div className="relative flex bg-profile rounded-full p-1 w-72">
+    <div className="flex justify-center mb-8">
+      <div className="relative flex bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-1.5 w-full max-w-[320px] shadow-inner">
         {/* Sliding Background */}
         <motion.div
-          className="absolute top-1 bottom-1 rounded-full bg-[var(--color-button-primary)]"
+          className="absolute top-1.5 bottom-1.5 rounded-xl bg-[var(--color-card)] shadow-[0_2px_8px_rgba(0,0,0,0.1)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-[var(--color-border-light)]"
           layout
           initial={{ opacity: 0 }}
           animate={{
             opacity: 1,
-            left: role === "student" ? "4px" : "calc(50% + 4px)",
+            left: role === "student" ? "6px" : "calc(50% + 2px)",
             width: "calc(50% - 8px)",
           }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          style={{ zIndex: 10 }} /* Ensure it stays behind buttons */
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          style={{ zIndex: 10 }}
         />
         {/* Student Button */}
         <button
+          type="button"
           onClick={() => handleToggle("student")}
-          className={`relative flex-1 px-6 py-2 rounded-full transition-colors duration-300 z-20 ${
-            role === "student" ? "bg-[var(--color-button-primary)] text-white" : "text-primary"
+          className={`relative flex-1 px-6 py-2.5 rounded-xl text-sm font-bold transition-colors duration-300 z-20 ${
+            role === "student"
+              ? "text-[var(--color-primary)] drop-shadow-sm"
+              : "text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
           }`}
         >
           Student
         </button>
         {/* Admin Button */}
         <button
+          type="button"
           onClick={() => handleToggle("admin")}
-          className={`relative flex-1 px-6 py-2 rounded-full transition-colors duration-300 z-20 ${
-            role === "admin" ? "bg-[var(--color-button-primary)] text-white" : "text-primary"
+          className={`relative flex-1 px-6 py-2.5 rounded-xl text-sm font-bold transition-colors duration-300 z-20 ${
+            role === "admin"
+              ? "text-[var(--color-primary)] drop-shadow-sm"
+              : "text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
           }`}
         >
           Admin

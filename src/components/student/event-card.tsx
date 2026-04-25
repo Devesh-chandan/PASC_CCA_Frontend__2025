@@ -1,5 +1,5 @@
 import { EventWithRsvp } from '@/types/events';
-import { Calendar, MapPin, Users, Award } from 'lucide-react';
+import { Calendar, MapPin, Users, Award, ExternalLink, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import Link from 'next/link';
 import { rsvpAPI } from '@/lib/api';
 import { useToast } from '@/components/ui/toast';
@@ -7,26 +7,26 @@ import { useToast } from '@/components/ui/toast';
 /* ──── Status badge colours ──── */
 const statusConfig: Record<string, { bg: string; text: string; dot: string }> = {
   UPCOMING: {
-    bg: 'bg-[var(--color-primary)]/10',
-    text: 'text-[var(--color-primary)]',
+    bg: 'bg-[var(--color-primary)]/10 dark:bg-[var(--color-primary)]/20',
+    text: 'text-[var(--color-primary)] font-bold',
     dot: 'bg-[var(--color-primary)]',
   },
   ONGOING: {
-    bg: 'bg-emerald-100/80 dark:bg-emerald-900/25',
-    text: 'text-emerald-700 dark:text-emerald-300',
-    dot: 'bg-green-500',
+    bg: 'bg-emerald-100/80 dark:bg-emerald-500/20',
+    text: 'text-emerald-700 dark:text-emerald-400 font-bold',
+    dot: 'bg-emerald-500 dark:bg-emerald-400',
   },
   COMPLETED: {
-    bg: 'bg-[var(--color-primary)]/10',
-    text: 'text-[var(--color-primary)]',
-    dot: 'bg-[var(--color-primary)]',
+    bg: 'bg-gray-100 dark:bg-gray-800/60',
+    text: 'text-gray-600 dark:text-gray-400 font-bold',
+    dot: 'bg-gray-500 dark:bg-gray-400',
   },
 };
 
 export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) => {
   const event = eventWithRsvp.event;
   const status = statusConfig[event.status] ?? statusConfig.UPCOMING;
-  const statusLabel = event.status.charAt(0) + event.status.slice(1).toLowerCase();
+  const statusLabel = event.status;
   const { success, error } = useToast();
 
   const formatDateInIST = (value: string | Date) => {
@@ -70,156 +70,112 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
   }
 
   return (
-    <div className="group rounded-[1.25rem] bg-[var(--color-card)] shadow-sm hover:shadow-md border border-[var(--color-border-light)] hover:border-[var(--color-border)] transition-all duration-300 overflow-hidden flex flex-col p-5 sm:p-6 pb-4 relative">
+    <div className="group flex flex-col h-full bg-[var(--color-card)] rounded-2xl shadow-sm border border-[var(--color-border-light)] hover:shadow-md hover:border-[var(--color-border)] transition-all duration-300 overflow-hidden relative">
       
-      {/* Title + Badge */}
-      <div className="flex items-start justify-between gap-4 mb-6">
-        <div className="min-w-0 pr-2">
-          <h3 className="text-xl sm:text-[22px] font-bold text-[var(--color-text-primary)] leading-tight tracking-tight break-words">
-            {event.title}
-          </h3>
-        </div>
-        <span
-          className={`shrink-0 flex items-center justify-center p-2 rounded-xl text-[11px] font-bold tracking-wide ${status.bg} ${status.text} border border-current/10 whitespace-nowrap leading-none h-fit min-w-[70px] text-center uppercase`}
-        >
-          {statusLabel}
-        </span>
-      </div>
+      {/* Content Container */}
+      <div className="p-5 flex-1 flex flex-col">
+        
+        {/* Title */}
+        <h3 className="text-[19px] sm:text-[20px] font-bold text-[var(--color-text-primary)] leading-[1.3] line-clamp-2 min-h-[52px] mb-3">
+          {event.title}
+        </h3>
 
-      {/* Meta Grid - matching the reference layout */}
-      <div className="grid grid-cols-2 gap-x-6 gap-y-6 mb-7">
-        {/* Date */}
-        <div>
-          <p className="text-[15px] sm:text-[16px] font-semibold text-[var(--color-text-primary)] mb-1">
-            {new Date(event.startDate).toLocaleDateString('en-US', {
-              weekday: 'short',
-              month: 'short',
-              day: 'numeric'
-            })}
-          </p>
-          <p className="text-[13.5px] text-[var(--color-text-muted)] tracking-wide font-medium">Date</p>
+        {/* Status Badge */}
+        <div className="flex items-center mb-4 text-xs">
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--color-border-light)] ${status.bg} ${status.text}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`}></span>
+            {statusLabel}
+          </span>
         </div>
 
-        {/* Time */}
-        <div>
-          <p className="text-[15px] sm:text-[16px] font-semibold text-[var(--color-text-primary)] mb-1">
-            {new Date(event.startDate).toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit'
-            })} - {new Date(event.endDate).toLocaleTimeString('en-US', {
-               hour: '2-digit',
-               minute: '2-digit'
-            })}
-          </p>
-          <p className="text-[13.5px] text-[var(--color-text-muted)] tracking-wide font-medium">Time</p>
-        </div>
-
-        {/* Location */}
-        <div>
-          <p className="text-[15px] sm:text-[16px] font-semibold text-[var(--color-text-primary)] mb-1 truncate">
-            {event.location}
-          </p>
-          <p className="text-[13.5px] text-[var(--color-text-muted)] tracking-wide font-medium">Location</p>
-        </div>
-
-        {/* Credits / Color matching reference */}
-        <div>
-          <div className="flex items-center gap-2 mb-1 h-[24px]">
-             <span className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
-               <Award className="w-3.5 h-3.5" />
-             </span>
-             <p className="text-[15px] sm:text-[16px] font-semibold text-[var(--color-text-primary)] leading-none">
-               {event.credits}
-             </p>
+        {/* Metadata Stack - Pill/Badge Layout */}
+        <div className="flex flex-col gap-2.5 mb-6">
+          
+          <div className="flex items-center gap-2.5 bg-black/[0.015] dark:bg-white/[0.04] shadow-sm dark:shadow-black/20 border border-[var(--color-border-light)] px-3.5 py-2 rounded-xl text-[13px] hover:border-[var(--color-border)] transition-colors w-full">
+            <Calendar className="w-[16px] h-[16px] text-[var(--color-text-muted)] shrink-0" />
+            <span className="font-medium text-[var(--color-text-primary)] tracking-wide truncate">
+              {new Date(event.startDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })} <span className="text-[var(--color-text-muted)] mx-0.5">-</span> {new Date(event.endDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
+            </span>
           </div>
-          <p className="text-[13.5px] text-[var(--color-text-muted)] tracking-wide font-medium">Credits</p>
+
+          <div className="flex items-center gap-2.5 bg-black/[0.015] dark:bg-white/[0.04] shadow-sm dark:shadow-black/20 border border-[var(--color-border-light)] px-3.5 py-2 rounded-xl text-[13px] hover:border-[var(--color-border)] transition-colors w-full">
+            <MapPin className="w-[16px] h-[16px] text-[var(--color-text-muted)] shrink-0" />
+            <span className="font-medium text-[var(--color-text-primary)] capitalize tracking-wide truncate">
+              {event.location}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="flex items-center gap-2.5 bg-black/[0.015] dark:bg-white/[0.04] shadow-sm dark:shadow-black/20 border border-[var(--color-border-light)] px-3.5 py-2 rounded-xl text-[13px] hover:border-[var(--color-border)] transition-colors w-full min-w-0">
+              <Award className="w-[16px] h-[16px] text-[var(--color-text-muted)] shrink-0" />
+              <span className="font-medium text-[var(--color-text-primary)] tracking-wide truncate">
+                {event.credits} Credits
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2.5 bg-black/[0.015] dark:bg-white/[0.04] shadow-sm dark:shadow-black/20 border border-[var(--color-border-light)] px-3.5 py-2 rounded-xl text-[13px] hover:border-[var(--color-border)] transition-colors w-full min-w-0">
+              <Users className="w-[16px] h-[16px] text-[var(--color-text-muted)] shrink-0" />
+              <span className="font-medium text-[var(--color-text-primary)] tracking-wide truncate">
+                <span className="text-[var(--color-text-muted)] font-normal mr-1 max-[380px]:hidden">Capacity:</span>
+                {event.capacity === -1 ? 'Unlimited' : event.capacity}
+              </span>
+            </div>
+          </div>
+
         </div>
+
+        {/* Description Area */}
+        <div className="mt-auto rounded-xl p-3.5 bg-[var(--color-surface)] border border-[var(--color-border-light)]">
+           <p className="text-[13px] text-[var(--color-text-secondary)] font-medium line-clamp-2 leading-relaxed">
+             {event.description || 'No description available for this event.'}
+           </p>
+        </div>
+
       </div>
 
-      <div className="w-full h-px bg-[var(--color-border-light)] mb-6" />
-
-      {/* Description Header + Text */}
-      <div className="mb-6">
-        <h4 className="text-[17px] font-semibold text-[var(--color-text-secondary)] mb-3">
-          Description
-        </h4>
-        <p className="text-[14.5px] text-[var(--color-text-primary)] leading-[1.6] line-clamp-3 font-medium">
-          {event.description || 'No description available for this event.'}
-        </p>
-      </div>
-
-      {/* Decorative Banner Image (Geometric placeholder since no image URL exists natively) */}
-      <div className="w-full h-[140px] rounded-[1.25rem] overflow-hidden bg-gradient-to-tr from-blue-500/20 via-purple-500/10 to-indigo-500/20 mb-6 flex items-center justify-center relative">
-         <div className="absolute inset-0 opacity-40 mix-blend-overlay bg-[url('https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=800&q=80')] bg-cover bg-center" />
-         <div className="bg-white/80 dark:bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-lg border border-[var(--color-border-light)] absolute bottom-3 right-3 flex items-center gap-1.5">
-           <Users className="w-3.5 h-3.5 text-[var(--color-text-primary)]" />
-           <span className="text-xs font-bold text-[var(--color-text-primary)]">{event.capacity <= 0 ? 'Full' : event.capacity + ' seats'}</span>
+      {/* Footer / Actions */}
+      <div className="px-5 pb-5">
+         <div className="w-full h-px bg-[var(--color-border-light)] mb-4" />
+         
+         <div className="flex items-center justify-between">
+          <Link 
+            href={`/student/events/${event.id}`}
+            className="flex items-center gap-1.5 text-[14px] font-bold text-[var(--color-primary)] dark:text-[#0284c7] hover:opacity-80 transition-colors group/link"
+          >
+             View Details
+             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover/link:translate-x-0.5 transition-transform"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+          </Link>
+          
+          {event.status === 'COMPLETED' ? (
+             <div className="flex items-center gap-2 opacity-80">
+               <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-text-muted)]" />
+               <span className="text-[13.5px] font-semibold text-[var(--color-text-muted)]">Completed</span>
+             </div>
+          ) : eventWithRsvp.rsvp ? (
+             <div className="flex items-center gap-3">
+               <div className="flex items-center gap-1.5">
+                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                 <span className="text-[13.5px] font-bold text-emerald-600 dark:text-emerald-400">Registered</span>
+               </div>
+               <div className="w-px h-3.5 bg-[var(--color-border-light)]" />
+               <button 
+                 onClick={handleRsvpCancel} 
+                 className="text-[13px] font-bold text-red-500 hover:text-red-600 transition-colors"
+               >
+                 Cancel RSVP
+               </button>
+             </div>
+          ) : (
+             <button 
+               onClick={handleRsvpButton}
+               className="flex items-center gap-1.5 text-[13.5px] font-bold text-white bg-[var(--color-primary)] dark:bg-[#0284c7] hover:bg-[var(--color-primary-hover)] dark:hover:opacity-90 hover:shadow-md transition-all duration-200 px-4 py-2 rounded-[10px] shadow-sm active:scale-[0.98]"
+             >
+               RSVP Now
+             </button>
+          )}
          </div>
       </div>
 
-      {/* Bottom Actions */}
-      <div className="mt-auto pt-4 flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-4">
-          {event.status === 'COMPLETED' ? (
-             <div className="flex items-center gap-2.5 opacity-60">
-               <div className="w-5 h-5 rounded-full bg-[var(--color-surface-hover)] flex items-center justify-center shrink-0">
-                  <div className="w-2 h-2 rounded-full bg-[var(--color-text-muted)]" />
-               </div>
-               <p className="text-[14px] font-semibold text-[var(--color-text-muted)]">Completed</p>
-             </div>
-          ) : eventWithRsvp.rsvp ? (
-             <div className="flex items-center gap-2.5">
-               <div className="w-5.5 h-5.5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 text-white shadow-sm">
-                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-               </div>
-               <p className="text-[14px] font-bold text-[var(--color-text-primary)]">
-                  {eventWithRsvp.rsvp.status === 'WAITLISTED' ? 'Waitlisted' : 'Registered'}
-               </p>
-             </div>
-          ) : (
-             <div className="flex items-center gap-2.5">
-                <div className="w-5.5 h-5.5 rounded-full border-[2px] border-[var(--color-border-light)] bg-[var(--color-surface)] flex items-center justify-center shrink-0" />
-                <p className="text-[14px] font-semibold text-[var(--color-text-primary)]">Open for RSVP</p>
-             </div>
-          )}
-
-          <Link 
-            href={`/student/events/${event.id}`}
-            className="text-[13px] font-bold text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] flex items-center gap-1 transition-colors py-1"
-          >
-            View Details
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-          </Link>
-        </div>
-
-        <div className="flex gap-2.5 mt-1">
-          {event.status !== 'COMPLETED' && (
-            eventWithRsvp.rsvp ? (
-              <button
-                onClick={handleRsvpCancel}
-                className="flex-1 text-[13.5px] font-bold text-red-500 hover:text-red-600 transition-all bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 py-2.5 rounded-xl border border-red-200/50 dark:border-red-500/20"
-              >
-                Cancel RSVP
-              </button>
-            ) : (
-              <button
-                onClick={handleRsvpButton}
-                className="flex-1 text-[13.5px] font-bold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] shadow-md shadow-[var(--color-primary)]/20 transition-all py-2.5 rounded-xl flex items-center justify-center gap-2"
-              >
-                RSVP Now
-              </button>
-            )
-          )}
-          {event.status === 'COMPLETED' && (
-             <button
-              disabled
-              className="flex-1 text-[13.5px] font-bold text-[var(--color-text-muted)] bg-[var(--color-surface)] py-2.5 rounded-xl border border-[var(--color-border-light)] cursor-not-allowed"
-            >
-              Event Ended
-            </button>
-          )}
-        </div>
-      </div>
     </div>
   );
 };

@@ -47,40 +47,46 @@ const AdminEventsPage = () => {
         <div className="min-h-screen p-6 bg-background">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                    <div>
-                        <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                            <Calendar className="w-8 h-8 text-primary" />
-                            Manage Events
-                        </h1>
-                        <p className="text-muted-foreground mt-1">
-                            View, edit, and monitor all event activities
-                        </p>
+                <header className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300 mb-8">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div className="flex items-start gap-4">
+                            <div className="w-11 h-11 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-border-light)] flex items-center justify-center shrink-0 mt-0.5">
+                                <Calendar className="w-5 h-5 text-[var(--color-primary)]" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight">
+                                    Manage Events
+                                </h1>
+                                <p className="text-sm md:text-base text-[var(--color-text-muted)] mt-1">
+                                    View, edit, and monitor all event activities
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => router.push("/admin/createEvent")}
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Create Event
+                        </button>
                     </div>
-                    <button
-                        onClick={() => router.push("/admin/createEvent")}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap"
-                    >
-                        <Plus className="h-4 w-4" />
-                        Create Event
-                    </button>
-                </div>
+                </header>
 
                 {/* Search bar — query is forwarded to the backend */}
                 <div className="mb-6 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] w-5 h-5" />
                     <input
                         id="admin-event-search"
                         type="text"
                         placeholder="Search events by title or description..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-10 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className="w-full pl-10 pr-10 py-3 border border-[var(--color-border)] rounded-xl bg-[var(--color-card)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-input-focus)]"
                     />
                     {searchQuery && (
                         <button
                             onClick={() => setSearchQuery("")}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
                             aria-label="Clear search"
                         >
                             ✕
