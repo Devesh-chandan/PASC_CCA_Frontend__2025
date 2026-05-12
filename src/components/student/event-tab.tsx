@@ -1,6 +1,6 @@
 'use client';
-import { EventWithRsvp } from '@/types/events';
-import { useState } from 'react';
+import { EventWithRsvp, Rsvp } from '@/types/events';
+import { useState, useEffect, useCallback } from 'react';
 import { EventCard } from '@/components/student/event-card';
 import { Search, ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 
@@ -86,6 +86,18 @@ function Pagination({
 
 // ---------- Main component ----------
 export const EventsTab = ({ eventsWithRsvp }: { eventsWithRsvp: EventWithRsvp[] }) => {
+  const [list, setList] = useState<EventWithRsvp[]>(eventsWithRsvp);
+
+  useEffect(() => {
+    setList(eventsWithRsvp);
+  }, [eventsWithRsvp]);
+
+  const patchEventRsvp = useCallback((eventId: number, rsvp: Rsvp | null) => {
+    setList((prev) =>
+      prev.map((row) => (row.event.id === eventId ? { ...row, rsvp } : row))
+    );
+  }, []);
+
   const [activeTab, setActiveTab] = useState('all-events');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -106,7 +118,7 @@ export const EventsTab = ({ eventsWithRsvp }: { eventsWithRsvp: EventWithRsvp[] 
   };
 
   const filterEvents = (status?: string) => {
-    let filtered = eventsWithRsvp;
+    let filtered = list;
 
     if (status === 'my-events') {
       filtered = filtered.filter((e) => e.rsvp !== null && e.rsvp !== undefined);
@@ -169,7 +181,11 @@ export const EventsTab = ({ eventsWithRsvp }: { eventsWithRsvp: EventWithRsvp[] 
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {paginated.map((eventWithRsvp, index) => (
-            <EventCard key={eventWithRsvp.event.id ?? index} eventWithRsvp={eventWithRsvp} />
+            <EventCard
+              key={eventWithRsvp.event.id ?? index}
+              eventWithRsvp={eventWithRsvp}
+              onRsvpChange={patchEventRsvp}
+            />
           ))}
         </div>
         <Pagination

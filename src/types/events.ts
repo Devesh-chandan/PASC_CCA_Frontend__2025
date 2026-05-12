@@ -10,6 +10,8 @@ export type Event = {
   capacity: number;
   numDays: number;           // Backend field that was missing
   prerequisite?: string;     // Backend uses singular 'prerequisite', not 'prerequisites'
+  /** Set on student event list when session count is loaded client-side */
+  sessionCount?: number;
 };
 
 export interface Rsvp {
@@ -26,7 +28,7 @@ export type RsvpStatus = "CONFIRMED" | "WAITLISTED" | "REJECTED" | "ATTENDING" |
 
 export interface EventWithRsvp {
   event: Event;
-  rsvp: Rsvp;
+  rsvp: Rsvp | null;
 }
 
 export type EventFor = 'ADMIN' | 'STUDENT RSVP' | 'STUDENT EVENTS';

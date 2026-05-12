@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Event, EventWithRsvp } from "@/types/events";
-import { eventAPI } from "@/lib/api";
+import { eventAPI, attendanceAPI } from "@/lib/api";
 import { useAuthStore } from "@/lib/store";
 
 
@@ -70,8 +70,23 @@ export function useFetchEventsForStudentRsvp() {
             const res = await eventAPI.getUserEvents();
             // Pass through raw ISO date strings - let components format them
             const raw2 = res.data?.data ?? res.data?.events ?? res.data;
-            const events = Array.isArray(raw2) ? raw2 : [];
-            setFetchedEvents(events);
+            const eventsList = Array.isArray(raw2) ? raw2 : [];
+            const enriched = await Promise.all(
+                eventsList.map(async (item: EventWithRsvp) => {
+                    try {
+                        const attRes = await attendanceAPI.getUserSessionsByEvent(item.event.id);
+                        const sessionArr = attRes.data?.data?.session;
+                        const count = Array.isArray(sessionArr) ? sessionArr.length : 0;
+                        return {
+                            ...item,
+                            event: { ...item.event, sessionCount: count },
+                        };
+                    } catch {
+                        return item;
+                    }
+                })
+            );
+            setFetchedEvents(enriched);
         } catch (err: any) {
             setError("Failed to fetch events");
             console.log("Failed to fetch events:", err?.response?.status || err?.message);

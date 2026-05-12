@@ -1,6 +1,7 @@
-import { EventWithRsvp } from '@/types/events';
-import { Calendar, MapPin, Users, Award, ExternalLink, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { Event, EventWithRsvp, Rsvp } from '@/types/events';
+import { Calendar, MapPin, Users, Award } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { rsvpAPI } from '@/lib/api';
 import { useToast } from '@/components/ui/toast';
 
@@ -23,11 +24,31 @@ const statusConfig: Record<string, { bg: string; text: string; dot: string }> = 
   },
 };
 
-export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) => {
+const sessionsChipClass =
+  'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--color-border-light)] shadow-sm font-semibold bg-[var(--color-primary)]/10 dark:bg-[var(--color-primary)]/15 text-[var(--color-primary)] dark:text-[#38bdf8]';
+
+export const EventCard = ({
+  eventWithRsvp,
+  onRsvpChange,
+}: {
+  eventWithRsvp: EventWithRsvp;
+  onRsvpChange: (eventId: number, rsvp: Rsvp | null) => void;
+}) => {
   const event = eventWithRsvp.event;
   const status = statusConfig[event.status] ?? statusConfig.UPCOMING;
   const statusLabel = event.status;
   const { success, error } = useToast();
+  const [rsvpLoading, setRsvpLoading] = useState(false);
+
+  const eventExtras = event as Event & {
+    _count?: { session?: number; sessions?: number };
+    session?: unknown[];
+  };
+  const sessionTotal =
+    event.sessionCount ??
+    eventExtras._count?.session ??
+    eventExtras._count?.sessions ??
+    (Array.isArray(eventExtras.session) ? eventExtras.session.length : 0);
 
   const formatDateInIST = (value: string | Date) => {
     return new Intl.DateTimeFormat('en-IN', {
@@ -45,13 +66,25 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
         error('Authentication Required', 'Please log in to RSVP for events.');
         return;
       }
-      await rsvpAPI.create(event.id);
-      success('RSVP Confirmed!', `You are now registered for "${event.title}".`);
-      window.location.reload();
+      setRsvpLoading(true);
+      const createRes = await rsvpAPI.create(event.id);
+      const rsvpRes = await rsvpAPI.getRsvpByEventId(event.id);
+      const newRsvp = rsvpRes.data?.data as Rsvp | undefined;
+      if (newRsvp) {
+        onRsvpChange(event.id, newRsvp);
+      }
+      const waitlisted = createRes.data?.data?.status === 'WAITLISTED';
+      if (waitlisted) {
+        success('Added to waitlist', `You're on the waitlist for "${event.title}".`);
+      } else {
+        success('RSVP Confirmed!', `You are now registered for "${event.title}".`);
+      }
     } catch (err: any) {
       const errorMessage =
         err.response?.data?.error || err.response?.data?.message || 'Failed to RSVP. Please try again.';
       error('RSVP Failed', errorMessage);
+    } finally {
+      setRsvpLoading(false);
     }
   }
 
@@ -61,11 +94,14 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
         error('Cancellation Failed', 'No RSVP found to cancel.');
         return;
       }
+      setRsvpLoading(true);
       await rsvpAPI.cancel(eventWithRsvp.rsvp.id);
+      onRsvpChange(event.id, null);
       success('RSVP Cancelled', `Your registration for "${event.title}" has been cancelled.`);
-      window.location.reload();
     } catch (err: any) {
       error('Cancellation Failed', err.response?.data?.error || 'Failed to cancel RSVP. Please try again.');
+    } finally {
+      setRsvpLoading(false);
     }
   }
 
@@ -80,12 +116,18 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
           {event.title}
         </h3>
 
-        {/* Status Badge */}
-        <div className="flex items-center mb-4 text-xs">
-          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--color-border-light)] ${status.bg} ${status.text}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`}></span>
+        {/* Status + session count (same chip family as status) */}
+        <div className="flex flex-wrap items-center gap-2 mb-4 text-xs">
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--color-border-light)] shadow-sm font-semibold ${status.bg} ${status.text}`}>
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${status.dot}`}></span>
             {statusLabel}
           </span>
+          {sessionTotal > 0 && (
+            <span className={sessionsChipClass}>
+              <Calendar className="w-3.5 h-3.5 shrink-0 opacity-90" />
+              {sessionTotal} Session{sessionTotal !== 1 ? 's' : ''}
+            </span>
+          )}
         </div>
 
         {/* Metadata Stack - Pill/Badge Layout */}
@@ -159,18 +201,22 @@ export const EventCard = ({ eventWithRsvp }: { eventWithRsvp: EventWithRsvp }) =
                </div>
                <div className="w-px h-3.5 bg-[var(--color-border-light)]" />
                <button 
+                 type="button"
                  onClick={handleRsvpCancel} 
-                 className="text-[13px] font-bold text-red-500 hover:text-red-600 transition-colors"
+                 disabled={rsvpLoading}
+                 className="text-[13px] font-bold text-red-500 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                >
-                 Cancel RSVP
+                 {rsvpLoading ? '…' : 'Cancel RSVP'}
                </button>
              </div>
           ) : (
              <button 
+               type="button"
                onClick={handleRsvpButton}
-               className="flex items-center gap-1.5 text-[13.5px] font-bold text-white bg-[var(--color-primary)] dark:bg-[#0284c7] hover:bg-[var(--color-primary-hover)] dark:hover:opacity-90 hover:shadow-md transition-all duration-200 px-4 py-2 rounded-[10px] shadow-sm active:scale-[0.98]"
+               disabled={rsvpLoading}
+               className="flex items-center gap-1.5 text-[13.5px] font-bold text-white bg-[var(--color-primary)] dark:bg-[#0284c7] hover:bg-[var(--color-primary-hover)] dark:hover:opacity-90 hover:shadow-md transition-all duration-200 px-4 py-2 rounded-[10px] shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
              >
-               RSVP Now
+               {rsvpLoading ? 'Saving…' : 'RSVP Now'}
              </button>
           )}
          </div>
