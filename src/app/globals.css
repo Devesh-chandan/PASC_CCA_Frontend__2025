@@ -7,16 +7,44 @@
 */
 @import "tailwindcss";
 
+/* Tailwind ↔ shadcn semantic colors (single spine; use bg-primary, text-foreground, etc.) */
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
 @layer base {
   :root {
-    /* shadcn design tokens (HSL) */
+    /* shadcn design tokens (HSL components — drive theme + aliases below) */
     --background: 0 0% 98%;
     --foreground: 0 0% 13%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 13%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 13%;
-    --primary: 207 70% 24%;
+    /* Brand interactive blue #2BA6DF — aligns CTAs, links, focus */
+    --primary: 197 73% 52%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96%;
     --secondary-foreground: 0 0% 13%;
@@ -32,15 +60,18 @@
     --radius: 0.65rem;
     --chart-1: 197 73% 52%;
     --chart-2: 160 58% 39%;
-    --chart-3: 207 70% 24%;
+    --chart-3: 204 69% 24%;
     --chart-4: 43 98% 53%;
     --chart-5: 197 62% 62%;
 
-    /* bg colors */
-    --color-background: #FAFAFA;
-    --color-card: #FFFFFF;
-    --color-surface: #F5F5F5;
-    --color-surface-hover: #ECEFF1;
+    /* Navy #134467 — nav emphasis, link hover (not the Tailwind theme key "primary") */
+    --brand: 204 69% 24%;
+
+    /* App aliases → same paint as shadcn where possible */
+    --color-background: hsl(var(--background));
+    --color-card: hsl(var(--card));
+    --color-surface: hsl(var(--secondary));
+    --color-surface-hover: hsl(var(--muted));
     --color-achievement-progress-bg: #ECEFF1;
     /* achievement progress bg */
     --color-podium-1: #fbf0cf;
@@ -56,25 +87,23 @@
     /* background for small profile/avatar icons (light) */
     --color-profile-icon-bg-hover: #2BA6DF;
     /* hover state for profile icon (light) */
-    --color-navbar: #FFFFFF;
-    --color-border: #CCCCCC;
-    --color-border-light: #ECEFF1;
-    --color-primary: #134467;
+    --color-navbar: hsl(var(--card));
+    --color-border: hsl(var(--border));
+    --color-border-light: hsl(var(--muted));
+    --color-primary: hsl(var(--primary));
     --color-primary-hover: #263238;
     --color-primary-light: #2BA6DF;
-    --color-secondary: #10b981;
-    --color-secondary-dark: #059669;
-    --color-accent: #FDB811;
+    --color-accent: hsl(var(--accent));
     --color-accent-hover: #E5A50F;
     --color-info: #2BA6DF;
     --color-info-light: #55B8E5;
     --color-info-lighter: #6BC1E9;
 
     /* text colors */
-    --color-text-primary: #212121;
-    --color-text-secondary: #333333;
-    --color-text-muted: #37474F;
-    --mini-text: 0 0% 13%;
+    --color-text-primary: hsl(var(--foreground));
+    --color-text-secondary: hsl(var(--muted-foreground));
+    --color-text-muted: hsl(var(--muted-foreground));
+    --mini-text: var(--foreground);
 
     /* badge colors */
     --color-badge-upcoming: #2BA6DF;
@@ -82,7 +111,7 @@
     --color-badge-completed: #37474F;
 
     /* button colors */
-    --color-button-primary: #2BA6DF;
+    --color-button-primary: hsl(var(--primary));
     --color-button-primary-hover: #2190C6;
     --color-button-accent: #FDB811;
     --color-button-accent-hover: #E5A50F;
@@ -95,19 +124,19 @@
     --color-benefit-text: #059669;
 
     /* nav colors */
-    --color-nav-active: #134467;
+    --color-nav-active: hsl(var(--brand));
     --color-nav-active-bg: #ECEFF1;
     --color-nav-text: #333333;
     --color-nav-hover-bg: #f5f5f5;
 
     /* input colors */
-    --color-input-border: #CCCCCC;
-    --color-input-focus: #2BA6DF;
+    --color-input-border: hsl(var(--input));
+    --color-input-focus: hsl(var(--ring));
     --color-input-focus-ring: rgba(43, 166, 223, 0.3);
 
     /* link colors */
-    --color-link: #2BA6DF;
-    --color-link-hover: #134467;
+    --color-link: hsl(var(--primary));
+    --color-link-hover: hsl(var(--brand));
 
     /* shadows */
     --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -116,7 +145,7 @@
     /* semantic status colors */
     --color-success: #059669;    /* emerald-700 */
     --color-warning: #d97706;    /* amber-600 */
-    --color-progress: #2BA6DF;   /* primary blue */
+    --color-progress: hsl(var(--primary));
 
     /* misc feature colors */
     --color-blue-light: #EBF8FF;
@@ -126,116 +155,101 @@
   }
 
   .dark {
-    /* shadcn design tokens (HSL) */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
-    --card: 0 0% 13%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 13%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 224 94% 49%;
+    /* shadcn design tokens (HSL) — aligned with app shell #0B1120 / #111827 */
+    --background: 218 49% 8%;
+    --foreground: 210 40% 98%;
+    --card: 217 33% 18%;
+    --card-foreground: 210 40% 98%;
+    --popover: 217 33% 18%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 199 89% 61%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 200 18% 14%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 200 18% 20%;
-    --muted-foreground: 0 0% 80%;
+    --secondary: 217 19% 22%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 19% 22%;
+    --muted-foreground: 215 16% 65%;
     --accent: 43 98% 53%;
     --accent-foreground: 0 0% 13%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
-    --border: 200 18% 26%;
-    --input: 200 18% 26%;
-    --ring: 224 94% 49%;
+    --border: 217 19% 27%;
+    --input: 217 19% 27%;
+    --ring: 199 89% 61%;
     --chart-1: 197 62% 62%;
     --chart-2: 160 60% 45%;
     --chart-3: 43 98% 53%;
-    --chart-4: 224 94% 49%;
+    --chart-4: 199 89% 61%;
     --chart-5: 197 56% 67%;
 
-    /* bg colors */
-    --color-background: #0B1120; /* Deep Navy-Black */
-    --color-card: #111827; /* Very dark slate-navy */
-    --color-surface: #1F2937; /* Dark slate */
-    --color-surface-hover: #374151; /* Interactive hover slate */
+    /* Lighter sky for hovers that sit on dark (replaces pure-navy brand slot in dark) */
+    --brand: 199 89% 71%;
+
+    /* App aliases */
+    --color-background: hsl(var(--background));
+    --color-card: hsl(var(--card));
+    --color-surface: hsl(var(--secondary));
+    --color-surface-hover: #374151;
     --color-achievement-progress-bg: #1F2937;
-    /* achievement progress bg */
     --color-podium-1: #4a3c10;
-    /* 1st place dark gold base bg */
     --color-podium-2: #1e293b;
-    /* 2nd place dark silver bg */
     --color-podium-3: #4a2c10;
-    /* 3rd place dark bronze base bg */
     --color-podium-avatar-bg: #0f172a;
     --color-podium-avatar-icon: #94a3b8;
     --color-profile: #1F2937;
     --color-profile-icon-bg: #1F2937;
-    /* background for small profile/avatar icons (dark) */
     --color-profile-icon-bg-hover: #38BDF8;
-    /* hover state for profile icon (dark) */
-    --color-navbar: #0B1120;
-    --color-border: #374151;
+    --color-navbar: hsl(var(--background));
+    --color-border: hsl(var(--border));
     --color-border-light: #1F2937;
-    --color-tabs: #0B1120;
-    --color-primary: #38BDF8; /* Neon/Vibe Blue matching the brand */
-    --color-primary-hover: #7DD3FC; /* Lighter glow */
+    --color-tabs: hsl(var(--background));
+    --color-primary: hsl(var(--primary));
+    --color-primary-hover: #7DD3FC;
     --color-primary-light: #BAE6FD;
-    --color-secondary: #34d399;
-    --color-secondary-dark: #10b981;
-    --color-accent: #FDB811;
+    --color-accent: hsl(var(--accent));
     --color-accent-hover: #FFD54F;
     --color-info: #55B8E5;
     --color-info-light: #6BC1E9;
     --color-info-lighter: #6BC1E9;
 
-    /* text colors */
-    --color-text-primary: #F8FAFC;
-    --color-text-secondary: #E2E8F0;
-    --color-text-muted: #94A3B8;
-    --mini-text: var(--color-text-secondary);
+    --color-text-primary: hsl(var(--foreground));
+    --color-text-secondary: hsl(var(--muted-foreground));
+    --color-text-muted: hsl(var(--muted-foreground));
+    --mini-text: var(--foreground);
 
-    /* badge colors */
     --color-badge-upcoming: #55B8E5;
     --color-badge-ongoing: #34d399;
     --color-badge-completed: #CCCCCC;
 
-    /* button colors */
-    --color-button-primary: #2BA6DF;
-    --color-button-primary-hover: #2190C6;
+    --color-button-primary: hsl(var(--primary));
+    --color-button-primary-hover: #7DD3FC;
     --color-button-accent: #FDB811;
     --color-button-accent-hover: #FFD54F;
     --color-button-rsvp: #0284C7;
     --color-button-cancel: #FDB811;
     --color-button-disabled: #374151;
 
-    /* benefit / success context */
     --color-benefit-bg: rgba(52, 211, 153, 0.12);
     --color-benefit-text: #34d399;
 
-    /* nav colors */
-    --color-nav-active: #38BDF8;
+    --color-nav-active: hsl(var(--primary));
     --color-nav-active-bg: #1F2937;
     --color-nav-text: #E2E8F0;
     --color-nav-hover-bg: #1F2937;
 
-    /* input colors */
-    --color-input-border: #374151;
-    --color-input-focus: #38BDF8;
+    --color-input-border: hsl(var(--input));
+    --color-input-focus: hsl(var(--ring));
     --color-input-focus-ring: rgba(56, 189, 248, 0.25);
 
-    /* link colors */
-    --color-link: #38BDF8;
-    --color-link-hover: #7DD3FC;
+    --color-link: hsl(var(--primary));
+    --color-link-hover: hsl(var(--brand));
 
-    /* shadows */
     --shadow-light: 0 4px 14px 0 rgba(0, 0, 0, 0.1);
     --shadow-dark: 0 4px 14px 0 rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
 
-    /* semantic status colors */
-    --color-success: #34d399;    /* emerald-400 */
-    --color-warning: #fbbf24;    /* amber-400 */
-    --color-progress: #38BDF8;   /* sky-400 */
+    --color-success: #34d399;
+    --color-warning: #fbbf24;
+    --color-progress: hsl(var(--primary));
 
-    /* misc feature colors */
     --color-blue-light: #0c2a3a;
     --color-blue-dark: #38BDF8;
     --color-faint-blue-feature: rgba(56, 189, 248, 0.10);
@@ -280,15 +294,7 @@
 
 @layer utilities {
 
-  /* Background utilities */
-  .bg-background {
-    background-color: var(--color-background);
-  }
-
-  .bg-card {
-    background-color: var(--color-card);
-  }
-
+  /* Domain-specific backgrounds (surfaces: bg-background / bg-card from @theme) */
   .bg-faint-blue {
     background-color: var(--color-faint-blue-feature);
   }
@@ -319,19 +325,6 @@
 
   .bg-blue-dark {
     background-color: var(--color-blue-dark);
-  }
-
-  /* Text utilities */
-  .text-primary {
-    color: var(--color-text-primary);
-  }
-
-  .text-secondary {
-    color: var(--color-text-secondary);
-  }
-
-  .text-muted {
-    color: var(--color-text-muted);
   }
 
   .text-success {

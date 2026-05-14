@@ -64,7 +64,7 @@ export default function AdminInvites() {
         >
           <div className="p-8 border-b border-[var(--color-border)] flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600 dark:text-blue-400">
+              <div className="p-3 bg-primary/10 rounded-2xl text-primary dark:bg-primary/15">
                 <Mail size={24} />
               </div>
               <div>

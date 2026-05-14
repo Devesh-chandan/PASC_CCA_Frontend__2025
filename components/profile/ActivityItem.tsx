@@ -13,7 +13,7 @@ export const ActivityItem: React.FC<ActivityItemProps> = ({ icon, title, date })
         {icon}
         <span className="font-medium">{title}</span>
       </div>
-      <span className="text-secondary text-sm">{date}</span>
+      <span className="text-muted-foreground text-sm">{date}</span>
     </li>
   );
 };

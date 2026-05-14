@@ -9,9 +9,9 @@ export function cn(...inputs: ClassValue[]) {
 export const getStatusColor = (status: Event['status']) => {
   switch (status) {
     case 'UPCOMING':
-      return 'text-blue-600';
+      return 'text-primary';
     case 'ONGOING':
-      return 'text-green-600';
+      return 'text-green-600 dark:text-emerald-400';
     case 'COMPLETED':
       return 'text-[var(--color-text-muted)]';
     default:

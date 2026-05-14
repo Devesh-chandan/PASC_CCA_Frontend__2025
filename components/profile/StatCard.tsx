@@ -11,12 +11,12 @@ export const StatCard: React.FC<StatCardProps> = ({
 }) => {
   return (
     <div className="bg-card rounded-xl p-4 flex flex-col gap-2 border border-card">
-      <div className="flex items-center gap-2 text-secondary">
+      <div className="flex items-center gap-2 text-muted-foreground">
         {icon}
         {title}
       </div>
       <div className={`text-3xl font-bold ${color}`}>{value}</div>
-      <div className="text-xs text-secondary">{subtext}</div>
+      <div className="text-xs text-muted-foreground">{subtext}</div>
     </div>
   );
 };

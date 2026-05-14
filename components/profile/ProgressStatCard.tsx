@@ -11,7 +11,7 @@ export const ProgressStatCard: React.FC<ProgressStatCardProps> = ({
   const textColor = color.replace('bg-', 'text-')
   return (
     <div className="bg-card rounded-xl p-4 flex flex-col gap-4 border border-card">
-      <div className="flex items-center gap-2 text-secondary">
+      <div className="flex items-center gap-2 text-muted-foreground">
         {icon}
         {title}
       </div>
