@@ -122,10 +122,10 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="w-full sticky top-0 z-50 bg-[var(--color-navbar)] border-b border-[var(--color-border)] transition-colors">
+    <nav className="w-full sticky top-0 z-50 bg-[var(--color-navbar)]/80 backdrop-blur-xl border-b border-[var(--color-border)]/50 transition-colors shadow-sm">
       <div className="flex justify-between items-center mx-auto px-5 py-3">
         {/* Logo */}
-        <Link href={isLoggedIn ? (effectiveRole === "admin" ? "/admin/dashboard" : "/student/dashboard") : "/"} className="flex items-center cursor-pointer">
+        <Link href={isLoggedIn ? (effectiveRole === "admin" ? "/admin/dashboard" : "/student/dashboard") : "/"} className="flex items-center cursor-pointer transition-transform hover:scale-105 duration-300">
           <Image src="/logo.png" width={120} height={80} alt="logo" priority />
         </Link>
 

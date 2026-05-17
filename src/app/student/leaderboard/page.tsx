@@ -211,28 +211,36 @@ export default function LeaderboardPage() {
 
         {/* ─── Your Rank Card ─── */}
         {scope === 'global' && userRank && (
-          <div className="relative overflow-hidden bg-[var(--color-button-primary)]/5 border border-[var(--color-button-primary)]/30 border-l-4 border-l-[var(--color-button-primary)] rounded-2xl">
-            <div className="flex items-center justify-between p-5">
-              <div className="flex items-center gap-5">
-                <div className="w-14 h-14 rounded-2xl bg-[var(--color-primary)]/10 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-[var(--color-primary)]" />
+          <div className="relative overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] bg-[var(--color-surface)] border border-[var(--color-primary)]/20 p-5 sm:p-7 shadow-sm transition-all duration-300">
+            {/* Background elements for flair */}
+            <div className="absolute top-0 right-0 p-4 sm:p-8 opacity-[0.03] pointer-events-none transform translate-x-4 -translate-y-4">
+              <Trophy className="w-32 h-32 sm:w-48 sm:h-48 transform rotate-12 text-[var(--color-primary)]" />
+            </div>
+            
+            <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="flex items-center gap-4 sm:gap-5">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[1rem] sm:rounded-[1.25rem] bg-[var(--color-primary)]/10 flex items-center justify-center border border-[var(--color-primary)]/20">
+                  <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-[var(--color-primary)]" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Your Global Rank</p>
-                  <p className="text-3xl font-bold text-[var(--color-text-primary)] tracking-tight mt-0.5">#{userRank.rank}</p>
+                  <p className="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-muted)] flex items-center gap-1.5">
+                    Your Global Rank {userRank.rank <= 3 && <Crown className="w-4 h-4 text-amber-500" />}
+                  </p>
+                  <div className="flex items-baseline gap-1.5 mt-0.5">
+                    <span className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--color-text-primary)]">#{userRank.rank}</span>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-6">
-                <div className="hidden sm:flex items-center gap-6">
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-[var(--color-text-primary)]">{userRank.credits}</p>
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-muted)]">Credits</p>
-                  </div>
-                  <div className="w-px h-8 bg-[var(--color-border-light)]" />
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-[var(--color-text-primary)]">{userRank.eventsAttended}</p>
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-muted)]">Events</p>
-                  </div>
+              
+              <div className="flex items-center bg-[var(--color-card)] rounded-2xl p-4 sm:px-6 sm:py-4 border border-[var(--color-border)] justify-between sm:justify-start w-full sm:w-auto shadow-sm">
+                <div className="text-center sm:text-right px-2 sm:px-0">
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">{userRank.credits}</p>
+                  <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mt-0.5 sm:mt-0">Credits</p>
+                </div>
+                <div className="w-px h-8 sm:h-10 bg-[var(--color-border)] mx-4 sm:mx-6" />
+                <div className="text-center sm:text-right px-2 sm:px-0">
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">{userRank.eventsAttended}</p>
+                  <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mt-0.5 sm:mt-0">Events</p>
                 </div>
               </div>
             </div>
@@ -240,28 +248,36 @@ export default function LeaderboardPage() {
         )}
 
         {showMyRankCard && userRank && (
-          <div className="relative overflow-hidden bg-[var(--color-button-primary)]/5 border border-[var(--color-button-primary)]/30 border-l-4 border-l-[var(--color-button-primary)] rounded-2xl">
-            <div className="flex items-center justify-between p-5">
-              <div className="flex items-center gap-5">
-                <div className="w-14 h-14 rounded-2xl bg-[var(--color-primary)]/10 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-[var(--color-primary)]" />
+          <div className="relative overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] bg-[var(--color-surface)] border border-[var(--color-primary)]/20 p-5 sm:p-7 shadow-sm transition-all duration-300">
+            {/* Background elements for flair */}
+            <div className="absolute top-0 right-0 p-4 sm:p-8 opacity-[0.03] pointer-events-none transform translate-x-4 -translate-y-4">
+              <Star className="w-32 h-32 sm:w-48 sm:h-48 transform rotate-12 text-[var(--color-primary)]" />
+            </div>
+            
+            <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="flex items-center gap-4 sm:gap-5">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[1rem] sm:rounded-[1.25rem] bg-[var(--color-primary)]/10 flex items-center justify-center border border-[var(--color-primary)]/20">
+                  <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-[var(--color-primary)]" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">Your Rank &middot; Division {selectedDivision}</p>
-                  <p className="text-3xl font-bold text-[var(--color-text-primary)] tracking-tight mt-0.5">#{userRank.rank}</p>
+                  <p className="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-muted)] flex items-center gap-1.5">
+                    Your Rank &middot; Division {selectedDivision} {userRank.rank <= 3 && <Crown className="w-4 h-4 text-amber-500" />}
+                  </p>
+                  <div className="flex items-baseline gap-1.5 mt-0.5">
+                    <span className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[var(--color-text-primary)]">#{userRank.rank}</span>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-6">
-                <div className="hidden sm:flex items-center gap-6">
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-[var(--color-text-primary)]">{userRank.credits}</p>
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-muted)]">Credits</p>
-                  </div>
-                  <div className="w-px h-8 bg-[var(--color-border-light)]" />
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-[var(--color-text-primary)]">{userRank.eventsAttended}</p>
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-muted)]">Events</p>
-                  </div>
+              
+              <div className="flex items-center bg-[var(--color-card)] rounded-2xl p-4 sm:px-6 sm:py-4 border border-[var(--color-border)] justify-between sm:justify-start w-full sm:w-auto shadow-sm">
+                <div className="text-center sm:text-right px-2 sm:px-0">
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">{userRank.credits}</p>
+                  <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mt-0.5 sm:mt-0">Credits</p>
+                </div>
+                <div className="w-px h-8 sm:h-10 bg-[var(--color-border)] mx-4 sm:mx-6" />
+                <div className="text-center sm:text-right px-2 sm:px-0">
+                  <p className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">{userRank.eventsAttended}</p>
+                  <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mt-0.5 sm:mt-0">Events</p>
                 </div>
               </div>
             </div>
@@ -470,7 +486,7 @@ export default function LeaderboardPage() {
 
                     {/* Events */}
                     <div className="flex justify-center pr-1 md:pr-0">
-                      <span className="inline-flex items-center gap-1 sm:gap-1.5 rounded-lg border border-[#16b78b]/22 bg-[#16b78b]/10 px-1.5 sm:px-2 py-0.5 text-[11px] sm:text-[13px] font-bold sm:font-semibold text-[#138e6d] dark:text-[#1cbaba]">
+                      <span className="inline-flex items-center gap-1 sm:gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-1.5 sm:px-2 py-0.5 text-[11px] sm:text-[13px] font-bold sm:font-semibold text-emerald-600 dark:text-emerald-400">
                         <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         <span className="tabular-nums">{entry.eventsAttended}</span>
                       </span>
@@ -478,7 +494,7 @@ export default function LeaderboardPage() {
 
                     {/* Credits */}
                     <div className="flex justify-center">
-                      <span className="inline-flex items-center gap-1 sm:gap-1.5 rounded-lg border border-[#1c4f73]/20 bg-[#1c4f73]/8 px-1.5 sm:px-2 py-0.5 text-[11px] sm:text-[13px] font-bold sm:font-semibold text-[#1c4f73] dark:text-[#8ec1df]">
+                      <span className="inline-flex items-center gap-1 sm:gap-1.5 rounded-lg border border-[var(--color-primary)]/20 bg-[var(--color-primary)]/10 px-1.5 sm:px-2 py-0.5 text-[11px] sm:text-[13px] font-bold sm:font-semibold text-[var(--color-primary)]">
                         <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         <span className="tabular-nums">{entry.credits}</span>
                       </span>

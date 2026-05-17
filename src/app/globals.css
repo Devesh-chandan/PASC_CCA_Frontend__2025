@@ -37,17 +37,17 @@
 @layer base {
   :root {
     /* shadcn design tokens (HSL components — drive theme + aliases below) */
-    --background: 0 0% 98%;
-    --foreground: 0 0% 13%;
+    --background: 210 20% 98%; /* Slightly softer, cooler off-white for depth */
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 13%;
+    --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
-    /* Brand interactive blue #2BA6DF — aligns CTAs, links, focus */
-    --primary: 197 73% 52%;
+    --popover-foreground: 222.2 84% 4.9%;
+    /* Brand interactive blue #1A90FF — aligns CTAs, links, focus */
+    --primary: 209 100% 55%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 13%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 200 14% 93%;
     --muted-foreground: 200 10% 26%;
     --accent: 43 98% 53%;
@@ -91,7 +91,7 @@
     --color-border: hsl(var(--border));
     --color-border-light: hsl(var(--muted));
     --color-primary: hsl(var(--primary));
-    --color-primary-hover: #263238;
+    --color-primary-hover: hsl(var(--primary) / 0.9);
     --color-primary-light: #2BA6DF;
     --color-accent: hsl(var(--accent));
     --color-accent-hover: #E5A50F;
@@ -112,7 +112,7 @@
 
     /* button colors */
     --color-button-primary: hsl(var(--primary));
-    --color-button-primary-hover: #2190C6;
+    --color-button-primary-hover: hsl(var(--primary) / 0.9);
     --color-button-accent: #FDB811;
     --color-button-accent-hover: #E5A50F;
     --color-button-rsvp: #134467;
@@ -150,104 +150,112 @@
     /* misc feature colors */
     --color-blue-light: #EBF8FF;
     --color-blue-dark: #1E40AF;
-    --color-faint-blue-feature: rgba(43, 166, 223, 0.08);
+    --color-faint-blue-feature: rgba(26, 144, 255, 0.08); /* Updated to match #1A90FF */
     --color-pure-white-feature: #FFFFFF;
   }
 
   .dark {
-    /* shadcn design tokens (HSL) — aligned with app shell #0B1120 / #111827 */
-    --background: 218 49% 8%;
-    --foreground: 210 40% 98%;
-    --card: 217 33% 18%;
-    --card-foreground: 210 40% 98%;
-    --popover: 217 33% 18%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 199 89% 61%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 217 19% 22%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 19% 22%;
-    --muted-foreground: 215 16% 65%;
+    /* UI-Matched Premium Dark Theme — Deep slate tinted with brand blue */
+    --background: 215 28% 8%; /* Very deep slate blue, blends with the blue accents */
+    --foreground: 210 20% 96%; /* Crisp ash-white text */
+    --card: 215 28% 12%; /* Elegant deep blue-gray card */
+    --card-foreground: 210 20% 96%;
+    --popover: 215 28% 12%;
+    --popover-foreground: 210 20% 96%;
+    
+    /* Interactive layers & muted data */
+    --primary: 209 100% 55%; /* #1A90FF Vivid Blue (from your exact request) */
+    --primary-foreground: 0 0% 100%; /* Pure white text on vibrant blue */
+    --secondary: 215 25% 18%; /* Interactive surface / slate hover */
+    --secondary-foreground: 210 20% 96%;
+    --muted: 215 25% 18%;
+    --muted-foreground: 215 15% 65%; /* Soft blue-gray for labels */
+    
+    /* System states (Inspired by LeetCode Easy/Medium/Hard tags) */
     --accent: 43 98% 53%;
-    --accent-foreground: 0 0% 13%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 217 19% 27%;
-    --input: 217 19% 27%;
-    --ring: 199 89% 61%;
-    --chart-1: 197 62% 62%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 43 98% 53%;
-    --chart-4: 199 89% 61%;
-    --chart-5: 197 56% 67%;
+    --accent-foreground: 0 0% 10%;
+    --destructive: 348 83% 61%; /* #ff375f Strong cherry red (LeetCode Hard) */
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Structure */
+    --border: 215 25% 22%; /* Sharp but appropriately tinted outlines */
+    --input: 215 25% 22%;
+    --ring: 209 100% 55%;
+    --chart-1: 209 100% 55%;
+    --chart-2: 173 100% 36%; /* #00b8a3 Cyan Green (LeetCode Easy) */
+    --chart-3: 43 100% 56%;  /* #ffc01e Gold/Orange (LeetCode Medium) */
+    --chart-4: 348 83% 61%;  /* #ff375f Red */
+    --chart-5: 290 90% 70%;
 
     /* Lighter sky for hovers that sit on dark (replaces pure-navy brand slot in dark) */
-    --brand: 199 89% 71%;
+    --brand: 209 100% 75%; /* Lighter blue for hover links */
 
     /* App aliases */
     --color-background: hsl(var(--background));
     --color-card: hsl(var(--card));
     --color-surface: hsl(var(--secondary));
-    --color-surface-hover: #374151;
-    --color-achievement-progress-bg: #1F2937;
+    --color-surface-hover: hsl(215 25% 24%);
+    --color-achievement-progress-bg: hsl(var(--secondary));
     --color-podium-1: #4a3c10;
     --color-podium-2: #1e293b;
     --color-podium-3: #4a2c10;
-    --color-podium-avatar-bg: #0f172a;
-    --color-podium-avatar-icon: #94a3b8;
-    --color-profile: #1F2937;
-    --color-profile-icon-bg: #1F2937;
-    --color-profile-icon-bg-hover: #38BDF8;
+    --color-podium-avatar-bg: hsl(215 28% 8%);
+    --color-podium-avatar-icon: #eff1f6;
+    --color-profile: hsl(var(--secondary));
+    --color-profile-icon-bg: hsl(var(--secondary));
+    --color-profile-icon-bg-hover: hsl(var(--primary));
     --color-navbar: hsl(var(--background));
     --color-border: hsl(var(--border));
-    --color-border-light: #1F2937;
+    --color-border-light: hsl(var(--border));
     --color-tabs: hsl(var(--background));
     --color-primary: hsl(var(--primary));
-    --color-primary-hover: #7DD3FC;
-    --color-primary-light: #BAE6FD;
+    --color-primary-hover: hsl(var(--primary) / 0.9);
+    --color-primary-light: #69C0FF;
     --color-accent: hsl(var(--accent));
     --color-accent-hover: #FFD54F;
-    --color-info: #55B8E5;
-    --color-info-light: #6BC1E9;
-    --color-info-lighter: #6BC1E9;
+    --color-info: #1A90FF;
+    --color-info-light: #40A9FF;
+    --color-info-lighter: #69C0FF;
 
     --color-text-primary: hsl(var(--foreground));
     --color-text-secondary: hsl(var(--muted-foreground));
     --color-text-muted: hsl(var(--muted-foreground));
     --mini-text: var(--foreground);
 
-    --color-badge-upcoming: #55B8E5;
-    --color-badge-ongoing: #34d399;
-    --color-badge-completed: #CCCCCC;
+    /* Multicolored badges like Leetcode difficulties */
+    --color-badge-upcoming: #1A90FF; /* Blue */
+    --color-badge-ongoing: #00b8a3;  /* Easy Green */
+    --color-badge-completed: #ffc01e; /* Medium Yellow */
 
     --color-button-primary: hsl(var(--primary));
-    --color-button-primary-hover: #7DD3FC;
-    --color-button-accent: #FDB811;
-    --color-button-accent-hover: #FFD54F;
-    --color-button-rsvp: #0284C7;
-    --color-button-cancel: #FDB811;
-    --color-button-disabled: #374151;
+    --color-button-primary-hover: hsl(var(--primary) / 0.9);
+    --color-button-accent: #ffc01e;
+    --color-button-accent-hover: #ffd04b;
+    --color-button-rsvp: #00b8a3;
+    --color-button-cancel: #ff375f;
+    --color-button-disabled: hsl(215 25% 22%);
 
-    --color-benefit-bg: rgba(52, 211, 153, 0.12);
-    --color-benefit-text: #34d399;
+    --color-benefit-bg: rgba(0, 184, 163, 0.12); /* Green tint */
+    --color-benefit-text: #00b8a3;
 
     --color-nav-active: hsl(var(--primary));
-    --color-nav-active-bg: #1F2937;
-    --color-nav-text: #E2E8F0;
-    --color-nav-hover-bg: #1F2937;
+    --color-nav-active-bg: hsl(var(--secondary));
+    --color-nav-text: #eff1f6;
+    --color-nav-hover-bg: hsl(var(--secondary));
 
     --color-input-border: hsl(var(--input));
     --color-input-focus: hsl(var(--ring));
-    --color-input-focus-ring: rgba(56, 189, 248, 0.25);
+    --color-input-focus-ring: rgba(26, 144, 255, 0.25);
 
     --color-link: hsl(var(--primary));
     --color-link-hover: hsl(var(--brand));
 
-    --shadow-light: 0 4px 14px 0 rgba(0, 0, 0, 0.1);
-    --shadow-dark: 0 4px 14px 0 rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    /* Strict flat design for dark mode (no heavy shadows, rely on borders) */
+    --shadow-light: none;
+    --shadow-dark: 0 0 0 1px rgba(255, 255, 255, 0.08);
 
-    --color-success: #34d399;
-    --color-warning: #fbbf24;
+    --color-success: #00b8a3;
+    --color-warning: #ffc01e;
     --color-progress: hsl(var(--primary));
 
     --color-blue-light: #0c2a3a;
@@ -382,6 +390,7 @@
   .auth-button:hover {
     background-color: var(--color-button-primary-hover);
     box-shadow: var(--shadow-dark);
+    transform: translateY(-0.125rem);
   }
 
   .auth-button:disabled {
