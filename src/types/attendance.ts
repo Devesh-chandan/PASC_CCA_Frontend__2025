@@ -1,3 +1,5 @@
+import type { Event as CcaEvent } from '@/types/events';
+
 export interface UserAttendanceStats {
   sessionsAttended: number;
   sessions: AttendanceSession[];
@@ -25,7 +27,7 @@ export interface UserPersonalBest {
   credits: number;
 }
 
-interface AttendanceSessionForUser {
+export interface AttendanceSessionForUser {
   id?: number;
   eventId: number;
   startTime?: Date | null;
@@ -34,10 +36,11 @@ interface AttendanceSessionForUser {
   sessionName: string;
   location: string;
   credits: number;
-  attened: boolean;
+  attened?: boolean;
+  attended?: boolean;
 }
 
 export interface EventAttendanceSessionForUser {
-  event: Event;
+  event: CcaEvent;
   session: AttendanceSessionForUser[];
 }

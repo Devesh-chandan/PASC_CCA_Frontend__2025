@@ -5,14 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, Clock, MapPin, Phone, ArrowLeft, FileText, Video, Link as LinkIcon, Code, File } from "lucide-react";
+import { Calendar, Clock, MapPin, Phone, ArrowLeft, FileText, Video, Link as LinkIcon, Code, File, CheckCircle, QrCode } from "lucide-react";
 import { getStatusBadgeVariant, getStatusColor, formatDate } from "@/lib/utils";
 import { attendanceAPI, resourceAPI } from "@/lib/api";
-import { EventAttendanceSessionForUser } from "@/types/attendance";
+import { EventAttendanceSessionForUser, AttendanceSessionForUser } from "@/types/attendance";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ReviewSection } from "@/components/events/ReviewSection";
 import { GallerySection } from "@/components/events/GallerySection";
+import { useToast } from "@/components/ui/toast";
 
 function formatDateToDDMMYY(dateString: string): string {
   if (!dateString) return "";
@@ -38,7 +39,7 @@ export default function EventDetailPage({
   const [attendanceLoading, setAttendanceLoading] = useState(false);
   const [attendanceError, setAttendanceError] = useState<string | null>(null);
   const [attendanceSuccess, setAttendanceSuccess] = useState<string | null>(null);
-
+  const { success: toastSuccess } = useToast();
 
   useEffect(() => {
     const resolveParamsAndFetch = async () => {
@@ -73,24 +74,45 @@ export default function EventDetailPage({
 
   // Handler for mark attendance
   const handleMarkAttendance = async () => {
-    if (!attendanceCode || !attendanceModal.sessionId) return;
+    if (!attendanceCode || !attendanceModal.sessionId || !event) return;
+    const sessionIdNum = Number(attendanceModal.sessionId);
+    const eventIdNum = Number(event.event?.id);
     setAttendanceLoading(true);
     setAttendanceError(null);
     setAttendanceSuccess(null);
     try {
-      const token = localStorage.getItem("token");
       const res = await attendanceAPI.markAttendance(
-        Number(eventDetails?.id),
-        Number(attendanceModal.sessionId),
+        eventIdNum,
+        sessionIdNum,
         attendanceCode
       );
       if (res.data && res.data.success) {
-        setAttendanceSuccess("Attendance marked successfully!");
-        setTimeout(() => {
-          setAttendanceModal({ open: false, sessionId: null });
-          setAttendanceCode("");
-          setAttendanceSuccess(null);
-        }, 1200);
+        const sid = sessionIdNum;
+        const sessionRow = Array.isArray(event.session)
+          ? event.session.find((s: AttendanceSessionForUser) => s.id === sid)
+          : undefined;
+        const creditsEarned = sessionRow?.credits ?? event.event?.credits ?? 0;
+        const eventTitle = event.event?.title ?? "this event";
+        const creditWord = creditsEarned === 1 ? "credit" : "credits";
+
+        setEvent((prev) => {
+          if (!prev || !Array.isArray(prev.session)) return prev;
+          return {
+            ...prev,
+            session: prev.session.map((s: AttendanceSessionForUser) =>
+              s.id === sid ? { ...s, attended: true } : s
+            ),
+          };
+        });
+
+        toastSuccess(
+          "Attendance Marked",
+          `Your attendance for ${eventTitle} has been marked. You earned ${creditsEarned} ${creditWord}!`
+        );
+
+        setAttendanceModal({ open: false, sessionId: null });
+        setAttendanceCode("");
+        setAttendanceSuccess(null);
       } else {
         setAttendanceError(res.data?.message || "Failed to mark attendance.");
       }
@@ -180,7 +202,7 @@ export default function EventDetailPage({
           </Card>
 
           {/* Sessions List (Student View) */}
-          <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200">
+          <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200 bg-[var(--color-card)]">
             <CardHeader>
               <CardTitle className="text-xl font-semibold text-[var(--color-text-primary)]">
                 Sessions
@@ -192,34 +214,36 @@ export default function EventDetailPage({
                   {event.session.map((session: any) => (
                     <div
                       key={session.id}
-                      className={`border rounded-lg p-4 transition-all bg-[var(--color-surface)]`}
+                      className="border border-[var(--color-border)] rounded-lg p-5 transition-all bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] shadow-sm hover:shadow-md flex flex-col justify-between"
                     >
-                      {/* Title */}
-                      <div className="mb-2">
-                        <span className="text-base font-medium text-[var(--color-text-primary)]">{session.sessionName}</span>
+                      <div>
+                        {/* Title */}
+                        <div className="mb-3 flex justify-between items-start">
+                          <span className="text-lg font-bold text-[var(--color-text-primary)] leading-tight">{session.sessionName}</span>
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${session.isActive ? 'bg-[var(--color-success)]/10 text-[var(--color-success)]' : 'bg-[var(--color-text-muted)]/10 text-[var(--color-text-muted)]'
+                              }`}
+                          >
+                            {session.isActive ? 'Active' : 'Disabled'}
+                          </span>
+                        </div>
+                        {/* Location */}
+                        <div className="mb-2 flex items-center text-sm text-[var(--color-text-muted)]">
+                          <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                          <span className="truncate">{session.location}</span>
+                        </div>
+                        {/* Start/End Time */}
+                        <div className="mb-4 flex items-center text-sm text-[var(--color-text-muted)]">
+                          <Clock className="w-4 h-4 mr-1 flex-shrink-0" />
+                          <span>
+                            {session.startTime ? new Date(session.startTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : "-"} - {session.endTime ? new Date(session.endTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : "-"}
+                          </span>
+                        </div>
                       </div>
-                      {/* Location */}
-                      <div className="mb-1">
-                        <span className="text-xs text-[var(--color-text-muted)]">{session.location}</span>
-                      </div>
-                      {/* Start/End Time */}
-                      <div className="mb-1">
-                        <span className="text-xs text-[var(--color-text-muted)]">
-                          {session.startTime ? new Date(session.startTime).toLocaleString() : "-"} - {session.endTime ? new Date(session.endTime).toLocaleString() : "-"}
-                        </span>
-                      </div>
-                      {/* Status */}
-                      <div className="mt-2">
-                        <span
-                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${session.isActive ? 'bg-green-100 text-green-800' : 'bg-[var(--color-surface)] text-[var(--color-text-primary)]'
-                            }`}
-                        >
-                          {session.isActive ? 'Active' : 'Disabled'}
-                        </span>
-                      </div>
+                      
                       {/* Mark Attendance Button */}
                       {session.isActive && (
-                        <div className="mt-4">
+                        <div className="mt-4 pt-4 border-t border-[var(--color-border)]">
                           {eventDetails?.status === 'COMPLETED' ? (
                             <Button
                               className="w-full bg-[var(--color-text-muted)] text-white font-semibold cursor-not-allowed"
@@ -229,14 +253,14 @@ export default function EventDetailPage({
                             </Button>
                           ) : session.attended ? (
                             <Button
-                              className="w-full bg-green-400 text-white font-semibold"
+                              className="w-full bg-[var(--color-success)] text-white font-semibold flex items-center justify-center gap-2"
                               disabled
                             >
-                              Attendance Marked
+                              <CheckCircle className="w-4 h-4" /> Attendance Marked
                             </Button>
                           ) : (
                             <Button
-                              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold transition-colors duration-200"
+                              className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-button-primary-hover)] text-white font-semibold transition-colors duration-200 flex items-center justify-center gap-2 shadow-sm"
                               onClick={() => setAttendanceModal({ open: true, sessionId: session.id })}
                             >
                               Mark Attendance
@@ -248,90 +272,8 @@ export default function EventDetailPage({
                   ))}
                 </div>
               ) : (
-                <div className="text-[var(--color-text-muted)]">No sessions available for this event.</div>
+                <div className="text-[var(--color-text-muted)] italic">No sessions available for this event.</div>
               )}
-            </CardContent>
-          </Card>
-
-          {/* Resources List */}
-          <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-[var(--color-text-primary)]">
-                Event Resources
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {resources.length > 0 ? (
-                <div className="grid grid-cols-1 gap-4">
-                  {resources.map((resource: any) => {
-                    const getIcon = (type: string) => {
-                      switch (type) {
-                        case 'SLIDES': return <FileText className="w-5 h-5 text-orange-500" />;
-                        case 'VIDEO': return <Video className="w-5 h-5 text-red-500" />;
-                        case 'CODE': return <Code className="w-5 h-5 text-[var(--color-info)]" />;
-                        case 'LINK': return <LinkIcon className="w-5 h-5 text-green-500" />;
-                        case 'DOCUMENT': return <FileText className="w-5 h-5 text-[var(--color-primary)]" />;
-                        default: return <File className="w-5 h-5 text-[var(--color-text-muted)]" />;
-                      }
-                    };
-
-                    return (
-                      <div
-                        key={resource.id}
-                        className="flex items-center justify-between p-4 border rounded-lg bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] transition-colors"
-                      >
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          <div className="p-2 bg-[var(--color-card)] rounded-lg border shadow-sm flex-shrink-0">
-                            {getIcon(resource.type)}
-                          </div>
-                          <div className="min-w-0">
-                            <h4 className="font-medium text-[var(--color-text-primary)] truncate">{resource.title}</h4>
-                            {resource.description && (
-                              <p className="text-sm text-[var(--color-text-muted)] truncate">{resource.description}</p>
-                            )}
-                          </div>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="ml-4 flex-shrink-0"
-                          onClick={() => window.open(resource.url, '_blank')}
-                        >
-                          View
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-8 bg-[var(--color-surface)] rounded-lg border border-dashed">
-                  <p className="text-[var(--color-text-muted)]">No resources available for this event yet.</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Gallery Section */}
-          <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-[var(--color-text-primary)]">
-                Event Gallery
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <GallerySection eventId={Number(eventDetails?.id)} />
-            </CardContent>
-          </Card>
-
-          {/* Reviews Section */}
-          <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-[var(--color-text-primary)]">
-                Reviews & Ratings
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ReviewSection eventId={Number(eventDetails?.id)} eventStatus={eventDetails?.status || ''} />
             </CardContent>
           </Card>
         </div>
@@ -417,32 +359,129 @@ export default function EventDetailPage({
               </div>
             </CardContent>
           </Card> */}
+
+          {/* Reviews Section */}
+          {/* <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-[var(--color-text-primary)]">
+                Reviews & Ratings
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ReviewSection eventId={Number(eventDetails?.id)} eventStatus={eventDetails?.status || ''} />
+            </CardContent>
+          </Card> */}
+        </div>
+      </div>
+
+      {/* Two-column layout for Resources/Gallery & Reviews */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch pt-8">
+        {/* Left Column: Resources and Gallery */}
+        <div className="space-y-6 flex flex-col items-stretch">
+          {/* Resources List */}
+          <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-[var(--color-text-primary)]">
+                Event Resources
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {resources.length > 0 ? (
+                <div className="grid grid-cols-1 gap-4">
+                  {resources.map((resource: any) => {
+                    const getIcon = (type: string) => {
+                      switch (type) {
+                        case 'SLIDES': return <FileText className="w-5 h-5 text-orange-500" />;
+                        case 'VIDEO': return <Video className="w-5 h-5 text-red-500" />;
+                        case 'CODE': return <Code className="w-5 h-5 text-[var(--color-info)]" />;
+                        case 'LINK': return <LinkIcon className="w-5 h-5 text-green-500" />;
+                        case 'DOCUMENT': return <FileText className="w-5 h-5 text-[var(--color-primary)]" />;
+                        default: return <File className="w-5 h-5 text-[var(--color-text-muted)]" />;
+                      }
+                    };
+
+                    return (
+                      <div
+                        key={resource.id}
+                        className="flex items-center justify-between p-4 border border-[var(--color-border)] rounded-lg bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] transition-colors shadow-sm"
+                      >
+                        <div className="flex items-center gap-3 overflow-hidden">
+                          <div className="p-2 bg-[var(--color-card)] rounded-lg border border-[var(--color-border)] shadow-sm flex-shrink-0">
+                            {getIcon(resource.type)}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-medium text-[var(--color-text-primary)] truncate">{resource.title}</h4>
+                            {resource.description && (
+                              <p className="text-sm text-[var(--color-text-muted)] truncate">{resource.description}</p>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="ml-4 flex-shrink-0 border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
+                          onClick={() => window.open(resource.url, '_blank')}
+                        >
+                          View
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 bg-[var(--color-surface)] rounded-lg border border-dashed border-[var(--color-border)]">
+                  <p className="text-[var(--color-text-muted)]">No resources available for this event yet.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Gallery Section */}
+          <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200 flex-1">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-[var(--color-text-primary)]">
+                Event Gallery
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <GallerySection eventId={Number(eventDetails?.id)} />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column: Reviews */}
+        <div className="flex flex-col h-full w-full">
+          <Card className="border-none shadow-sm hover:shadow-lg transition-shadow duration-200 h-full w-full flex flex-col items-stretch">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold text-[var(--color-text-primary)]">
+                Reviews & Ratings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-y-auto">
+              <ReviewSection eventId={Number(eventDetails?.id)} eventStatus={eventDetails?.status || ''} />
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* Attendance Code Modal */}
       <Dialog open={attendanceModal.open} onOpenChange={open => setAttendanceModal(v => ({ ...v, open }))}>
-        <DialogContent>
+        <DialogContent className="bg-[var(--color-card)] border-[var(--color-border)] shadow-lg rounded-xl">
           <DialogHeader>
-            <DialogTitle>Enter Attendance Code</DialogTitle>
+            <DialogTitle className="text-[var(--color-text-primary)]">Enter Attendance Code</DialogTitle>
           </DialogHeader>
-          <Input
-            placeholder="Enter code"
-            value={attendanceCode}
-            onChange={e => setAttendanceCode(e.target.value)}
-            disabled={attendanceLoading}
-            className="mb-2"
-          />
-          {attendanceError && <div className="text-red-600 text-sm mb-2">{attendanceError}</div>}
-          {attendanceSuccess && <div className="text-green-600 text-sm mb-2">{attendanceSuccess}</div>}
-          <DialogFooter>
-            <Button
-              onClick={handleMarkAttendance}
-              disabled={attendanceLoading || !attendanceCode}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              {attendanceLoading ? "Marking..." : "Submit"}
-            </Button>
+          <div className="space-y-4 py-2">
+            <Input
+              placeholder="Enter code"
+              value={attendanceCode}
+              onChange={e => setAttendanceCode(e.target.value)}
+              disabled={attendanceLoading}
+              className="w-full bg-[var(--color-surface)] border-[var(--color-input-border)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-input-focus)] focus:ring-[var(--color-input-focus-ring)]"
+            />
+            {attendanceError && <div className="text-[var(--color-destructive)] text-sm">{attendanceError}</div>}
+            {attendanceSuccess && <div className="text-[var(--color-success)] text-sm">{attendanceSuccess}</div>}
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="outline"
               onClick={() => {
@@ -452,8 +491,16 @@ export default function EventDetailPage({
                 setAttendanceSuccess(null);
               }}
               disabled={attendanceLoading}
+              className="border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text-primary)]"
             >
               Cancel
+            </Button>
+            <Button
+              onClick={handleMarkAttendance}
+              disabled={attendanceLoading || !attendanceCode}
+              className="bg-[var(--color-primary)] hover:bg-[var(--color-button-primary-hover)] text-white"
+            >
+              {attendanceLoading ? "Marking..." : "Submit"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -461,3 +508,5 @@ export default function EventDetailPage({
     </div>
   );
 }
+
+

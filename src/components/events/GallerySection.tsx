@@ -44,7 +44,7 @@ export function GallerySection({ eventId }: GallerySectionProps) {
 
   if (gallery.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
+      <div className="text-center py-8 bg-[var(--color-surface)] rounded-lg border border-dashed text-[var(--color-text-muted)]">
         <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
         <p>No photos available yet</p>
       </div>
@@ -58,7 +58,7 @@ export function GallerySection({ eventId }: GallerySectionProps) {
           <div
             key={image.id}
             onClick={() => setSelectedImage(image)}
-            className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group"
+            className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group bg-[var(--color-surface)] border border-[var(--color-border-light)] hover:border-[var(--color-border)] shadow-sm hover:shadow-md transition-all"
           >
             <img
               src={image.imageUrl}

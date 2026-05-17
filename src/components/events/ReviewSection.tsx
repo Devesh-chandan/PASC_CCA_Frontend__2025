@@ -286,26 +286,29 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
     <div className="space-y-6">
       {/* Stats Overview */}
       {stats && (
-        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 rounded-xl p-6 border border-yellow-200 dark:border-yellow-800">
+        <div className="bg-[var(--color-card)] rounded-xl p-6 border border-[var(--color-border)] shadow-sm dark:shadow-dark">
           <div className="flex items-center justify-between mb-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-4xl font-bold text-foreground">
+                <span className="text-4xl font-bold text-[var(--color-text-primary)]">
                   {stats.averageRating.toFixed(1)}
                 </span>
                 {renderStars(Math.round(stats.averageRating))}
               </div>
-              <p className="text-muted-foreground">
+              <p className="text-[var(--color-text-muted)]">
                 Based on {stats.totalReviews} review{stats.totalReviews !== 1 ? 's' : ''}
               </p>
             </div>
             {['COMPLETED', 'ONGOING', 'UPCOMING'].includes(eventStatus) && !userHasReviewed && !showReviewForm && (
-              <Button onClick={() => setShowReviewForm(true)}>
+              <Button 
+                onClick={() => setShowReviewForm(true)} 
+                className="bg-[var(--color-button-primary)] hover:bg-[var(--color-button-primary-hover)] text-white shadow-sm"
+              >
                 Write Review
               </Button>
             )}
             {showReviewForm && (
-              <Button variant="outline" onClick={handleCancelEdit}>
+              <Button variant="outline" onClick={handleCancelEdit} className="border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]">
                 <X className="w-4 h-4 mr-2" />
                 Cancel
               </Button>
@@ -316,19 +319,19 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             {stats.averageContentRating && (
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Content</p>
+                <p className="text-sm text-[var(--color-text-muted)] mb-1">Content</p>
                 {renderStars(Math.round(stats.averageContentRating))}
               </div>
             )}
             {stats.averageSpeakerRating && (
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Speaker</p>
+                <p className="text-sm text-[var(--color-text-muted)] mb-1">Speaker</p>
                 {renderStars(Math.round(stats.averageSpeakerRating))}
               </div>
             )}
             {stats.averageOrganizationRating && (
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Organization</p>
+                <p className="text-sm text-[var(--color-text-muted)] mb-1">Organization</p>
                 {renderStars(Math.round(stats.averageOrganizationRating))}
               </div>
             )}
@@ -338,12 +341,12 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
 
       {/* Review Form */}
       {showReviewForm && (
-        <div className="bg-card rounded-xl border border-border p-6">
-          <h3 className="text-lg font-semibold mb-4">
+        <div className="bg-[var(--color-card)] rounded-xl border border-[var(--color-border)] shadow-sm dark:shadow-dark p-6">
+          <h3 className="text-lg font-semibold mb-4 text-[var(--color-text-primary)]">
             {editingReview ? 'Edit Your Review' : 'Write Your Review'}
           </h3>
 
-          <div className="space-y-4">
+          <div className="space-y-4 text-[var(--color-text-primary)]">
             {/* Overall Rating */}
             <div>
               <label className="block text-sm font-medium mb-2">Overall Rating</label>
@@ -380,7 +383,7 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
               <textarea
                 value={formData.review}
                 onChange={(e) => setFormData({ ...formData, review: e.target.value })}
-                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-[var(--color-input-border)] bg-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-input-focus-ring)] focus:border-[var(--color-input-focus)]"
                 rows={4}
                 placeholder="Share your experience..."
               />
@@ -393,7 +396,7 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
                 id="anonymous"
                 checked={formData.anonymous}
                 onChange={(e) => setFormData({ ...formData, anonymous: e.target.checked })}
-                className="rounded"
+                className="rounded border-[var(--color-input-border)] text-[var(--color-button-primary)] focus:ring-[var(--color-input-focus-ring)]"
               />
               <label htmlFor="anonymous" className="text-sm">
                 Post anonymously
@@ -414,12 +417,12 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
 
       {/* Reviews List */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Reviews</h3>
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Reviews</h3>
 
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
-              <div key={i} className="bg-card rounded-lg border border-border p-4">
+              <div key={i} className="bg-[var(--color-card)] rounded-lg border border-[var(--color-border)] p-4 shadow-sm">
                 <Skeleton className="h-4 w-32 mb-2" />
                 <Skeleton className="h-4 w-full mb-2" />
                 <Skeleton className="h-4 w-3/4" />
@@ -427,7 +430,7 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
             ))}
           </div>
         ) : reviews.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="text-center py-8 text-[var(--color-text-muted)] bg-[var(--color-surface)] rounded-lg border border-dashed border-[var(--color-border)]">
             No reviews yet. Be the first to review!
           </div>
         ) : (
@@ -440,19 +443,19 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
             return displayedReviews.map(review => {
               const isOwnReview = review.userId === currentUserId;
               return (
-                <div key={review.id} className={`bg-card rounded-lg border p-4 ${isOwnReview ? 'border-[var(--color-info)]/40 dark:border-[var(--color-info)]/40 bg-[var(--color-surface-hover)]/50/20' : 'border-border'}`}>
+                <div key={review.id} className={`bg-[var(--color-card)] rounded-lg border p-4 shadow-sm ${isOwnReview ? 'border-[var(--color-info)] dark:border-[var(--color-info)] bg-[var(--color-surface-hover)]' : 'border-[var(--color-border)]'}`}>
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <p className="font-medium flex items-center gap-2">
+                      <p className="font-medium flex items-center gap-2 text-[var(--color-text-primary)]">
                         {review.anonymous ? 'Anonymous' : review.user?.name || 'User'}
                         {isOwnReview && (
-                          <span className="text-xs bg-[var(--color-surface-hover)] text-[var(--color-primary)] px-2 py-0.5 rounded-full">
+                          <span className="text-xs bg-[var(--color-faint-blue-feature)] text-[var(--color-primary)] px-2 py-0.5 rounded-full border border-[var(--color-primary)]/20">
                             Your review
                           </span>
                         )}
                       </p>
                       {!review.anonymous && review.user?.department && (
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-[var(--color-text-muted)]">
                           {review.user.department}
                         </p>
                       )}
@@ -460,7 +463,7 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
                     <div className="flex items-start gap-3">
                       <div className="text-right">
                         {renderStars(review.rating)}
-                        <p className="text-xs text-muted-foreground mt-1" suppressHydrationWarning>
+                        <p className="text-xs text-[var(--color-text-muted)] mt-1" suppressHydrationWarning>
                           {formatDistanceToNow(new Date(review.createdAt))}
                         </p>
                       </div>
@@ -470,7 +473,7 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
                           {isOwnReview && (
                             <button
                               onClick={() => handleEditReview(review)}
-                              className="p-2 hover:bg-[var(--color-surface-hover)]/30 rounded-lg transition-colors"
+                              className="p-2 hover:bg-[var(--color-surface-hover)] rounded-lg transition-colors border border-transparent"
                               title="Edit review"
                             >
                               <Edit2 className="w-4 h-4 text-[var(--color-primary)]" />
@@ -478,7 +481,7 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
                           )}
                           <button
                             onClick={() => handleDeleteReview(review.id)}
-                            className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                            className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors border border-transparent"
                             title="Delete review"
                           >
                             <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
@@ -489,23 +492,23 @@ export function ReviewSection({ eventId, eventStatus }: ReviewSectionProps) {
                   </div>
 
                   {review.review && (
-                    <p className="text-foreground mt-2">{review.review}</p>
+                    <p className="text-[var(--color-text-primary)] mt-2">{review.review}</p>
                   )}
 
                   {(review.contentRating || review.speakerRating || review.organizationRating) && (
                     <div className="flex gap-4 mt-3 text-sm">
                       {review.contentRating && (
-                        <span className="text-muted-foreground">
+                        <span className="text-[var(--color-text-muted)]">
                           Content: {review.contentRating}/5
                         </span>
                       )}
                       {review.speakerRating && (
-                        <span className="text-muted-foreground">
+                        <span className="text-[var(--color-text-muted)]">
                           Speaker: {review.speakerRating}/5
                         </span>
                       )}
                       {review.organizationRating && (
-                        <span className="text-muted-foreground">
+                        <span className="text-[var(--color-text-muted)]">
                           Organization: {review.organizationRating}/5
                         </span>
                       )}
