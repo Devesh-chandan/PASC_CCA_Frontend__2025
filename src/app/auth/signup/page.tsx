@@ -99,9 +99,9 @@ export default function Signup() {
             <Link
               href="/auth/login"
               className="flex-1 text-center py-3 px-5
-                bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]
+                bg-[#1A90FF] hover:bg-[#1A90FF]/90
                 text-white rounded-xl font-semibold text-sm
-                transition-all duration-200 shadow-sm hover:shadow-md"
+                transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5"
             >
               Sign In
             </Link>
@@ -111,7 +111,7 @@ export default function Signup() {
                 bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)]
                 text-[var(--color-text-primary)] border border-[var(--color-border)]
                 rounded-xl font-semibold text-sm
-                transition-all duration-200"
+                transition-all duration-200 hover:shadow-sm hover:-translate-y-0.5"
             >
               Contact Admin
             </a>

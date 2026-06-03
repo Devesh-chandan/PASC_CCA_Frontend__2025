@@ -17,7 +17,7 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, setActiveTab }) => 
           className={`flex-1 py-2 rounded-lg font-semibold ${
             activeTab === tab.id
               ? "bg-[var(--color-profile)] text-primary"
-              : "text-secondary"
+              : "text-muted-foreground"
           }`}
           onClick={() => setActiveTab(tab.id)}
         >

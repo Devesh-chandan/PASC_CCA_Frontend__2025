@@ -142,7 +142,7 @@ export default function Home() {
       title: "Community Hub", 
       description: "Connect with peers across departments and build lasting networks", 
       color: "from-[#134467] to-[#55B8E5]", 
-      bgColor: "bg-purple-500/10 dark:bg-purple-500/20" 
+      bgColor: "bg-primary/10 dark:bg-primary/20" 
     }
   ];
 
@@ -226,7 +226,7 @@ export default function Home() {
                 
                 <button
                   onClick={() => router.push('/auth/login')}
-                  className="group px-8 py-4 bg-[var(--color-card)] border-2 border-[var(--color-border)] text-[var(--color-text-primary)] rounded-xl font-semibold text-lg hover:border-[#2BA6DF] dark:hover:border-[#2BA6DF] hover:bg-[var(--color-surface-hover)] dark:hover:bg-[#263238] transition-all duration-300"
+                  className="group px-8 py-4 bg-[var(--color-card)] border-2 border-[var(--color-border)] text-[var(--color-text-primary)] rounded-xl font-semibold text-lg hover:border-primary dark:hover:border-primary hover:bg-[var(--color-surface-hover)] dark:hover:bg-[#263238] transition-all duration-300"
                 >
                   <span className="flex items-center justify-center gap-2">
                     Sign In

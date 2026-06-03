@@ -44,30 +44,32 @@ export function GallerySection({ eventId }: GallerySectionProps) {
 
   if (gallery.length === 0) {
     return (
-      <div className="text-center py-8 bg-[var(--color-surface)] rounded-lg border border-dashed text-[var(--color-text-muted)]">
-        <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p>No photos available yet</p>
+      <div className="text-center py-12 bg-surface/50 rounded-2xl border-2 border-dashed border-border/50 text-[var(--color-text-muted)] flex flex-col items-center justify-center">
+        <div className="bg-background p-4 rounded-full shadow-sm mb-4">
+          <ImageIcon className="w-8 h-8 opacity-40" />
+        </div>
+        <p className="font-medium text-foreground/70">No photos available yet</p>
       </div>
     );
   }
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
         {gallery.map(image => (
           <div
             key={image.id}
             onClick={() => setSelectedImage(image)}
-            className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group bg-[var(--color-surface)] border border-[var(--color-border-light)] hover:border-[var(--color-border)] shadow-sm hover:shadow-md transition-all"
+            className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer group bg-card border border-border/40 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
           >
             <img
               src={image.imageUrl}
               alt={image.caption || 'Event photo'}
-              className="w-full h-full object-cover transition-transform group-hover:scale-110"
+              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             />
             {image.caption && (
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-                <p className="text-white text-sm line-clamp-2">{image.caption}</p>
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                <p className="text-white text-sm font-medium line-clamp-2 drop-shadow-md">{image.caption}</p>
               </div>
             )}
           </div>

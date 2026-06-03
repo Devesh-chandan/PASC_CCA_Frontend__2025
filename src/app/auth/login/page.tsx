@@ -426,7 +426,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={!isFormFilled || loading}
-                className="w-full py-3.5 mt-4 bg-[var(--color-button-primary)] hover:bg-[var(--color-button-primary-hover)] disabled:bg-[var(--color-surface-hover)] disabled:text-[var(--color-text-primary)] text-white rounded-xl font-bold shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm flex items-center justify-center gap-2 border border-transparent disabled:border-[var(--color-border-light)]"
+                className="w-full py-3.5 mt-4 text-sm font-bold bg-[#1A90FF] hover:bg-[#1A90FF]/90 text-white shadow-md hover:shadow-xl hover:-translate-y-0.5 rounded-xl transition-all flex items-center justify-center gap-2 border border-transparent disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>

@@ -9,9 +9,9 @@ interface DashboardCardProps {
 
 const DashboardCard: React.FC<DashboardCardProps> = ({ title, children, className = '' }) => {
   return (
-    <div className={`rounded-lg border border-card bg-card p-6 shadow-sm ${className}`}>
-      <h3 className="text-lg font-medium text-primary">{title}</h3>
-      <div className="mt-4">{children}</div>
+    <div className={`rounded-xl border border-border/50 bg-card p-6 shadow-sm hover:shadow-md transition-all duration-300 ${className}`}>
+      <h3 className="text-lg font-semibold tracking-tight text-primary">{title}</h3>
+      <div className="mt-4 text-foreground/90">{children}</div>
     </div>
   )
 }

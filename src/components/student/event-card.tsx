@@ -25,7 +25,7 @@ const statusConfig: Record<string, { bg: string; text: string; dot: string }> = 
 };
 
 const sessionsChipClass =
-  'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--color-border-light)] shadow-sm font-semibold bg-[var(--color-primary)]/10 dark:bg-[var(--color-primary)]/15 text-[var(--color-primary)] dark:text-[#38bdf8]';
+  'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--color-border-light)] shadow-sm font-semibold bg-primary/10 dark:bg-primary/15 text-primary';
 
 export const EventCard = ({
   eventWithRsvp,
@@ -182,7 +182,7 @@ export const EventCard = ({
          <div className="flex items-center justify-between">
           <Link 
             href={`/student/events/${event.id}`}
-            className="flex items-center gap-1.5 text-[14px] font-bold text-[var(--color-primary)] dark:text-[#0284c7] hover:opacity-80 transition-colors group/link"
+            className="flex items-center gap-1.5 text-sm font-bold text-primary hover:opacity-80 transition-colors group/link"
           >
              View Details
              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover/link:translate-x-0.5 transition-transform"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
@@ -214,7 +214,7 @@ export const EventCard = ({
                type="button"
                onClick={handleRsvpButton}
                disabled={rsvpLoading}
-               className="flex items-center gap-1.5 text-[13.5px] font-bold text-white bg-[var(--color-primary)] dark:bg-[#0284c7] hover:bg-[var(--color-primary-hover)] dark:hover:opacity-90 hover:shadow-md transition-all duration-200 px-4 py-2 rounded-[10px] shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+               className="flex items-center gap-1.5 text-[13.5px] font-bold text-primary-foreground bg-primary hover:bg-primary/90 hover:shadow-md transition-all duration-200 px-4 py-2 rounded-[10px] shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
              >
                {rsvpLoading ? 'Saving…' : 'RSVP Now'}
              </button>

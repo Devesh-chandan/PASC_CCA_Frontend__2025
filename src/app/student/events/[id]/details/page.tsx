@@ -217,11 +217,11 @@ export default function EventDetailsPage({
             </div>
 
             {event.prerequisite && (
-              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
+              <div className="mt-6 p-4 bg-primary/10 border border-primary/25 dark:bg-primary/15 dark:border-primary/30 rounded-lg">
+                <h3 className="font-semibold text-foreground mb-1">
                   Prerequisites
                 </h3>
-                <p className="text-blue-800 dark:text-blue-200">{event.prerequisite}</p>
+                <p className="text-muted-foreground">{event.prerequisite}</p>
               </div>
             )}
           </div>

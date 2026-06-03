@@ -122,10 +122,10 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="w-full sticky top-0 z-50 bg-[var(--color-navbar)] border-b border-[var(--color-border)] transition-colors">
+    <nav className="w-full sticky top-0 z-50 bg-[var(--color-navbar)]/80 backdrop-blur-xl border-b border-[var(--color-border)]/50 transition-colors shadow-sm">
       <div className="flex justify-between items-center mx-auto px-5 py-3">
         {/* Logo */}
-        <Link href={isLoggedIn ? (effectiveRole === "admin" ? "/admin/dashboard" : "/student/dashboard") : "/"} className="flex items-center cursor-pointer">
+        <Link href={isLoggedIn ? (effectiveRole === "admin" ? "/admin/dashboard" : "/student/dashboard") : "/"} className="flex items-center cursor-pointer transition-transform hover:scale-105 duration-300">
           <Image src="/logo.png" width={120} height={80} alt="logo" priority />
         </Link>
 
@@ -251,7 +251,7 @@ const Navbar = () => {
                   e.stopPropagation();
                   setShowUserMenu(!showUserMenu);
                 }}
-                className="bg-[var(--color-profile-icon-bg)] p-2 rounded-full cursor-pointer hover:bg-[var(--color-primary)] hover:shadow-[0_0_15px_rgba(43,166,223,0.4)] dark:hover:bg-[#0284c7] dark:hover:shadow-[0_0_15px_rgba(2,132,199,0.4)] hover:scale-105 active:scale-95 transition-all duration-300 group"
+                className="bg-[var(--color-profile-icon-bg)] p-2 rounded-full cursor-pointer hover:bg-primary hover:shadow-[0_0_15px_rgba(43,166,223,0.4)] dark:hover:bg-primary dark:hover:shadow-[0_0_15px_rgba(56,189,248,0.35)] hover:scale-105 active:scale-95 transition-all duration-300 group"
               >
                 <User className="h-6 w-6 text-white group-hover:text-white transition-colors" />
               </button>

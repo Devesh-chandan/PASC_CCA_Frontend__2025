@@ -88,7 +88,7 @@ export default function VerifyResetPassword() {
               </div>
               <button
                 disabled={!isFormFilled}
-                className="auth-button w-full py-2 rounded-lg text-white font-medium text-sm sm:text-base"
+                className="w-full py-2 rounded-lg text-white font-medium text-sm sm:text-base bg-[#1A90FF] hover:bg-[#1A90FF]/90 transition-all hover:shadow-md hover:-translate-y-0.5"
               >
                 Reset Password
               </button>

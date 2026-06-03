@@ -272,7 +272,7 @@ export default function SessionManagementPage({
               {sessions.map(session => (
                 <div
                   key={session.id}
-                  className="border border-border rounded-lg p-4 hover:bg-accent transition-colors"
+                  className="border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-primary/5 dark:hover:bg-primary/10 transition-all hover:shadow-md"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>

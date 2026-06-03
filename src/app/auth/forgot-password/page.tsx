@@ -88,7 +88,7 @@ export default function ForgotPassword() {
               <button
                 type="submit"
                 disabled={!email || loading}
-                className="w-full py-4 bg-[var(--color-button-primary)] hover:bg-[var(--color-button-primary-hover)] disabled:bg-[var(--color-surface-hover)] disabled:text-[var(--color-text-muted)] text-white rounded-2xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm flex items-center justify-center gap-2 border border-transparent"
+                className="w-full py-4 bg-[#1A90FF] hover:bg-[#1A90FF]/90 disabled:bg-[var(--color-surface-hover)] disabled:text-[var(--color-text-muted)] text-white rounded-2xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm flex items-center justify-center gap-2 border border-transparent"
               >
                 {loading ? (
                   <>
