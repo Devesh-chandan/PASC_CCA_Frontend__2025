@@ -1,11 +1,81 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Trophy, Medal, Award, Crown, TrendingUp, Info, ChevronDown, Users, Star, ArrowUp, Calendar, User } from 'lucide-react';
+import { Trophy, Medal, Award, Crown, TrendingUp, Info, ChevronDown, Users, Star, ArrowUp, Calendar, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import { leaderboardAPI } from '@/lib/api';
 import { LeaderboardEntry, LeaderboardPeriod } from '@/types/leaderboard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
+// ---------- Reusable Pagination bar ----------
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+
+  const getPageNumbers = () => {
+    const pages: (number | '...')[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push('...');
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (currentPage < totalPages - 2) pages.push('...');
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
+  return (
+    <div className='flex items-center justify-center gap-1.5 mt-8'>
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-sm font-medium border border-[var(--color-border-light)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        <ChevronLeft className='w-4 h-4' /> Prev
+      </button>
+
+      {getPageNumbers().map((page, idx) =>
+        page === '...' ? (
+          <span key={'dots-' + idx} className='px-2 py-2 text-[var(--color-text-muted)] text-sm select-none'>
+            …
+          </span>
+        ) : (
+          <button
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={
+              'w-10 h-10 rounded-xl text-sm font-medium transition-all border ' +
+              (currentPage === page
+                ? 'bg-[var(--color-button-primary)] text-white border-transparent shadow-sm'
+                : 'bg-[var(--color-card)] text-[var(--color-text-secondary)] border-[var(--color-border-light)] hover:bg-[var(--color-surface)]')
+            }
+          >
+            {page}
+          </button>
+        )
+      )}
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-sm font-medium border border-[var(--color-border-light)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        Next <ChevronRight className='w-4 h-4' />
+      </button>
+    </div>
+  );
+}
 
 const periods: { value: LeaderboardPeriod; label: string }[] = [
   { value: 'WEEKLY', label: 'This Week' },
@@ -35,6 +105,8 @@ export default function LeaderboardPage() {
   const [myInfo, setMyInfo] = useState<MyDivisionInfo | null>(null);
   const [myInfoLoading, setMyInfoLoading] = useState(true);
   const [userRank, setUserRank] = useState<LeaderboardEntry | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   useEffect(() => {
     const fetchMyInfo = async () => {
@@ -74,6 +146,7 @@ export default function LeaderboardPage() {
       if (response.data?.success && response.data.data) {
         const data = response.data.data as LeaderboardEntry[];
         setLeaderboard(data);
+        setCurrentPage(1);
         const userId = parseInt(localStorage.getItem('userId') || '0');
         const userEntry = data.find((entry) => entry.userId === userId);
         setUserRank(userEntry || null);
@@ -99,6 +172,21 @@ export default function LeaderboardPage() {
 
   const top3 = !loading && leaderboard.length >= 3 ? leaderboard.slice(0, 3) : null;
   const restOfList = !loading ? (leaderboard.length >= 3 ? leaderboard.slice(3) : leaderboard) : [];
+
+  const listToPaginate = top3 ? restOfList : leaderboard;
+  const totalPages = Math.ceil(listToPaginate.length / PAGE_SIZE);
+  const paginatedList = listToPaginate.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
+  const startIndex = top3 
+    ? (listToPaginate.length > 0 ? 3 + (currentPage - 1) * PAGE_SIZE + 1 : 0)
+    : (listToPaginate.length > 0 ? (currentPage - 1) * PAGE_SIZE + 1 : 0);
+
+  const endIndex = top3
+    ? Math.min(3 + currentPage * PAGE_SIZE, leaderboard.length)
+    : Math.min(currentPage * PAGE_SIZE, leaderboard.length);
 
   /* Medal colors */
   const medalStyles = [
@@ -300,7 +388,7 @@ export default function LeaderboardPage() {
                   </div>
                 </div>
                 <div className="text-center space-y-1 mt-1">
-                  <p className="font-semibold text-sm text-[var(--color-text-primary)] truncate max-w-[110px] md:max-w-[140px]">{top3[1].userName || 'User'}</p>
+                  <p className="font-semibold text-sm text-[var(--color-text-primary)] truncate max-w-[110px] md:max-w-[140px]" title={top3[1].userName || 'User'}>{top3[1].userName || 'User'}</p>
                   <p className="text-[11px] text-[var(--color-text-muted)]">{top3[1].department}</p>
                   <div className="pt-1">
                     <p className="text-xl md:text-2xl font-bold text-[var(--color-text-primary)]">{top3[1].credits}</p>
@@ -326,7 +414,7 @@ export default function LeaderboardPage() {
                   </div>
                 </div>
                 <div className="text-center space-y-1 mt-1">
-                  <p className="font-bold text-base md:text-lg text-[var(--color-text-primary)] truncate max-w-[120px] md:max-w-[160px]">{top3[0].userName || 'User'}</p>
+                  <p className="font-bold text-base md:text-lg text-[var(--color-text-primary)] truncate max-w-[120px] md:max-w-[160px]" title={top3[0].userName || 'User'}>{top3[0].userName || 'User'}</p>
                   <p className="text-[11px] text-[var(--color-text-muted)]">{top3[0].department}</p>
                   <div className="pt-1">
                     <p className="text-2xl md:text-3xl font-bold text-[var(--color-primary)]">{top3[0].credits}</p>
@@ -351,7 +439,7 @@ export default function LeaderboardPage() {
                   </div>
                 </div>
                 <div className="text-center space-y-1 mt-1">
-                  <p className="font-semibold text-sm text-[var(--color-text-primary)] truncate max-w-[110px] md:max-w-[140px]">{top3[2].userName || 'User'}</p>
+                  <p className="font-semibold text-sm text-[var(--color-text-primary)] truncate max-w-[110px] md:max-w-[140px]" title={top3[2].userName || 'User'}>{top3[2].userName || 'User'}</p>
                   <p className="text-[11px] text-[var(--color-text-muted)]">{top3[2].department}</p>
                   <div className="pt-1">
                     <p className="text-xl md:text-2xl font-bold text-[var(--color-text-primary)]">{top3[2].credits}</p>
@@ -431,7 +519,7 @@ export default function LeaderboardPage() {
           {/* Data Rows */}
           {!loading && leaderboard.length > 0 && (
             <div className="space-y-3">
-              {(top3 ? restOfList : leaderboard).map((entry, index) => {
+              {paginatedList.map((entry, index) => {
                 const isHighlighted = shouldHighlightUser(entry);
                 return (
                   <div
@@ -508,9 +596,16 @@ export default function LeaderboardPage() {
 
         {/* Total count footer */}
         {!loading && leaderboard.length > 0 && (
-          <p className="text-center text-xs text-[var(--color-text-muted)]">
-            Showing top {leaderboard.length} student{leaderboard.length !== 1 ? 's' : ''}
-          </p>
+          <div className="space-y-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+            <p className="text-center text-xs text-[var(--color-text-muted)]">
+              Showing {startIndex}–{endIndex} of {leaderboard.length} students
+            </p>
+          </div>
         )}
 
       </div>

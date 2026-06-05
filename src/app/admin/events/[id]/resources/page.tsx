@@ -22,6 +22,7 @@ export default function EventResourcesPage({
   const [resources, setResources] = useState<EventResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
+  const [deleteResourceId, setDeleteResourceId] = useState<number | null>(null);
   const [editingResource, setEditingResource] = useState<EventResource | null>(null);
   const [formData, setFormData] = useState<ResourceCreateInput>({
     eventId: 0,
@@ -82,14 +83,19 @@ export default function EventResourcesPage({
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this resource?')) return;
-    
+  const handleDelete = (id: number) => {
+    setDeleteResourceId(id);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteResourceId === null) return;
     try {
-      await resourceAPI.delete(id);
+      await resourceAPI.delete(deleteResourceId);
       fetchResources(eventId);
     } catch (error) {
       console.error('Error deleting resource:', error);
+    } finally {
+      setDeleteResourceId(null);
     }
   };
 
@@ -144,36 +150,40 @@ export default function EventResourcesPage({
     <div className="min-h-screen p-6 bg-background">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <header className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
           <div className="flex flex-col gap-2">
             <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 self-start px-3 py-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => router.push('/admin/events')}
+              className="flex items-center gap-2 self-start px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--color-border-light)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-primary)]/30 transition-all shadow-sm active:scale-95"
             >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Events
+              <ArrowLeft className="w-4 h-4 text-[var(--color-primary)]" />
+              <span>Back to Events</span>
             </button>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                <FileIcon className="w-8 h-8 text-primary" />
-                Event Resources
-              </h1>
-              <p className="text-muted-foreground mt-1 text-base font-medium">
-                {eventTitle || 'Manage study materials and assets'}
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2">
+              <div className="flex items-start gap-4">
+                <div className="w-11 h-11 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-border-light)] flex items-center justify-center shrink-0 mt-0.5">
+                  <FileIcon className="w-5 h-5 text-[var(--color-primary)]" />
+                </div>
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight">Event Resources</h1>
+                  <p className="text-sm md:text-base text-[var(--color-text-muted)] mt-1">
+                    {eventTitle || 'Manage study materials and assets'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  resetForm();
+                  setShowDialog(true);
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap self-start sm:self-center"
+              >
+                <Plus className="w-4 h-4" />
+                Add New Resource
+              </button>
             </div>
           </div>
-          <Button
-            onClick={() => {
-              resetForm();
-              setShowDialog(true);
-            }}
-            className="px-6 py-6 rounded-2xl text-base font-semibold shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5 stroke-[2.5px]" />
-            Add New Resource
-          </Button>
-        </div>
+        </header>
 
         {/* Resources List */}
         <div className="bg-[var(--color-card)] rounded-[2rem] border border-[var(--color-border)] p-6 sm:p-8 shadow-sm">
@@ -210,7 +220,7 @@ export default function EventResourcesPage({
                   resetForm();
                   setShowDialog(true);
                 }}
-                className="mt-8 rounded-xl"
+                className="mt-10 rounded-2xl px-8 h-12 border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors font-bold"
               >
                 Add Your First Resource
               </Button>
@@ -229,13 +239,13 @@ export default function EventResourcesPage({
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => handleEdit(resource)}
-                        className="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 hover:bg-blue-100 transition-all active:scale-90"
+                        className="p-2 rounded-xl bg-[var(--color-info)]/10 text-[var(--color-info)] hover:bg-[var(--color-info)]/20 transition-all active:scale-90"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(resource.id)}
-                        className="p-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 hover:bg-red-100 transition-all active:scale-90"
+                        className="p-2 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 transition-all active:scale-90"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -285,8 +295,8 @@ export default function EventResourcesPage({
         <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-[2rem] border-[var(--color-border)] bg-[var(--color-card)] shadow-2xl">
           <DialogHeader className="p-8 pb-0">
             <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-primary/10">
-                {editingResource ? <Edit className="w-6 h-6 text-primary" /> : <Plus className="w-6 h-6 text-primary" />}
+              <div className="p-2.5 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 shadow-inner">
+                {editingResource ? <Edit className="w-6 h-6 text-[var(--color-primary)]" /> : <Plus className="w-6 h-6 text-[var(--color-primary)]" />}
               </div>
               {editingResource ? 'Edit Resource' : 'Add New Resource'}
             </DialogTitle>
@@ -295,62 +305,69 @@ export default function EventResourcesPage({
           <div className="p-8 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2 space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Title</label>
+                <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1">Title</label>
                 <Input
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="e.g., Workshop Slides - Introduction to React"
-                  className="h-12 rounded-xl bg-muted/30 border-border/50 focus:ring-primary/20"
+                  className="h-12 px-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-light)] focus-visible:border-[var(--color-primary)] focus-visible:ring-[var(--color-primary)]/10 text-sm font-semibold placeholder:font-medium text-foreground outline-none"
                 />
               </div>
 
               <div className="md:col-span-2 space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Description</label>
+                <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-3 bg-muted/30 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-sm"
+                  className="w-full px-4 py-3 bg-[var(--color-surface)] border border-[var(--color-border-light)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 transition-all font-medium text-sm text-[var(--color-text-primary)] placeholder:font-medium outline-none"
                   rows={3}
                   placeholder="What is this resource about?"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Type</label>
-                <select
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value as ResourceType })}
-                  className="w-full h-12 px-4 bg-muted/30 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-semibold text-sm appearance-none cursor-pointer"
-                >
-                  <option value="SLIDES">📂 Slides</option>
-                  <option value="VIDEO">🎥 Video</option>
-                  <option value="CODE">💻 Code</option>
-                  <option value="DOCUMENT">📄 Document</option>
-                  <option value="LINK">🔗 Link</option>
-                  <option value="OTHER">📁 Other</option>
-                </select>
+                <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1">Type</label>
+                <div className="relative">
+                  <select
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value as ResourceType })}
+                    className="w-full h-12 pl-4 pr-10 bg-[var(--color-surface)] border border-[var(--color-border-light)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 transition-all font-semibold text-sm cursor-pointer appearance-none text-[var(--color-text-primary)]"
+                  >
+                    <option value="SLIDES">📂 Slides</option>
+                    <option value="VIDEO">🎥 Video</option>
+                    <option value="CODE">💻 Code</option>
+                    <option value="DOCUMENT">📄 Document</option>
+                    <option value="LINK">🔗 Link</option>
+                    <option value="OTHER">📁 Other</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[var(--color-text-secondary)]">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">File Size (Optional)</label>
+                <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1">File Size (Optional)</label>
                 <Input
                   value={formData.fileSize || ''}
                   onChange={(e) => setFormData({ ...formData, fileSize: parseInt(e.target.value) || undefined })}
                   placeholder="Size in bytes"
                   type="number"
-                  className="h-12 rounded-xl bg-muted/30 border-border/50 focus:ring-primary/20"
+                  className="h-12 px-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-light)] focus-visible:border-[var(--color-primary)] focus-visible:ring-[var(--color-primary)]/10 text-sm font-semibold placeholder:font-medium text-foreground outline-none"
                 />
               </div>
 
               <div className="md:col-span-2 space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">URL / Source Link</label>
+                <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1">URL / Source Link</label>
                 <div className="relative">
                   <Input
                     value={formData.url}
                     onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                     placeholder="https://drive.google.com/..."
                     type="url"
-                    className="h-12 pl-11 rounded-xl bg-muted/30 border-border/50 focus:ring-primary/20"
+                    className="h-12 pl-11 pr-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-light)] focus-visible:border-[var(--color-primary)] focus-visible:ring-[var(--color-primary)]/10 text-sm font-semibold placeholder:font-medium text-foreground outline-none"
                   />
                   <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 </div>
@@ -360,17 +377,39 @@ export default function EventResourcesPage({
 
           <DialogFooter className="p-8 pt-0 flex gap-3">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => {
                 setShowDialog(false);
                 resetForm();
               }}
-              className="rounded-xl px-8 h-12"
+              className="rounded-xl px-8 h-12 border-[var(--color-border-light)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]"
             >
               Cancel
             </Button>
-            <Button onClick={handleSubmit} className="rounded-xl px-8 h-12 shadow-md hover:shadow-lg transition-all active:scale-95">
+            <Button onClick={handleSubmit} className="rounded-xl px-8 h-12 bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 font-bold">
               {editingResource ? 'Update Info' : 'Attach Resource'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Resource Delete Confirmation Dialog */}
+      <Dialog open={deleteResourceId !== null} onOpenChange={(open) => { if (!open) setDeleteResourceId(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete Resource?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">
+            Are you sure you want to delete this study material/asset? This action cannot be undone.
+          </p>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteResourceId(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700 text-white border-transparent"
+            >
+              Delete
             </Button>
           </DialogFooter>
         </DialogContent>

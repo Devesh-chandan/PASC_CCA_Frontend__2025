@@ -99,7 +99,7 @@ const Navbar = () => {
           {pathname === "/auth/login" ? (
             <Link
               href="/auth/signup"
-              className="flex items-center gap-2 px-4 py-2.5 bg-[#2BA6DF] text-white rounded-xl font-semibold hover:bg-[#208bc0] hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm"
+              className="flex items-center gap-2 px-4 py-2.5 bg-[var(--color-button-primary)] text-white rounded-xl font-semibold hover:bg-[var(--color-button-primary-hover)] hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm"
             >
               <UserPlus className="w-4 h-4" />
               <span className="hidden sm:inline">Sign Up</span>
@@ -107,7 +107,7 @@ const Navbar = () => {
           ) : (
             <Link
               href="/auth/login"
-              className="flex items-center gap-2 px-4 py-2.5 bg-slate-50/80 dark:bg-slate-800/80 backdrop-blur-md text-slate-700 dark:text-slate-200 rounded-xl font-semibold border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transition-all text-sm"
+              className="flex items-center gap-2 px-4 py-2.5 bg-[var(--color-button-primary)] text-white rounded-xl font-semibold hover:bg-[var(--color-button-primary-hover)] hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm"
             >
               <LogIn className="w-4 h-4" />
               <span className="hidden sm:inline">Login</span>
@@ -131,10 +131,10 @@ const Navbar = () => {
 
         {/* Navigation Links - Only show for logged in users */}
         {isLoggedIn && effectiveRole === "student" && (
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-4">
             <Link
               href="/student/dashboard"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isActive("/student/dashboard")
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${isActive("/student/dashboard")
                 ? "bg-[var(--color-nav-active-bg)] text-[var(--color-nav-active)] font-medium"
                 : "text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)]"
                 }`}
@@ -144,7 +144,7 @@ const Navbar = () => {
             </Link>
             <Link
               href="/student/events"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isActive("/student/events")
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${isActive("/student/events")
                 ? "bg-[var(--color-nav-active-bg)] text-[var(--color-nav-active)] font-medium"
                 : "text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)]"
                 }`}
@@ -154,7 +154,7 @@ const Navbar = () => {
             </Link>
             <Link
               href="/student/leaderboard"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isActive("/student/leaderboard")
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${isActive("/student/leaderboard")
                 ? "bg-[var(--color-nav-active-bg)] text-[var(--color-nav-active)] font-medium"
                 : "text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)]"
                 }`}
@@ -164,7 +164,7 @@ const Navbar = () => {
             </Link>
             <Link
               href="/student/announcements"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isActive("/student/announcements")
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${isActive("/student/announcements")
                 ? "bg-[var(--color-nav-active-bg)] text-[var(--color-nav-active)] font-medium"
                 : "text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)]"
                 }`}
@@ -176,10 +176,10 @@ const Navbar = () => {
         )}
 
         {isLoggedIn && effectiveRole === "admin" && (
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-4">
             <Link
               href="/admin/dashboard"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isActive("/admin/dashboard")
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${isActive("/admin/dashboard")
                 ? "bg-[var(--color-nav-active-bg)] text-[var(--color-nav-active)] font-medium"
                 : "text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)]"
                 }`}
@@ -189,7 +189,7 @@ const Navbar = () => {
             </Link>
             <Link
               href="/admin/events"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isActive("/admin/events")
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${isActive("/admin/events")
                 ? "bg-[var(--color-nav-active-bg)] text-[var(--color-nav-active)] font-medium"
                 : "text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)]"
                 }`}
@@ -199,7 +199,7 @@ const Navbar = () => {
             </Link>
             <Link
               href="/admin/announcements"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isActive("/admin/announcements")
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${isActive("/admin/announcements")
                 ? "bg-[var(--color-nav-active-bg)] text-[var(--color-nav-active)] font-medium"
                 : "text-[var(--color-nav-text)] hover:bg-[var(--color-nav-hover-bg)]"
                 }`}
@@ -251,9 +251,9 @@ const Navbar = () => {
                   e.stopPropagation();
                   setShowUserMenu(!showUserMenu);
                 }}
-                className="bg-[var(--color-profile-icon-bg)] p-2 rounded-full cursor-pointer hover:bg-primary hover:shadow-[0_0_15px_rgba(43,166,223,0.4)] dark:hover:bg-primary dark:hover:shadow-[0_0_15px_rgba(56,189,248,0.35)] hover:scale-105 active:scale-95 transition-all duration-300 group"
+                className="bg-[var(--color-primary)] p-2 rounded-full cursor-pointer hover:bg-[var(--color-primary-hover)] hover:shadow-[0_0_15px_rgba(26,144,255,0.4)] hover:scale-105 active:scale-95 transition-all duration-300 group border border-[var(--color-primary)]"
               >
-                <User className="h-6 w-6 text-white group-hover:text-white transition-colors" />
+                <User className="h-6 w-6 text-white transition-colors" />
               </button>
 
               {/* User Dropdown Menu */}

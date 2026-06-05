@@ -116,7 +116,7 @@ function DonutChart({
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center transition-all duration-300 pointer-events-none">
         {hoveredSegment ? (
           <>
-            <span className="text-2xl font-extrabold tracking-tight drop-shadow-sm transition-colors" style={{ color: hoveredSegment.color }}>
+            <span className="text-2xl font-bold tracking-tight drop-shadow-sm transition-colors" style={{ color: hoveredSegment.color }}>
               {hoveredSegment.value}
             </span>
             <span className="text-[10px] font-semibold uppercase tracking-wider mt-0.5 transition-colors" style={{ color: hoveredSegment.color }}>
@@ -126,7 +126,7 @@ function DonutChart({
         ) : (
           <>
             {centerValue && (
-              <span className="text-2xl font-extrabold text-[var(--color-text-primary)] tracking-tight drop-shadow-sm">{centerValue}</span>
+              <span className="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight drop-shadow-sm">{centerValue}</span>
             )}
             {centerLabel && (
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] mt-0.5">{centerLabel}</span>
@@ -278,39 +278,39 @@ const AdminDashboard = () => {
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* ── Header ── */}
-        <header className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+        <header className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-start gap-4">
-              <div className="w-11 h-11 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-border-light)] flex items-center justify-center shrink-0 mt-0.5">
-                <LayoutDashboard className="w-5 h-5 text-[var(--color-primary)]" />
+            <div className="flex items-start gap-4 sm:gap-5">
+              <div className="w-12 h-12 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-border-light)] flex items-center justify-center shrink-0">
+                <LayoutDashboard className="w-6 h-6 text-[var(--color-primary)]" />
               </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight">
+              <div className="space-y-1.5">
+                <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] tracking-tight leading-tight">
                   Admin Dashboard
                 </h1>
-                <p className="text-sm md:text-base text-[var(--color-text-muted)] mt-1">
+                <p className="text-sm sm:text-base text-[var(--color-text-muted)] leading-relaxed">
                   Comprehensive insights into CCA activities
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap gap-3 items-center mt-3 md:mt-0">
+            <div className="flex flex-wrap gap-3 items-center mt-3 sm:mt-0">
               <button
                 onClick={fetchAnalytics}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-[var(--color-border-light)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] transition-all shadow-sm active:scale-95"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/15 hover:border-[var(--color-primary)]/50 transition-all shadow-sm active:scale-95"
               >
                 <RefreshCw className="h-4 w-4" />
                 Refresh Data
               </button>
               <button
                 onClick={() => router.push("/admin/invites")}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-[#2BA6DF]/30 bg-[#2BA6DF]/10 text-[#2BA6DF] hover:bg-[#2BA6DF]/20 transition-all shadow-sm active:scale-95"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 hover:border-amber-500/50 transition-all shadow-sm active:scale-95"
               >
                 <Mail className="h-4 w-4" />
                 Manage Invites
               </button>
               <button
                 onClick={() => router.push("/admin/createEvent")}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95"
               >
                 <Plus className="h-4 w-4" />
                 Create Event
@@ -346,51 +346,57 @@ const AdminDashboard = () => {
         {/* ── Event Status Pipeline ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Chart Panel */}
-          <div className="lg:col-span-1 rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-6 shadow-sm flex flex-col hover:shadow-md transition-shadow duration-300">
-            <div className="w-full flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-lg text-[var(--color-text-primary)] tracking-tight">Event Distribution</h3>
-              <div className="p-1.5 bg-[var(--color-surface-hover)]/30 rounded-lg hidden sm:block">
-                <Activity className="w-4 h-4 text-[var(--color-text-muted)]" />
+          <div className="lg:col-span-1 rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-4 sm:p-5 shadow-sm flex flex-col hover:shadow-md transition-shadow duration-300">
+            <div className="w-full flex items-center justify-between mb-1.5">
+              <h3 className="font-bold text-lg text-[var(--color-text-primary)] tracking-tight">Event Distribution</h3>
+              <div className="w-9 h-9 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 flex items-center justify-center shrink-0 hidden sm:flex">
+                <Activity className="w-5 h-5 text-[var(--color-primary)]" />
               </div>
             </div>
 
-            <div className="flex-1 flex flex-row items-center justify-between w-full mt-2 sm:mt-4">
+            <div className="flex-1 flex flex-row items-center justify-between w-full mt-1.5">
               {/* Left: Chart Visualization */}
-              <div className="flex-shrink-0 flex items-center justify-center w-[120px] sm:w-[130px]">
+              <div className="flex-shrink-0 flex items-center justify-center w-[105px] sm:w-[110px]">
                 <DonutChart
                   segments={eventPipelineSegments}
                   centerValue={totalPipelineEvents.toString()}
                   centerLabel="Total Events"
-                  size={130}
+                  size={110}
                 />
               </div>
 
               {/* Right: Legend Items */}
-              <div className="flex flex-col flex-1 justify-center gap-2 sm:gap-2.5 pl-5 sm:pl-7">
-                {eventPipelineSegments.filter(s => s.value >= 0).map((seg) => (
-                  <div key={seg.label} className="flex items-center justify-between group">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shadow-sm group-hover:scale-110 transition-transform" style={{ backgroundColor: seg.color }} />
-                      <span className="text-[var(--color-text-muted)] text-[13px] sm:text-sm font-medium group-hover:text-[var(--color-text-primary)] transition-colors">
-                        {seg.label}
+              <div className="flex flex-col flex-1 justify-center gap-1 pl-4 sm:pl-5">
+                {eventPipelineSegments.filter(s => s.value >= 0).map((seg) => {
+                  const percentage = totalPipelineEvents > 0 ? Math.round((seg.value / totalPipelineEvents) * 100) : 0;
+                  return (
+                    <div key={seg.label} className="grid grid-cols-[1fr_auto_40px] items-center gap-3 py-1 group border-b border-[var(--color-border-light)]/20 last:border-0">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="w-2.5 h-2.5 rounded-full shadow-sm group-hover:scale-110 transition-transform shrink-0" style={{ backgroundColor: seg.color }} />
+                        <span className="text-[var(--color-text-muted)] text-[13px] sm:text-sm font-semibold group-hover:text-[var(--color-text-primary)] transition-colors truncate">
+                          {seg.label}
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-bold text-[var(--color-text-muted)] bg-[var(--color-surface-hover)]/60 px-2 py-0.5 rounded-full border border-[var(--color-border-light)]/30 min-w-[44px] text-center tabular-nums">
+                        {percentage}%
+                      </span>
+                      <span className="text-right text-[13px] sm:text-sm font-bold text-[var(--color-text-primary)] tabular-nums">
+                        {seg.value}
                       </span>
                     </div>
-                    <span className="text-[var(--color-text-primary)] font-bold text-xs sm:text-[13px] bg-[var(--color-surface)]/50 px-2 sm:px-2.5 py-0.5 rounded-md border border-[var(--color-border-light)] shadow-sm">
-                      {seg.value}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
 
           {/* Metrics Tiles layout block (2x2 grid) */}
-          <div className="lg:col-span-1 grid grid-cols-2 gap-4 h-full">
-            <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="flex items-center justify-between mb-4">
+          <div className="lg:col-span-1 grid grid-cols-2 gap-3 h-full">
+            <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold text-sm text-[var(--color-text-muted)]">Ongoing</h3>
-                <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
-                  <Activity className="w-4 h-4 text-green-600 dark:text-green-400" />
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                  <Activity className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
               </div>
               <p className="text-3xl font-bold text-[var(--color-text-primary)]">
@@ -398,11 +404,11 @@ const AdminDashboard = () => {
               </p>
             </div>
 
-            <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="flex items-center justify-between mb-4">
+            <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold text-sm text-[var(--color-text-muted)]">Upcoming</h3>
-                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <div className="w-9 h-9 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 flex items-center justify-center shrink-0">
+                  <Calendar className="w-5 h-5 text-[var(--color-primary)]" />
                 </div>
               </div>
               <p className="text-3xl font-bold text-[var(--color-text-primary)]">
@@ -410,11 +416,11 @@ const AdminDashboard = () => {
               </p>
             </div>
 
-            <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="flex items-center justify-between mb-4">
+            <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold text-sm text-[var(--color-text-muted)]">Completed</h3>
-                <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
+                  <CheckCircle className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
               <p className="text-3xl font-bold text-[var(--color-text-primary)]">
@@ -422,11 +428,11 @@ const AdminDashboard = () => {
               </p>
             </div>
 
-            <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="flex items-center justify-between mb-4">
+            <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold text-sm text-[var(--color-text-muted)]">Active</h3>
-                <div className="w-8 h-8 bg-[var(--color-info)]/10 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-4 h-4 text-[var(--color-info)]" />
+                <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                  <BarChart3 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 </div>
               </div>
               <p className="text-3xl font-bold text-[var(--color-text-primary)]">
@@ -439,38 +445,55 @@ const AdminDashboard = () => {
         {/* ── Engagement Highlights ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Average Rating */}
-          <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
-            <div className="flex items-center justify-between">
+          <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col justify-between">
+            <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-[var(--color-text-muted)] mb-1">
+                <p className="text-sm font-semibold text-[var(--color-text-muted)] mb-1">
                   Average Rating
                 </p>
-                <p className="text-4xl font-bold text-[var(--color-text-primary)]">
-                  {(analytics?.averageEventRating ?? 0).toFixed(1)}
-                </p>
-                <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-2">
-                  Overall event rating
-                </p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl font-bold tracking-tight text-[var(--color-text-primary)]">
+                    {(analytics?.averageEventRating ?? 0).toFixed(1)}
+                  </span>
+                  <span className="text-sm font-semibold text-[var(--color-text-muted)]">/ 5.0</span>
+                </div>
+                {/* Visual Stars */}
+                <div className="flex items-center gap-1 mt-2">
+                  {[1, 2, 3, 4, 5].map((starIdx) => {
+                    const isFilled = starIdx <= Math.round(analytics?.averageEventRating ?? 0);
+                    return (
+                      <Star
+                        key={starIdx}
+                        className={`w-4 h-4 ${
+                          isFilled
+                            ? "text-amber-500 fill-amber-500"
+                            : "text-[var(--color-border)] fill-transparent"
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
               </div>
-              <Star className="w-12 h-12 text-green-500 opacity-30" />
+              <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                <Star className="w-5 h-5 text-amber-500 fill-amber-500/10" />
+              </div>
             </div>
           </div>
 
           {/* Credits Distributed */}
-          <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
-            <div className="flex items-center justify-between">
+          <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col justify-between">
+            <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-[var(--color-text-muted)] mb-1">
+                <p className="text-sm font-semibold text-[var(--color-text-muted)] mb-1">
                   Credits Distributed
                 </p>
                 <p className="text-4xl font-bold text-[var(--color-text-primary)]">
                   {analytics?.totalCreditsDistributed ?? 0}
                 </p>
-                <p className="text-sm font-medium text-amber-600 dark:text-amber-400 mt-2">
-                  {analytics?.totalAttendance ?? 0} attendances
-                </p>
               </div>
-              <Award className="w-12 h-12 text-amber-500 opacity-30" />
+              <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                <Award className="w-5 h-5 text-amber-500" />
+              </div>
             </div>
           </div>
         </div>
@@ -478,9 +501,11 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* ── Top Performing Events (Span 2) ── */}
           <div className="lg:col-span-2 flex flex-col h-full rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-5 h-5 text-primary" />
-              <h3 className="text-xl font-semibold">Top Performing Events</h3>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 flex items-center justify-center shrink-0">
+                <TrendingUp className="w-5 h-5 text-[var(--color-primary)]" />
+              </div>
+              <h3 className="text-xl font-bold tracking-tight text-foreground">Top Performing Events</h3>
             </div>
 
             {analytics?.topEvents && analytics.topEvents.length > 0 ? (
@@ -491,7 +516,7 @@ const AdminDashboard = () => {
                     className="flex items-center gap-3.5 px-4.5 py-3.5 rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface)]/35 hover:bg-[var(--color-surface)] shadow-[0_2px_8px_rgba(15,23,42,0.08)] hover:shadow-[0_6px_14px_rgba(15,23,42,0.1)] transition-[background-color,box-shadow]"
                   >
                     <div
-                      className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-[15px] font-extrabold border transition-all ${index === 0
+                      className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-[15px] font-bold border transition-all ${index === 0
                         ? 'bg-[#ffe44d] border-[#e6be00] text-[#8a7200]' // 1st (Solid Gold Base)
                         : index === 1
                           ? 'bg-[#e2e8f0] border-[#cbd5e1] text-[#475569]' // 2nd (Solid Silver/Slate)
@@ -504,10 +529,10 @@ const AdminDashboard = () => {
                     </div>
                     <div className="flex-1 min-w-0 flex items-center justify-between gap-4">
                       <div className="min-w-0">
-                        <p className="text-[15px] sm:text-base font-semibold text-[var(--color-text-primary)] truncate leading-tight">
+                        <p className="text-[15px] sm:text-base font-bold text-[var(--color-text-primary)] truncate leading-tight" title={event.title}>
                           {event.title}
                         </p>
-                        <div className="flex items-center gap-3 mt-1 text-[13px] sm:text-sm font-medium text-[var(--color-text-muted)]">
+                        <div className="flex items-center gap-3 mt-1 text-[13px] sm:text-sm font-semibold text-[var(--color-text-muted)]">
                           <div className="flex items-center gap-1.5">
                             <Users className="w-3.5 h-3.5" />
                             {event.attendanceCount} Attendees
@@ -534,22 +559,24 @@ const AdminDashboard = () => {
 
           {/* ── Recent Activity (Span 1) ── */}
           <div className="lg:col-span-1 flex flex-col h-full rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
-            <div className="flex items-center gap-2 mb-4">
-              <Activity className="w-5 h-5 text-primary" />
-              <h3 className="text-xl font-semibold">Recent Activity</h3>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 flex items-center justify-center shrink-0">
+                <Activity className="w-5 h-5 text-[var(--color-primary)]" />
+              </div>
+              <h3 className="text-xl font-bold tracking-tight text-foreground">Recent Activity</h3>
             </div>
 
             {analytics?.recentActivity && analytics.recentActivity.length > 0 ? (
-              <div className="space-y-2">
+              <div className="relative border-l border-[var(--color-border-light)] ml-2.5 pl-0 py-1 space-y-5">
                 {analytics.recentActivity.map((activity: any, index: number) => (
-                  <div
-                    key={index}
-                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-[var(--color-surface-hover)] transition-colors"
-                  >
-                    <div className="w-2 h-2 bg-[var(--color-info)] rounded-full mt-2 flex-shrink-0" />
-                    <div className="flex-1">
-                      <p className="text-[var(--color-text-primary)]">{activity.description}</p>
-                      <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                  <div key={index} className="relative pl-6 group">
+                    {/* Timeline Dot on the line */}
+                    <span className="absolute -left-[5px] top-2.5 w-2.5 h-2.5 rounded-full bg-[var(--color-primary)] ring-[4px] ring-[var(--color-card)] transition-transform group-hover:scale-125 duration-200" />
+                    <div className="p-3.5 rounded-xl border border-[var(--color-border-light)] bg-[var(--color-surface)]/30 hover:bg-[var(--color-surface)]/60 hover:border-[var(--color-primary)]/20 transition-all shadow-[0_2px_6px_rgba(15,23,42,0.03)] hover:shadow-[0_4px_10px_rgba(15,23,42,0.06)]">
+                      <p className="text-sm font-bold text-foreground leading-snug line-clamp-2" title={activity.description}>
+                        {activity.description}
+                      </p>
+                      <p className="text-xs text-[var(--color-text-muted)] font-semibold mt-1.5">
                         {formatDate(activity.timestamp)}
                       </p>
                     </div>

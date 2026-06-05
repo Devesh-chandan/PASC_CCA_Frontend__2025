@@ -21,6 +21,7 @@ export default function EventGalleryPage({
   const [gallery, setGallery] = useState<EventGallery[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
+  const [deleteImageId, setDeleteImageId] = useState<number | null>(null);
   const [selectedImage, setSelectedImage] = useState<EventGallery | null>(null);
   const [formData, setFormData] = useState<GalleryCreateInput>({
     eventId: 0,
@@ -74,14 +75,19 @@ export default function EventGalleryPage({
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this image?')) return;
-    
+  const handleDelete = (id: number) => {
+    setDeleteImageId(id);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteImageId === null) return;
     try {
-      await galleryAPI.delete(id);
+      await galleryAPI.delete(deleteImageId);
       fetchGallery(eventId);
     } catch (error) {
       console.error('Error deleting image:', error);
+    } finally {
+      setDeleteImageId(null);
     }
   };
 
@@ -97,36 +103,40 @@ export default function EventGalleryPage({
     <div className="min-h-screen p-6 bg-background">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <header className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
           <div className="flex flex-col gap-2">
             <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 self-start px-3 py-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => router.push('/admin/events')}
+              className="flex items-center gap-2 self-start px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--color-border-light)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-primary)]/30 transition-all shadow-sm active:scale-95"
             >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Events
+              <ArrowLeft className="w-4 h-4 text-[var(--color-primary)]" />
+              <span>Back to Events</span>
             </button>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                <ImageIcon className="w-8 h-8 text-primary" />
-                Event Gallery
-              </h1>
-              <p className="text-muted-foreground mt-1 text-base font-medium">
-                {eventTitle || 'Manage event photos and memories'}
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2">
+              <div className="flex items-start gap-4">
+                <div className="w-11 h-11 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-border-light)] flex items-center justify-center shrink-0 mt-0.5">
+                  <ImageIcon className="w-5 h-5 text-[var(--color-primary)]" />
+                </div>
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight">Event Gallery</h1>
+                  <p className="text-sm md:text-base text-[var(--color-text-muted)] mt-1">
+                    {eventTitle || 'Manage event photos and memories'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  resetForm();
+                  setShowDialog(true);
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap self-start sm:self-center"
+              >
+                <Plus className="w-4 h-4" />
+                Add Image
+              </button>
             </div>
           </div>
-          <Button
-            onClick={() => {
-              resetForm();
-              setShowDialog(true);
-            }}
-            className="px-6 py-6 rounded-2xl text-base font-semibold shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5 stroke-[2.5px]" />
-            Add Image
-          </Button>
-        </div>
+        </header>
 
         {/* Gallery Grid Section */}
         <div className="bg-[var(--color-card)] rounded-[2.5rem] border border-[var(--color-border)] p-6 sm:p-10 shadow-sm min-h-[500px]">
@@ -228,21 +238,21 @@ export default function EventGalleryPage({
 
       {/* Add Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-[2.5rem] border-[var(--color-border)] bg-[var(--color-card)] shadow-2xl">
-          <DialogHeader className="p-10 pb-0">
-            <DialogTitle className="text-3xl font-bold text-foreground flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-primary/10 shadow-inner">
-                <Plus className="w-8 h-8 text-primary" />
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-[2rem] border-[var(--color-border)] bg-[var(--color-card)] shadow-2xl">
+          <DialogHeader className="p-8 pb-0">
+            <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 shadow-inner">
+                <Plus className="w-6 h-6 text-[var(--color-primary)]" />
               </div>
               Add New Photo
             </DialogTitle>
           </DialogHeader>
           
-          <div className="p-10 space-y-8">
-            <div className="grid grid-cols-1 gap-8">
-              <div className="space-y-3">
-                <label className="text-sm font-black uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+          <div className="p-8 space-y-6">
+            <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)]" />
                   Image URL
                 </label>
                 <Input
@@ -250,35 +260,35 @@ export default function EventGalleryPage({
                   onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                   placeholder="https://images.unsplash.com/..."
                   type="url"
-                  className="h-14 rounded-2xl bg-muted/30 border-border/50 focus:ring-primary/20 text-lg"
+                  className="h-12 px-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-light)] focus-visible:border-[var(--color-primary)] focus-visible:ring-[var(--color-primary)]/10 text-sm font-semibold placeholder:font-medium text-foreground outline-none"
                 />
               </div>
 
-              <div className="space-y-3">
-                <label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground ml-1 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)]" />
                   Caption <span className="text-[10px] text-muted-foreground font-medium lowercase">(optional)</span>
                 </label>
                 <textarea
                   value={formData.caption}
                   onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
-                  className="w-full px-5 py-4 bg-muted/30 border border-border/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium text-lg leading-relaxed"
+                  className="w-full px-4 py-3 bg-[var(--color-surface)] border border-[var(--color-border-light)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 transition-all font-medium text-sm text-[var(--color-text-primary)] placeholder:font-medium outline-none"
                   rows={3}
                   placeholder="Describe this moment..."
                 />
               </div>
 
               {formData.imageUrl && (
-                <div className="space-y-3">
-                  <label className="text-sm font-black uppercase tracking-widest text-muted-foreground ml-1">Live Preview</label>
-                  <div className="relative rounded-[2rem] overflow-hidden border-2 border-dashed border-primary/20 p-2">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1">Live Preview</label>
+                  <div className="relative rounded-[1.5rem] overflow-hidden border-2 border-dashed border-[var(--color-border-light)] p-2">
                     <img
                       src={formData.imageUrl}
                       alt="Preview"
-                      className="w-full h-64 object-cover rounded-[1.5rem] shadow-lg"
+                      className="w-full h-64 object-cover rounded-[1rem] shadow-lg"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x600?text=Invalid+Image+URL+Provided';
-                        (e.target as HTMLImageElement).className = "w-full h-64 object-center rounded-[1.5rem] opacity-50 grayscale";
+                        (e.target as HTMLImageElement).className = "w-full h-64 object-center rounded-[1rem] opacity-50 grayscale";
                       }}
                     />
                     <div className="absolute inset-x-0 bottom-4 flex justify-center">
@@ -292,21 +302,21 @@ export default function EventGalleryPage({
             </div>
           </div>
 
-          <DialogFooter className="p-10 pt-0 flex gap-4">
+          <DialogFooter className="p-8 pt-0 flex gap-3">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => {
                 setShowDialog(false);
                 resetForm();
               }}
-              className="rounded-2xl px-10 h-14 font-bold"
+              className="rounded-xl px-8 h-12 border-[var(--color-border-light)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]"
             >
               Cancel
             </Button>
             <Button 
               onClick={handleSubmit} 
               disabled={!formData.imageUrl}
-              className="rounded-2xl px-10 h-14 shadow-xl hover:shadow-2xl transition-all active:scale-95 font-black bg-primary text-white"
+              className="rounded-xl px-8 h-12 bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 font-bold"
             >
               Upload to Gallery
             </Button>
@@ -347,6 +357,28 @@ export default function EventGalleryPage({
           </div>
         </div>
       )}
+      {/* Photo Delete Confirmation Dialog */}
+      <Dialog open={deleteImageId !== null} onOpenChange={(open) => { if (!open) setDeleteImageId(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete Photo?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">
+            Are you sure you want to delete this photo from the event gallery? This action cannot be undone.
+          </p>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteImageId(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              className="bg-red-600 hover:bg-red-700 text-white border-transparent"
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

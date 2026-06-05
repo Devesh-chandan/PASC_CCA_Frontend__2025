@@ -136,24 +136,24 @@ export default function AdminInvites() {
                   exit={{ opacity: 0, height: 0 }}
                   className="mt-8 space-y-6"
                 >
-                  <div className="flex items-center gap-3 text-green-600 dark:text-green-400 mb-4 font-bold text-lg">
+                  <div className="flex items-center gap-3 text-emerald-600 dark:text-emerald-400 mb-4 font-bold text-lg">
                     <CheckCircle2 size={24} />
                     Processing Complete
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-2xl bg-green-50/50 dark:bg-green-900/10 border border-green-200/50 dark:border-green-800/30">
-                      <h4 className="text-green-700 dark:text-green-400 font-bold mb-2 flex items-center gap-2">
+                    <div className="p-4 rounded-2xl bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20">
+                      <h4 className="text-emerald-600 dark:text-emerald-400 font-bold mb-2 flex items-center gap-2">
                         Sent Successfully ({results.sent.length})
                       </h4>
-                      <ul className="text-sm text-green-600 dark:text-green-400/80 space-y-1 max-h-[150px] overflow-y-auto no-scrollbar">
+                      <ul className="text-sm text-emerald-600 dark:text-emerald-400/80 space-y-1 max-h-[150px] overflow-y-auto no-scrollbar">
                         {results.sent.map((email) => <li key={email}>{email}</li>)}
                         {results.sent.length === 0 && <li className="italic opacity-50">None</li>}
                       </ul>
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-red-50/50 dark:bg-red-900/10 border border-red-200/50 dark:border-red-800/30">
-                      <h4 className="text-red-700 dark:text-red-400 font-bold mb-2 flex items-center gap-2">
+                    <div className="p-4 rounded-2xl bg-red-500/5 dark:bg-red-500/10 border border-red-500/20">
+                      <h4 className="text-red-600 dark:text-red-400 font-bold mb-2 flex items-center gap-2">
                         Failed to Send ({results.failed.length})
                       </h4>
                       <ul className="text-sm text-red-600 dark:text-red-400/80 space-y-1 max-h-[150px] overflow-y-auto no-scrollbar">

@@ -11,9 +11,19 @@ import { attendanceAPI, resourceAPI } from "@/lib/api";
 import { EventAttendanceSessionForUser, AttendanceSessionForUser } from "@/types/attendance";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { ReviewSection } from "@/components/events/ReviewSection";
-import { GallerySection } from "@/components/events/GallerySection";
+import dynamic from 'next/dynamic';
 import { useToast } from "@/components/ui/toast";
+
+const ReviewSection = dynamic(() => import("@/components/events/ReviewSection").then(m => m.ReviewSection), {
+  loading: () => <Skeleton className="h-64 w-full rounded-2xl" />,
+  ssr: false
+});
+
+const GallerySection = dynamic(() => import("@/components/events/GallerySection").then(m => m.GallerySection), {
+  loading: () => <Skeleton className="h-48 w-full rounded-2xl" />,
+  ssr: false
+});
+import { Skeleton } from "@/components/ui/skeleton";
 
 function formatDateToDDMMYY(dateString: string): string {
   if (!dateString) return "";
@@ -126,10 +136,105 @@ export default function EventDetailPage({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[var(--color-primary)] mx-auto"></div>
-          <p className="text-[var(--color-text-muted)] mt-4">Loading event details...</p>
+      <div className="max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
+        {/* Navigation Header Skeleton */}
+        <div className="flex items-center space-x-4 mb-6">
+          <Skeleton className="h-10 w-36 rounded-xl" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-pulse">
+          {/* Main Content Skeleton */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Event Title Card Skeleton */}
+            <Card className="border-none shadow-sm p-6 space-y-4">
+              <div className="flex items-start justify-between flex-wrap gap-4">
+                <Skeleton className="h-8 w-2/3 rounded-lg" />
+                <Skeleton className="h-6 w-20 rounded-full" />
+              </div>
+              <div className="space-y-2.5 pt-2">
+                <Skeleton className="h-4 w-full rounded" />
+                <Skeleton className="h-4 w-11/12 rounded" />
+                <Skeleton className="h-4 w-4/5 rounded" />
+              </div>
+            </Card>
+
+            {/* Prerequisites Skeleton */}
+            <Card className="border-none shadow-sm p-6 space-y-3">
+              <Skeleton className="h-6 w-32 rounded" />
+              <Skeleton className="h-4 w-full rounded" />
+            </Card>
+
+            {/* Sessions List Skeleton */}
+            <Card className="border-none shadow-sm p-6 space-y-4 bg-[var(--color-card)]">
+              <Skeleton className="h-6 w-24 rounded" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[1, 2].map((i) => (
+                  <div key={i} className="border border-[var(--color-border)] rounded-lg p-5 space-y-4 bg-[var(--color-surface)]">
+                    <div className="flex justify-between items-start">
+                      <Skeleton className="h-5 w-1/2 rounded" />
+                      <Skeleton className="h-5 w-14 rounded-full" />
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center">
+                        <Skeleton className="h-4 w-4 rounded-full mr-2 shrink-0" />
+                        <Skeleton className="h-4 w-32 rounded" />
+                      </div>
+                      <div className="flex items-center">
+                        <Skeleton className="h-4 w-4 rounded-full mr-2 shrink-0" />
+                        <Skeleton className="h-4 w-44 rounded" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+
+          {/* Sidebar Skeleton */}
+          <div className="space-y-6">
+            <Card className="border-none shadow-sm p-6 space-y-6">
+              <Skeleton className="h-6 w-32 rounded" />
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Skeleton className="w-9 h-9 rounded-lg shrink-0" />
+                  <div className="space-y-1.5 flex-1">
+                    <Skeleton className="h-4 w-16 rounded" />
+                    <Skeleton className="h-4.5 w-28 rounded" />
+                  </div>
+                </div>
+              ))}
+            </Card>
+          </div>
+        </div>
+
+        {/* Lower Grid Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch pt-8 animate-pulse">
+          <Card className="border-none shadow-sm p-6 space-y-4">
+            <Skeleton className="h-6 w-36 rounded" />
+            <div className="space-y-3">
+              {[1, 2].map((i) => (
+                <div key={i} className="flex items-center justify-between p-4 border border-[var(--color-border)] rounded-lg bg-[var(--color-surface)]">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="w-9 h-9 rounded-lg shrink-0" />
+                    <div className="space-y-1.5">
+                      <Skeleton className="h-4 w-28 rounded" />
+                      <Skeleton className="h-3.5 w-40 rounded" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-8 w-14 rounded-lg" />
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="border-none shadow-sm p-6 space-y-4">
+            <Skeleton className="h-6 w-36 rounded" />
+            <div className="grid grid-cols-3 gap-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Skeleton key={i} className="aspect-video w-full rounded-lg" />
+              ))}
+            </div>
+          </Card>
         </div>
       </div>
     );
@@ -156,10 +261,10 @@ export default function EventDetailPage({
       {/* Navigation Header */}
       <div className="flex items-center space-x-4 mb-6">
         <button
-          className="flex items-center text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] cursor-pointer transition-colors"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-[var(--color-border-light)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text-primary)] transition-all shadow-sm active:scale-95"
           onClick={() => router.push('/student/events')}
         >
-          <ArrowLeft className="w-5 h-5 mr-1" />
+          <ArrowLeft className="w-[18px] h-[18px] stroke-[2.5]" />
           <span>Back to Events</span>
         </button>
       </div>
@@ -210,7 +315,8 @@ export default function EventDetailPage({
             </CardHeader>
             <CardContent>
               {Array.isArray(event.session) && event.session.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                <div className="max-h-[380px] overflow-y-auto pr-1 custom-scrollbar">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
                   {event.session.map((session: any) => (
                     <div
                       key={session.id}
@@ -270,6 +376,7 @@ export default function EventDetailPage({
                       )}
                     </div>
                   ))}
+                  </div>
                 </div>
               ) : (
                 <div className="text-[var(--color-text-muted)] italic">No sessions available for this event.</div>
@@ -387,7 +494,8 @@ export default function EventDetailPage({
             </CardHeader>
             <CardContent>
               {resources.length > 0 ? (
-                <div className="grid grid-cols-1 gap-4">
+                <div className="max-h-[320px] overflow-y-auto pr-1 custom-scrollbar">
+                  <div className="grid grid-cols-1 gap-4">
                   {resources.map((resource: any) => {
                     const getIcon = (type: string) => {
                       switch (type) {
@@ -427,6 +535,7 @@ export default function EventDetailPage({
                       </div>
                     );
                   })}
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-8 bg-[var(--color-surface)] rounded-lg border border-dashed border-[var(--color-border)]">
