@@ -6,6 +6,8 @@ import { useState } from "react";
 import { eventAPI } from "@/lib/api";
 import { getStatusBadgeVariant, getStatusColor, formatDate } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 
 interface EventCardProps extends Event {
@@ -15,25 +17,35 @@ interface EventCardProps extends Event {
 export const EventCard = ({ onRefresh, ...event }: EventCardProps) => {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { success, error } = useToast();
 
   const getStatusBadge = (status: Event["status"]) => {
-    const variants: Record<string, string> = {
-      UPCOMING: "bg-orange-500/10 text-orange-600 dark:text-orange-500 border border-orange-500/20 font-semibold px-2.5 py-1 text-xs",
-      COMPLETED: "bg-[var(--color-surface)] text-[var(--color-text-secondary)] border border-[var(--color-border-light)] font-medium px-2.5 py-1 text-xs",
-      ONGOING: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-500 border border-emerald-500/30 font-bold px-2.5 py-1 text-xs shadow-[0_0_12px_rgba(16,185,129,0.2)]",
+    const statusConfig: Record<string, { bg: string; text: string; dot: string }> = {
+      UPCOMING: {
+        bg: 'bg-[var(--color-primary)]/10 dark:bg-[var(--color-primary)]/20',
+        text: 'text-[var(--color-primary)] font-bold',
+        dot: 'bg-[var(--color-primary)]',
+      },
+      ONGOING: {
+        bg: 'bg-emerald-100/80 dark:bg-emerald-500/20',
+        text: 'text-emerald-700 dark:text-emerald-400 font-bold',
+        dot: 'bg-emerald-500 dark:bg-emerald-400',
+      },
+      COMPLETED: {
+        bg: 'bg-[var(--color-surface)] dark:bg-[var(--color-surface-hover)]/60',
+        text: 'text-[var(--color-text-muted)] font-bold',
+        dot: 'bg-[var(--color-text-muted)]',
+      },
     };
+
+    const config = statusConfig[status] ?? statusConfig.UPCOMING;
+
     return (
-      <Badge className={variants[status] || "bg-[var(--color-surface)] text-[var(--color-text-primary)]"}>
-        {status === 'ONGOING' ? (
-          <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            {status}
-          </span>
-        ) : (
-          status
-        )}
-      </Badge>
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[var(--color-border-light)] shadow-sm text-xs ${config.bg} ${config.text}`}>
+        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${config.dot}`} />
+        {status}
+      </span>
     );
   };
 
@@ -67,11 +79,12 @@ export const EventCard = ({ onRefresh, ...event }: EventCardProps) => {
 
 
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this event? This action cannot be undone.")) {
-      return;
-    }
+  const handleDeleteClick = () => {
+    setShowDeleteDialog(true);
+  };
 
+  const handleDeleteConfirm = async () => {
+    setShowDeleteDialog(false);
     setIsDeleting(true);
     try {
       await eventAPI.delete(event.id);
@@ -92,7 +105,7 @@ export const EventCard = ({ onRefresh, ...event }: EventCardProps) => {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex-1 w-full lg:w-auto">
           <div className="flex items-center flex-wrap gap-2.5">
-            <h3 className="font-bold text-lg md:text-xl text-foreground leading-tight tracking-tight">
+            <h3 className="font-bold text-lg md:text-xl text-foreground leading-tight tracking-tight line-clamp-2" title={event.title}>
               {event.title}
             </h3>
             <div className="w-fit">{getStatusBadge(event.status)}</div>
@@ -108,7 +121,7 @@ export const EventCard = ({ onRefresh, ...event }: EventCardProps) => {
             
             <div className="flex items-center gap-1.5 text-sm md:text-[14.5px] text-muted-foreground">
               <MapPin className="w-4 h-4 text-[var(--color-primary)] stroke-[2.5]" />
-              <span className="font-medium text-[var(--color-text-secondary)]">
+              <span className="font-medium text-[var(--color-text-secondary)] inline-block truncate max-w-[150px] sm:max-w-[250px]" title={event.location}>
                 {event.location}
               </span>
             </div>
@@ -172,7 +185,7 @@ export const EventCard = ({ onRefresh, ...event }: EventCardProps) => {
             Attendance
           </button>
           <button
-            onClick={handleDelete}
+            onClick={handleDeleteClick}
             disabled={isDeleting}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-transparent text-red-500 text-sm font-medium hover:bg-red-500/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -181,6 +194,30 @@ export const EventCard = ({ onRefresh, ...event }: EventCardProps) => {
           </button>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete Event?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">
+            Are you sure you want to delete the event "{event.title}"? This action cannot be undone and will remove the event for all students.
+          </p>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} disabled={isDeleting}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white border-transparent"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

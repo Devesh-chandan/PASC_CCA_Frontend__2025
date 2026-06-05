@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Plus, Edit, Clock, MapPin, Award, Calendar } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Clock, MapPin, Award, Calendar, AlertCircle } from 'lucide-react';
 import { attendanceAPI, eventAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -216,45 +216,69 @@ export default function SessionManagementPage({
   };
 
   return (
-    <main className="min-h-screen bg-background p-4 md:p-6">
+    <main className="min-h-screen bg-[var(--color-background)] p-4 md:p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
+        <header className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border-light)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="flex flex-col gap-2">
             <button
-              onClick={() => router.back()}
-              className="flex items-center text-blue-600 hover:text-blue-800 mb-2"
+              onClick={() => router.push('/admin/events')}
+              className="flex items-center gap-2 self-start px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--color-border-light)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-primary)]/30 transition-all shadow-sm active:scale-95"
             >
-              <ArrowLeft className="w-5 h-5 mr-1" />
-              Back
+              <ArrowLeft className="w-4 h-4 text-[var(--color-primary)]" />
+              <span>Back to Events</span>
             </button>
-            <h1 className="text-3xl font-bold text-foreground">Session Management</h1>
-            <p className="text-muted-foreground mt-1">{eventTitle}</p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2">
+              <div className="flex items-start gap-4">
+                <div className="w-11 h-11 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-border-light)] flex items-center justify-center shrink-0 mt-0.5">
+                  <Clock className="w-5 h-5 text-[var(--color-primary)]" />
+                </div>
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight">Session Management</h1>
+                  <p className="text-sm md:text-base text-[var(--color-text-muted)] mt-1">{eventTitle}</p>
+                </div>
+              </div>
+              <Button
+                onClick={() => {
+                  resetForm();
+                  setShowDialog(true);
+                }}
+                className="flex items-center gap-2"
+                disabled={eventStatus === 'COMPLETED'}
+                title={eventStatus === 'COMPLETED' ? 'Cannot create sessions for a completed event' : undefined}
+              >
+                <Plus className="w-5 h-5" />
+                Create Session
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => {
-                resetForm();
-                setShowDialog(true);
-              }}
-              className="flex items-center gap-2"
-              disabled={eventStatus === 'COMPLETED'}
-              title={eventStatus === 'COMPLETED' ? 'Cannot create sessions for a completed event' : undefined}
-            >
-              <Plus className="w-5 h-5" />
-              Create Session
-            </Button>
-          </div>
-        </div>
+        </header>
 
         {eventStatus === 'COMPLETED' && (
-          <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
-            This event is <strong>completed</strong>. New sessions cannot be created.
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-sm transition-all duration-300">
+            {/* Soft decorative glow background */}
+            <div className="absolute right-0 top-0 -mr-6 -mt-6 w-32 h-32 rounded-full bg-[var(--color-text-secondary)]/5 blur-2xl pointer-events-none" />
+            
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border-light)] flex items-center justify-center shrink-0">
+                <AlertCircle className="w-5 h-5 text-[var(--color-text-secondary)] stroke-[2.5]" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="font-bold text-base text-[var(--color-text-primary)] leading-tight tracking-tight">
+                  Event Completed
+                </h4>
+                <p className="text-sm font-medium text-[var(--color-text-secondary)] leading-relaxed">
+                  This event is completed. New sessions cannot be created.
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
+
+
         {/* Sessions List */}
-        <div className="bg-card rounded-xl border border-border p-6">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border-light)] p-6 shadow-sm">
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3].map(i => (
@@ -262,9 +286,9 @@ export default function SessionManagementPage({
               ))}
             </div>
           ) : sessions.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="text-center py-12 text-[var(--color-text-muted)]">
               <Clock className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-lg mb-2">No sessions yet</p>
+              <p className="text-lg mb-2 font-bold">No sessions yet</p>
               <p className="text-sm">Create attendance sessions for this event</p>
             </div>
           ) : (
@@ -272,11 +296,11 @@ export default function SessionManagementPage({
               {sessions.map(session => (
                 <div
                   key={session.id}
-                  className="border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-primary/5 dark:hover:bg-primary/10 transition-all hover:shadow-md"
+                  className="p-5 bg-[var(--color-card)] border border-[var(--color-border-light)] rounded-2xl hover:border-primary/30 hover:bg-[var(--color-surface-hover)]/40 transition-[background-color,border-color,box-shadow] shadow-sm"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="font-semibold text-lg text-foreground">
+                      <h3 className="font-semibold text-lg text-[var(--color-text-primary)]">
                         {session.sessionName}
                       </h3>
                       <Badge variant={session.isActive ? "default" : "secondary"} className="mt-1">
@@ -286,7 +310,7 @@ export default function SessionManagementPage({
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleEdit(session)}
-                        className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                        className="p-2 hover:bg-[var(--color-surface)] rounded-lg transition-colors"
                         title="Edit session"
                       >
                         <Edit className="w-4 h-4 text-blue-600" />
@@ -305,21 +329,23 @@ export default function SessionManagementPage({
                   </div>
 
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground">
+                    <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
                       <MapPin className="w-4 h-4" />
                       <span>{session.location}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
+                    <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
                       <Calendar className="w-4 h-4" />
                       <span>{formatDateTime(session.startTime)}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
+                    <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
                       <Award className="w-4 h-4" />
                       <span>{session.credits} credits</span>
                     </div>
-                    <div className="mt-3 p-2 bg-accent rounded">
-                      <p className="text-xs text-muted-foreground">Attendance Code:</p>
-                      <p className="font-mono font-bold text-lg">{session.code}</p>
+                    <div className="mt-3 p-3 bg-[var(--color-surface)] border border-[var(--color-border-light)] rounded-xl flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] uppercase font-bold text-[var(--color-text-muted)] tracking-wider">Attendance Code</p>
+                        <p className="font-mono font-extrabold text-xl text-[var(--color-primary)] tracking-wider mt-0.5">{session.code}</p>
+                      </div>
                     </div>
                   </div>
                 </div>

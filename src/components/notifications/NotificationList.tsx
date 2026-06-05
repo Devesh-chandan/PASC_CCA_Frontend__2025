@@ -1,11 +1,81 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { notificationAPI } from '@/lib/api';
 import { Notification } from '@/types/notification';
 import { NotificationItem } from './NotificationItem';
-import { Bell, Eye, EyeOff } from 'lucide-react';
+import { Bell, Eye, EyeOff, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/lib/store';
+
+// ---------- Reusable Pagination bar ----------
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+
+  const getPageNumbers = () => {
+    const pages: (number | '...')[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push('...');
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (currentPage < totalPages - 2) pages.push('...');
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
+  return (
+    <div className='flex items-center justify-center gap-1.5 mt-8'>
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-sm font-medium border border-[var(--color-border-light)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        <ChevronLeft className='w-4 h-4' /> Prev
+      </button>
+
+      {getPageNumbers().map((page, idx) =>
+        page === '...' ? (
+          <span key={'dots-' + idx} className='px-2 py-2 text-[var(--color-text-muted)] text-sm select-none'>
+            …
+          </span>
+        ) : (
+          <button
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={
+              'w-10 h-10 rounded-xl text-sm font-medium transition-all border ' +
+              (currentPage === page
+                ? 'bg-[var(--color-button-primary)] text-white border-transparent shadow-sm'
+                : 'bg-[var(--color-card)] text-[var(--color-text-secondary)] border-[var(--color-border-light)] hover:bg-[var(--color-surface)]')
+            }
+          >
+            {page}
+          </button>
+        )
+      )}
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-sm font-medium border border-[var(--color-border-light)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        Next <ChevronRight className='w-4 h-4' />
+      </button>
+    </div>
+  );
+}
 
 export function NotificationList() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -14,14 +84,10 @@ export function NotificationList() {
     type ViewFilter = 'all' | 'unread' | 'event' | 'rsvp' | 'waitlist' | 'announcement';
     const [view, setView] = useState<ViewFilter>('all');
     const role = useAuthStore((state) => state.role);
+    const [currentPage, setCurrentPage] = useState(1);
+    const PAGE_SIZE = 10;
 
-    useEffect(() => {
-        if (role === 'student') {
-            fetchNotifications();
-        }
-    }, [role]);
-
-    const fetchNotifications = async () => {
+    const fetchNotifications = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -36,37 +102,46 @@ export function NotificationList() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const handleMarkAsRead = async (notificationId: number) => {
+    useEffect(() => {
+        if (role === 'student') {
+            fetchNotifications();
+        }
+    }, [role, fetchNotifications]);
+
+    const handleMarkAsRead = useCallback(async (notificationId: number) => {
         try {
             await notificationAPI.markAsRead(notificationId);
-            setNotifications(notifications.map(n =>
+            setNotifications(prev => prev.map(n =>
                 n.id === notificationId ? { ...n, read: true } : n
             ));
         } catch (error) {
             console.error('Error marking notification as read:', error);
         }
-    };
+    }, []);
 
-    const handleMarkAllAsRead = async () => {
+    const handleMarkAllAsRead = useCallback(async () => {
         try {
             await notificationAPI.markAllAsRead();
-            setNotifications(notifications.map(n => ({ ...n, read: true })));
+            setNotifications(prev => prev.map(n => ({ ...n, read: true })));
         } catch (error) {
             console.error('Error marking all as read:', error);
         }
-    };
+    }, []);
 
-    const unreadCount = notifications.filter((n) => !n.read).length;
-    const filteredNotifications = notifications.filter((n) => {
-        if (view === 'unread') return !n.read;
-        if (view === 'event') return n.type.startsWith('EVENT_');
-        if (view === 'rsvp') return n.type.startsWith('RSVP_');
-        if (view === 'waitlist') return n.type.startsWith('WAITLIST_');
-        if (view === 'announcement') return n.type === 'ANNOUNCEMENT';
-        return true;
-    });
+    const unreadCount = useMemo(() => notifications.filter((n) => !n.read).length, [notifications]);
+    
+    const filteredNotifications = useMemo(() => {
+        return notifications.filter((n) => {
+            if (view === 'unread') return !n.read;
+            if (view === 'event') return n.type.startsWith('EVENT_');
+            if (view === 'rsvp') return n.type.startsWith('RSVP_');
+            if (view === 'waitlist') return n.type.startsWith('WAITLIST_');
+            if (view === 'announcement') return n.type === 'ANNOUNCEMENT';
+            return true;
+        });
+    }, [notifications, view]);
 
     if (loading) {
         return (
@@ -114,6 +189,12 @@ export function NotificationList() {
         );
     }
 
+    const totalPages = Math.ceil(filteredNotifications.length / PAGE_SIZE);
+    const paginatedNotifications = filteredNotifications.slice(
+        (currentPage - 1) * PAGE_SIZE,
+        currentPage * PAGE_SIZE
+    );
+
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -132,7 +213,10 @@ export function NotificationList() {
                     {(['all', 'unread', 'event', 'rsvp', 'waitlist', 'announcement'] as const).map((filterView) => (
                         <button
                             key={filterView}
-                            onClick={() => setView(filterView)}
+                            onClick={() => {
+                                setView(filterView);
+                                setCurrentPage(1);
+                            }}
                             className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap ${
                                 view === filterView
                                     ? 'bg-[var(--color-button-primary)] text-white'
@@ -169,15 +253,22 @@ export function NotificationList() {
                     <p className="text-[var(--color-text-muted)] mt-1">Switch to All to review earlier updates.</p>
                 </div>
             ) : (
-                <div className="space-y-3">
-                    {filteredNotifications.map(notification => (
-                        <NotificationItem
-                            key={notification.id}
-                            notification={notification}
-                            onMarkAsRead={handleMarkAsRead}
-                        />
-                    ))}
-                </div>
+                <>
+                    <div className="space-y-3">
+                        {paginatedNotifications.map(notification => (
+                            <NotificationItem
+                                key={notification.id}
+                                notification={notification}
+                                onMarkAsRead={handleMarkAsRead}
+                            />
+                        ))}
+                    </div>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </>
             )}
         </div>
     );

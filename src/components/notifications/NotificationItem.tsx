@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, memo } from 'react';
 import { Notification, NotificationType } from '@/types/notification';
 import {
   Bell,
@@ -83,7 +84,8 @@ const notificationIcons: Record<NotificationType, React.ReactNode> = {
   ),
 };
 
-export function NotificationItem({ notification, onMarkAsRead, compact = false }: NotificationItemProps) {
+export const NotificationItem = memo(function NotificationItem({ notification, onMarkAsRead, compact = false }: NotificationItemProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const handleClick = () => {
     if (!notification.read) {
       onMarkAsRead(notification.id);
@@ -145,10 +147,21 @@ export function NotificationItem({ notification, onMarkAsRead, compact = false }
                 )}
               </div>
 
-              <div className="mt-3 bg-[var(--color-surface)]/70 border border-[var(--color-border-light)]/40 p-4 rounded-2xl rounded-tl-sm shadow-sm">
-                <p className={`text-sm md:text-[15px] ${!notification.read ? 'text-[var(--color-text-primary)] font-medium' : 'text-[var(--color-text-secondary)]'} whitespace-pre-wrap leading-[1.6]`}>
+              <div className="mt-3 bg-[var(--color-surface)]/70 border border-[var(--color-border-light)]/40 p-4 rounded-2xl rounded-tl-sm shadow-sm flex flex-col gap-2">
+                <p className={`text-sm md:text-[15px] ${!notification.read ? 'text-[var(--color-text-primary)] font-medium' : 'text-[var(--color-text-secondary)]'} whitespace-pre-wrap leading-[1.6] ${!isExpanded && (notification.message?.split(/\s+/).length > 80 || (notification.message?.length ?? 0) > 400) ? 'line-clamp-6' : ''}`}>
                   {notification.message}
                 </p>
+                {(notification.message?.split(/\s+/).length > 80 || (notification.message?.length ?? 0) > 400) && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsExpanded(!isExpanded);
+                    }}
+                    className="text-xs font-bold text-[var(--color-primary)] hover:underline self-start mt-1"
+                  >
+                    {isExpanded ? 'Show less' : 'Show more'}
+                  </button>
+                )}
               </div>
             </>
           )}
@@ -156,6 +169,6 @@ export function NotificationItem({ notification, onMarkAsRead, compact = false }
       </div>
     </div>
   );
-}
+});
 
 

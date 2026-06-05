@@ -181,7 +181,7 @@ const EditEventPage: React.FC = () => {
 
       console.log("✅ Event updated:", response.data);
       success('Changes Saved!', 'Event details have been updated successfully. Redirecting...');
-      setTimeout(() => router.push('/admin/dashboard'), 1500);
+      setTimeout(() => router.push('/admin/events'), 1500);
     } catch (err: any) {
       console.error('❌ Error updating event:', err);
       toastError('Update Failed', 'Unable to sync changes. Please verify your connection and try again.');
@@ -201,10 +201,10 @@ const EditEventPage: React.FC = () => {
                 <p className="text-lg font-semibold mb-2">Error Loading Event</p>
                 <p className="text-sm text-[var(--color-text-muted)]">{errorMessage}</p>
                 <button
-                  onClick={() => router.push('/admin/dashboard')}
+                  onClick={() => router.push('/admin/events')}
                   className="mt-4 bg-[var(--color-button-primary)] text-white px-6 py-2 rounded hover:bg-[var(--color-button-primary)]"
                 >
-                  Back to Dashboard
+                  Back to Events
                 </button>
               </div>
             ) : (
@@ -220,30 +220,34 @@ const EditEventPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen p-6 bg-background">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <main className="min-h-screen bg-[var(--color-background)] p-4 sm:p-6 md:p-8 lg:p-10">
+      <div className="max-w-7xl mx-auto space-y-8 md:space-y-10">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[var(--color-card)] p-8 rounded-[2.5rem] border border-[var(--color-border)] shadow-sm">
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[var(--color-card)] p-5 sm:p-7 rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] shadow-sm hover:shadow-md transition-shadow duration-300">
+          <div className="flex flex-col gap-3">
             <button
-              onClick={() => router.push('/admin/dashboard')}
-              className="flex items-center gap-2 self-start px-3 py-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => router.push('/admin/events')}
+              className="flex items-center gap-2 self-start px-4 py-2 rounded-xl text-sm font-semibold border border-[var(--color-border-light)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-primary)]/30 transition-all shadow-sm active:scale-95"
             >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Dashboard
+              <ArrowLeft className="w-4 h-4 text-[var(--color-primary)]" />
+              <span>Back to Events</span>
             </button>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                <Settings className="w-8 h-8 text-primary" />
-                Edit Event Configuration
-              </h1>
-              <p className="text-muted-foreground mt-1 font-medium">
-                Refine the details and manage student engagement for this event.
-              </p>
+            <div className="flex items-start gap-4 sm:gap-5 mt-1">
+              <div className="w-12 h-12 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-border-light)] flex items-center justify-center shrink-0">
+                <Settings className="w-6 h-6 text-[var(--color-primary)]" />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)] tracking-tight leading-tight">
+                  Edit Event Configuration
+                </h1>
+                <p className="text-[13px] sm:text-sm text-[var(--color-text-muted)] font-medium mt-1 leading-relaxed max-w-2xl">
+                  Refine the details and manage student engagement for this event.
+                </p>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="px-5 py-3 rounded-2xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="px-4 py-2 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-border-light)] flex items-center gap-2.5">
               <Calendar className="w-5 h-5 text-primary" />
               <div className="flex flex-col">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-primary/60 leading-tight">Organizer</span>
@@ -253,249 +257,207 @@ const EditEventPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="space-y-8 md:space-y-10">
           {/* Main Configuration Form */}
-          <div className="lg:col-span-8 space-y-8">
-            <div className="bg-[var(--color-card)] rounded-[2.5rem] border border-[var(--color-border)] p-8 sm:p-10 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32" />
+          <div className="bg-[var(--color-card)] rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] p-6 sm:p-8 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32" />
 
-              <h2 className="text-2xl font-bold text-foreground mb-8 flex items-center gap-3 relative z-10">
-                <FileText className="w-6 h-6 text-primary" />
+            <div className="flex items-center gap-2.5 mb-6 relative z-10">
+              <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20">
+                <FileText className="w-5 h-5 text-[var(--color-primary)]" />
+              </span>
+              <h3 className="text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
                 Core Information
-                <span className="ml-auto px-4 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold uppercase tracking-wider border border-emerald-500/20">
-                  Live Sync Active
-                </span>
-              </h2>
+              </h3>
+              <span className="ml-auto px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-sm">
+                Live Sync Active
+              </span>
+            </div>
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSubmit();
-                }}
-                className="space-y-8 relative z-10"
-              >
-                <div className="space-y-3">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Event Title</label>
-                  <input
-                    name="title"
-                    value={formData.title}
-                    onChange={handleInputChange}
-                    placeholder="Enter a compelling title..."
-                    className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all text-lg font-semibold placeholder:font-medium"
-                    required
-                  />
-                </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }}
+              className="space-y-6 relative z-10"
+            >
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Event Title</label>
+                <input
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  placeholder="Enter a compelling title..."
+                  className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all text-base font-semibold placeholder:font-medium text-foreground outline-none"
+                  required
+                />
+              </div>
 
-                <div className="space-y-3">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Description & Context</label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    placeholder="Write a detailed description of what students can expect..."
-                    className="w-full p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all text-base font-medium leading-relaxed"
-                    rows={6}
-                    required
-                  />
-                </div>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Description & Context</label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  placeholder="Write a detailed description of what students can expect..."
+                  className="w-full p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all text-base font-medium leading-relaxed text-foreground resize-y outline-none"
+                  rows={6}
+                  required
+                />
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Timeline Start</label>
-                    <div className="relative">
-                      <input
-                        type="date"
-                        name="startDate"
-                        value={formData.startDate}
-                        onChange={handleInputChange}
-                        className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
-                        required
-                      />
-                      <Calendar className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Timeline End</label>
-                    <div className="relative">
-                      <input
-                        type="date"
-                        name="endDate"
-                        value={formData.endDate}
-                        onChange={handleInputChange}
-                        className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
-                        required
-                      />
-                      <Calendar className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Event Venue / Digital Link</label>
-                  <input
-                    name="location"
-                    value={formData.location}
-                    onChange={handleInputChange}
-                    placeholder="Physical room or meeting URL"
-                    className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3 text-sm">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Credit Reward</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Timeline Start</label>
+                  <div className="relative">
                     <input
-                      type="number"
-                      name="credits"
-                      value={formData.credits}
+                      type="date"
+                      name="startDate"
+                      value={formData.startDate}
                       onChange={handleInputChange}
-                      placeholder="e.g., 5"
-                      className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
+                      className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold text-foreground text-sm outline-none"
                       required
                     />
+                    <Calendar className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Student Capacity</label>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Timeline End</label>
+                  <div className="relative">
                     <input
-                      type="number"
-                      name="capacity"
-                      value={formData.capacity}
+                      type="date"
+                      name="endDate"
+                      value={formData.endDate}
                       onChange={handleInputChange}
-                      placeholder="e.g., 100"
-                      className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold"
+                      className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold text-foreground text-sm outline-none"
                       required
                     />
+                    <Calendar className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                   </div>
                 </div>
+              </div>
 
-                <div className="space-y-3">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Required Prerequisites</label>
-                  <textarea
-                    name="prerequisite"
-                    value={formData.prerequisite}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Event Venue / Digital Link</label>
+                <input
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                  placeholder="Physical room or meeting URL"
+                  className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold text-foreground text-sm outline-none"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2 text-sm">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Credit Reward</label>
+                  <input
+                    type="number"
+                    name="credits"
+                    value={formData.credits}
                     onChange={handleInputChange}
-                    placeholder="List any software, knowledge, or tools required..."
-                    className="w-full p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all text-base font-medium"
-                    rows={3}
+                    placeholder="e.g., 5"
+                    className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold text-foreground text-sm outline-none"
+                    required
                   />
                 </div>
-
-                {formData.startDate && formData.endDate && (
-                  <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20">
-                    <Clock className="w-5 h-5 text-blue-600" />
-                    <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                      Computed Schedule: <span className="font-bold underline underline-offset-4">{calculateNumDays(formData.startDate, formData.endDate)} session days</span> planned.
-                    </p>
-                  </div>
-                )}
-
-                <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-[var(--color-border)]/50">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex-1 bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] h-14 rounded-2xl disabled:opacity-50 flex items-center justify-center gap-3 transition-all active:scale-95 font-bold text-lg shadow-sm"
-                  >
-                    {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <CheckCircle className="w-6 h-6" />}
-                    {isSubmitting ? 'Pushing Updates...' : 'Publish Modifications'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => router.push('/admin/dashboard')}
-                    className="px-10 h-14 rounded-2xl border border-[var(--color-border)] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-all active:scale-95 bg-transparent"
-                  >
-                    Discard Changes
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            {/* Attendance Section */}
-            <div className="bg-[var(--color-card)] rounded-[2.5rem] border border-[var(--color-border)] p-8 sm:p-10 shadow-sm relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-1 bg-[var(--color-primary)] h-full opacity-50 group-hover:opacity-100 transition-opacity" />
-              <SessionManager eventId={Number(eventId)} eventStartDate={formData.startDate} eventEndDate={formData.endDate} />
-            </div>
-          </div>
-
-          {/* Management Sidebar */}
-          <div className="lg:col-span-4 space-y-8">
-            <Tabs defaultValue="attendees" className="w-full">
-              <div className="bg-[var(--color-card)] p-3 rounded-[2rem] border border-[var(--color-border)] shadow-sm mb-6">
-                <TabsList className="grid w-full grid-cols-3 bg-muted/30 rounded-2xl p-1 gap-1 h-auto">
-                  <TabsTrigger value="attendees" className="rounded-xl py-3 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:text-primary transition-all duration-300">
-                    <Users className="w-4 h-4 mb-1 md:mb-0 md:mr-2" />
-                    <span className="text-[10px] md:text-xs font-semibold uppercase tracking-tight">RSVPs</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="resources" className="rounded-xl py-3 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:text-primary transition-all duration-300">
-                    <FileText className="w-4 h-4 mb-1 md:mb-0 md:mr-2" />
-                    <span className="text-[10px] md:text-xs font-semibold uppercase tracking-tight">Files</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="gallery" className="rounded-xl py-3 data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:text-primary transition-all duration-300">
-                    <ImageIcon className="w-4 h-4 mb-1 md:mb-0 md:mr-2" />
-                    <span className="text-[10px] md:text-xs font-semibold uppercase tracking-tight">Gallery</span>
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-
-              <div className="bg-[var(--color-card)] rounded-[2.5rem] border border-[var(--color-border)] p-2 shadow-sm min-h-[600px] overflow-hidden">
-                <div className="h-full overflow-y-auto custom-scrollbar p-6">
-                  <TabsContent value="attendees" className="mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
-                    <div className="flex items-center gap-2 mb-6 px-2">
-                      <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                        <Users className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Registration Hub</h3>
-                    </div>
-                    <AttendeeList eventId={Number(eventId)} />
-                  </TabsContent>
-
-                  <TabsContent value="resources" className="mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
-                    <div className="flex items-center gap-2 mb-6 px-2">
-                      <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                        <FileText className="w-4 h-4 text-emerald-600" />
-                      </div>
-                      <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Asset Repository</h3>
-                    </div>
-                    <ResourceManager eventId={Number(eventId)} />
-                  </TabsContent>
-
-                  <TabsContent value="gallery" className="mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
-                    <div className="flex items-center gap-2 mb-6 px-2">
-                      <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                        <ImageIcon className="w-4 h-4 text-amber-600" />
-                      </div>
-                      <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Visual Archive</h3>
-                    </div>
-                    <GalleryManager eventId={Number(eventId)} />
-                  </TabsContent>
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Student Capacity</label>
+                  <input
+                    type="number"
+                    name="capacity"
+                    value={formData.capacity}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 100"
+                    className="w-full h-14 px-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all font-semibold text-foreground text-sm outline-none"
+                    required
+                  />
                 </div>
               </div>
-            </Tabs>
 
-            {/* Action Quick Links */}
-            <div className="bg-[var(--color-card)] rounded-[2.5rem] border border-[var(--color-border)] p-8 shadow-sm space-y-4">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Advanced Controls</h3>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground ml-1">Required Prerequisites</label>
+                <textarea
+                  name="prerequisite"
+                  value={formData.prerequisite}
+                  onChange={handleInputChange}
+                  placeholder="List any software, knowledge, or tools required..."
+                  className="w-full p-5 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] focus:ring-4 focus:ring-[var(--color-primary)]/10 focus:border-[var(--color-primary)] transition-all text-base font-medium text-foreground resize-y outline-none"
+                  rows={3}
+                />
+              </div>
+
+              {formData.startDate && formData.endDate && (
+                <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-[var(--color-info)]/5 dark:bg-[var(--color-info)]/10 border border-[var(--color-info)]/20 text-[var(--color-info)]">
+                  <Clock className="w-5 h-5 text-[var(--color-info)]" />
+                  <p className="text-[13px] font-semibold">
+                    Computed Schedule: <span className="font-bold underline underline-offset-4">{calculateNumDays(formData.startDate, formData.endDate)} session days</span> planned.
+                  </p>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-[var(--color-border-light)]">
                 <button
-                  onClick={() => router.push(`/admin/events/${eventId}/analytics`)}
-                  className="w-full p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border-light)] hover:bg-[var(--color-primary)]/10 text-[var(--color-text-primary)] hover:border-[var(--color-primary)]/20 hover:text-[var(--color-primary)] transition-all flex items-center justify-between group"
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] h-14 rounded-2xl disabled:opacity-50 flex items-center justify-center gap-3 transition-all active:scale-95 font-bold text-base shadow-sm"
                 >
-                  <span className="font-bold">Real-time Analytics</span>
-                  <ArrowLeft className="w-4 h-4 rotate-180 group-hover:translate-x-1 transition-transform" />
+                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
+                  {isSubmitting ? 'Pushing Updates...' : 'Publish Modifications'}
                 </button>
                 <button
-                  className="w-full p-4 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border-light)] hover:bg-red-500/10 text-red-600 dark:text-red-400 hover:border-red-500/20 transition-all flex items-center justify-between group"
-                  onClick={() => warning('Access Restricted', 'Permanent deletion requires higher clearance.')}
+                  type="button"
+                  onClick={() => router.push('/admin/events')}
+                  className="px-10 h-14 rounded-2xl border border-[var(--color-border)] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] transition-all active:scale-95 bg-transparent"
                 >
-                  <span className="font-bold">Archive This Event</span>
-                  <Trash2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  Discard Changes
                 </button>
               </div>
-            </div>
+            </form>
           </div>
+
+          {/* Registration Details Section */}
+          <div className="bg-[var(--color-card)] rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] p-6 sm:p-8 shadow-sm relative overflow-hidden">
+            <AttendeeList eventId={Number(eventId)} />
+          </div>
+
+          {/* Tabs Section */}
+          <Tabs defaultValue="sessions" className="w-full">
+            <div className="bg-[var(--color-card)] p-2.5 rounded-2xl border border-[var(--color-border)] shadow-sm mb-6">
+              <TabsList className="grid w-full grid-cols-3 bg-muted/30 rounded-xl p-1 gap-1 h-auto">
+                <TabsTrigger value="sessions" className="rounded-lg py-2.5 flex flex-col md:flex-row items-center justify-center text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] data-[state=active]:!bg-[var(--color-button-primary)] data-[state=active]:!text-white data-[state=active]:shadow-sm transition-all duration-200">
+                  <Clock className="w-4 h-4 mb-1 md:mb-0 md:mr-2" />
+                  <span className="text-[10px] md:text-xs font-semibold uppercase tracking-tight">Sessions</span>
+                </TabsTrigger>
+                <TabsTrigger value="resources" className="rounded-lg py-2.5 flex flex-col md:flex-row items-center justify-center text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] data-[state=active]:!bg-[var(--color-button-primary)] data-[state=active]:!text-white data-[state=active]:shadow-sm transition-all duration-200">
+                  <FileText className="w-4 h-4 mb-1 md:mb-0 md:mr-2" />
+                  <span className="text-[10px] md:text-xs font-semibold uppercase tracking-tight">Files</span>
+                </TabsTrigger>
+                <TabsTrigger value="gallery" className="rounded-lg py-2.5 flex flex-col md:flex-row items-center justify-center text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-[var(--color-text-primary)] data-[state=active]:!bg-[var(--color-button-primary)] data-[state=active]:!text-white data-[state=active]:shadow-sm transition-all duration-200">
+                  <ImageIcon className="w-4 h-4 mb-1 md:mb-0 md:mr-2" />
+                  <span className="text-[10px] md:text-xs font-semibold uppercase tracking-tight">Gallery</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <div className="bg-[var(--color-card)] rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] p-6 sm:p-8 shadow-sm">
+              <TabsContent value="sessions" className="mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
+                <SessionManager eventId={Number(eventId)} eventStartDate={formData.startDate} eventEndDate={formData.endDate} />
+              </TabsContent>
+
+              <TabsContent value="resources" className="mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
+                <ResourceManager eventId={Number(eventId)} />
+              </TabsContent>
+
+              <TabsContent value="gallery" className="mt-0 animate-in fade-in slide-in-from-right-4 duration-500">
+                <GalleryManager eventId={Number(eventId)} />
+              </TabsContent>
+            </div>
+          </Tabs>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

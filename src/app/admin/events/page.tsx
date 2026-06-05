@@ -14,7 +14,7 @@ const AdminEventsPage = () => {
     const router = useRouter();
 
     // Search is sent to backend — filtering happens in the database, not the browser
-    const { events, loading, error } = useFetchEventsForAdmin(searchQuery);
+    const { events, loading, error, refetchEvents } = useFetchEventsForAdmin(searchQuery);
 
     if (loading) {
         return (
@@ -116,7 +116,7 @@ const AdminEventsPage = () => {
                     <div className="mt-0">
                         {["ALL EVENTS", "ONGOING", "UPCOMING", "COMPLETED"].map((status) => (
                             activeTab === status && (
-                                <EventsList key={status} events={events} filterStatus={status as EventStatus} />
+                                <EventsList key={status} events={events} filterStatus={status as EventStatus} onRefresh={refetchEvents} />
                             )
                         ))}
                     </div>

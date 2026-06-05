@@ -5,7 +5,77 @@ import { announcementAPI } from '@/lib/api';
 import { Notification } from '@/types/notification';
 import { NotificationItem } from './NotificationItem';
 import { Skeleton } from '../ui/skeleton';
-import { Bell } from 'lucide-react';
+import { Bell, ChevronLeft, ChevronRight } from 'lucide-react';
+
+// ---------- Reusable Pagination bar ----------
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+
+  const getPageNumbers = () => {
+    const pages: (number | '...')[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push('...');
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (currentPage < totalPages - 2) pages.push('...');
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
+  return (
+    <div className='flex items-center justify-center gap-1.5 mt-8'>
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-sm font-medium border border-[var(--color-border-light)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        <ChevronLeft className='w-4 h-4' /> Prev
+      </button>
+
+      {getPageNumbers().map((page, idx) =>
+        page === '...' ? (
+          <span key={'dots-' + idx} className='px-2 py-2 text-[var(--color-text-muted)] text-sm select-none'>
+            …
+          </span>
+        ) : (
+          <button
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={
+              'w-10 h-10 rounded-xl text-sm font-medium transition-all border ' +
+              (currentPage === page
+                ? 'bg-[var(--color-button-primary)] text-white border-transparent shadow-sm'
+                : 'bg-[var(--color-card)] text-[var(--color-text-secondary)] border-[var(--color-border-light)] hover:bg-[var(--color-surface)]')
+            }
+          >
+            {page}
+          </button>
+        )
+      )}
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-sm font-medium border border-[var(--color-border-light)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        Next <ChevronRight className='w-4 h-4' />
+      </button>
+    </div>
+  );
+}
 
 /**
  * AdminNotificationList — mirrors NotificationList for students but
@@ -15,6 +85,8 @@ export function AdminNotificationList() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const PAGE_SIZE = 10;
 
     useEffect(() => {
         fetchNotifications();
@@ -80,7 +152,7 @@ export function AdminNotificationList() {
 
     if (error) {
         return (
-            <div className='text-center py-12 bg-card rounded-lg border border-border'>
+            <div className='text-center py-12 bg-[var(--color-card)] rounded-xl border border-[var(--color-border)]'>
                 <p className='text-red-500 mb-4'>{error}</p>
                 <button onClick={fetchNotifications} className='text-[var(--color-primary)] hover:underline font-medium'>
                     Try again
@@ -91,7 +163,7 @@ export function AdminNotificationList() {
 
     if (notifications.length === 0) {
         return (
-            <div className='text-center py-12 bg-card rounded-lg border border-border'>
+            <div className='text-center py-12 bg-[var(--color-card)] rounded-xl border border-[var(--color-border)]'>
                 <Bell className='w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50' />
                 <h3 className='text-lg font-medium'>No announcements</h3>
                 <p className='text-muted-foreground'>No announcements have been sent yet.</p>
@@ -100,6 +172,11 @@ export function AdminNotificationList() {
     }
 
     const hasUnread = notifications.some((n) => !n.read);
+    const totalPages = Math.ceil(notifications.length / PAGE_SIZE);
+    const paginatedNotifications = notifications.slice(
+        (currentPage - 1) * PAGE_SIZE,
+        currentPage * PAGE_SIZE
+    );
 
     return (
         <div className='space-y-4'>
@@ -114,7 +191,7 @@ export function AdminNotificationList() {
                 </div>
             )}
             <div className='space-y-3'>
-                {notifications.map((notification) => (
+                {paginatedNotifications.map((notification) => (
                     <NotificationItem
                         key={notification.id}
                         notification={notification}
@@ -122,6 +199,11 @@ export function AdminNotificationList() {
                     />
                 ))}
             </div>
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
         </div>
     );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Megaphone, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Megaphone, AlertCircle, AlertTriangle, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 import { announcementAPI } from '@/lib/api';
 import { Announcement, AnnouncementPriority, AnnouncementCreateInput } from '@/types/announcement';
 import { Button } from '@/components/ui/button';
@@ -14,9 +14,170 @@ import { useToast } from '@/components/ui/toast';
 const departments = ['CE', 'IT', 'ENTC', 'ECE', 'AIDS'];
 const years = [1, 2];
 
+// ---------- Reusable Pagination bar ----------
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+
+  const getPageNumbers = () => {
+    const pages: (number | '...')[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push('...');
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (currentPage < totalPages - 2) pages.push('...');
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
+  return (
+    <div className='flex items-center justify-center gap-1.5 mt-8'>
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-sm font-medium border border-[var(--color-border-light)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        <ChevronLeft className='w-4 h-4' /> Prev
+      </button>
+
+      {getPageNumbers().map((page, idx) =>
+        page === '...' ? (
+          <span key={'dots-' + idx} className='px-2 py-2 text-[var(--color-text-muted)] text-sm select-none'>
+            …
+          </span>
+        ) : (
+          <button
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={
+              'w-10 h-10 rounded-xl text-sm font-medium transition-all border ' +
+              (currentPage === page
+                ? 'bg-[var(--color-button-primary)] text-white border-transparent shadow-sm'
+                : 'bg-[var(--color-card)] text-[var(--color-text-secondary)] border-[var(--color-border-light)] hover:bg-[var(--color-surface)]')
+            }
+          >
+            {page}
+          </button>
+        )
+      )}
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="flex items-center gap-1 px-3.5 py-2 rounded-xl text-sm font-medium border border-[var(--color-border-light)] bg-[var(--color-card)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        Next <ChevronRight className='w-4 h-4' />
+      </button>
+    </div>
+  );
+}
+
+function AnnouncementCard({
+  announcement,
+  onEdit,
+  onDelete,
+  getPriorityIcon,
+  getPriorityColor
+}: {
+  announcement: Announcement;
+  onEdit: (a: Announcement) => void;
+  onDelete: (id: number) => void;
+  getPriorityIcon: (priority: AnnouncementPriority) => React.ReactNode;
+  getPriorityColor: (priority: AnnouncementPriority) => string;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const message = announcement.message || '';
+  const isLong = message.split(/\s+/).length > 60 || message.length > 300;
+
+  return (
+    <div className="transition-[background-color,box-shadow,border-color] p-4 md:p-5 rounded-2xl border border-[var(--color-border-light)] bg-[var(--color-card)] hover:bg-[var(--color-surface-hover)]/40 shadow-[0_2px_8px_rgba(15,23,42,0.04)] hover:shadow-[0_6px_16px_rgba(15,23,42,0.08)]">
+      <div className="flex items-start justify-between gap-3 md:gap-4">
+        <div className="flex-shrink-0 mt-1">
+          {getPriorityIcon(announcement.priority)}
+        </div>
+        <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex items-center gap-2 mb-1.5">
+            <h4 className="text-[11px] md:text-xs font-semibold uppercase tracking-wider text-[var(--color-primary)]">
+              {announcement.priority} PRIORITY
+            </h4>
+          </div>
+          <h3 className={`text-[15px] md:text-base font-semibold leading-snug text-[var(--color-text-primary)]`}>
+            {announcement.title}
+          </h3>
+          <div className="flex items-center gap-2 mt-1 mb-3">
+            <p className="text-[11px] text-[var(--color-text-muted)] font-medium tracking-wide">
+              {new Date(announcement.createdAt).toLocaleDateString('en-US', { weekday: 'long', hour: 'numeric', minute: 'numeric' })}
+            </p>
+          </div>
+
+          <div className="bg-[var(--color-surface)]/70 border border-[var(--color-border-light)]/40 p-4 rounded-2xl rounded-tl-sm shadow-sm flex flex-col gap-3">
+            <p className={`text-sm md:text-[15px] whitespace-pre-wrap leading-[1.6] text-[var(--color-text-secondary)] ${!isExpanded && isLong ? 'line-clamp-4' : ''}`}>
+              {announcement.message}
+            </p>
+            {isLong && (
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="text-xs font-bold text-[var(--color-primary)] hover:underline self-start mt-1"
+              >
+                {isExpanded ? 'Show less' : 'Read more'}
+              </button>
+            )}
+
+            <div className="flex flex-wrap items-center gap-4 text-[11px] text-[var(--color-text-muted)]/80 pt-3 border-t border-[var(--color-border-light)]/80 font-semibold uppercase tracking-wider">
+              {announcement.expiresAt && (
+                <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3" /> Expires: {formatDateTime(announcement.expiresAt)}</span>
+              )}
+              {announcement.targetAudience && (
+                <>
+                  {announcement.targetAudience.departments && Array.isArray(announcement.targetAudience.departments) && announcement.targetAudience.departments.length > 0 && (
+                    <span>Depts: {announcement.targetAudience.departments.join(', ')}</span>
+                  )}
+                  {announcement.targetAudience.years && Array.isArray(announcement.targetAudience.years) && announcement.targetAudience.years.length > 0 && (
+                    <span>Years: {announcement.targetAudience.years.join(', ')}</span>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
+        </div>
+
+        <div className="flex gap-2 flex-shrink-0 mt-1">
+          <button
+            onClick={() => onEdit(announcement)}
+            className="p-2 hover:bg-[var(--color-surface-hover)] rounded-xl transition-colors"
+          >
+            <Edit className="w-4 h-4 text-[var(--color-primary)]" />
+          </button>
+          <button
+            onClick={() => onDelete(announcement.id)}
+            className="p-2 hover:bg-red-500/10 rounded-xl transition-colors"
+          >
+            <Trash2 className="w-4 h-4 text-red-500" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminAnnouncementsPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
   const [showDialog, setShowDialog] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +211,7 @@ export default function AdminAnnouncementsPage() {
       const response = await announcementAPI.getAllAdmin({ limit: 50 });
       if (response.data?.success && response.data.data) {
         setAnnouncements(response.data.data as Announcement[]);
+        setCurrentPage(1);
       }
     } catch (error: any) {
       console.error('Error fetching announcements:', error);
@@ -180,12 +342,47 @@ export default function AdminAnnouncementsPage() {
 
   const getPriorityColor = (priority: AnnouncementPriority) => {
     switch (priority) {
-      case 'LOW': return 'bg-[var(--color-surface)] text-[var(--color-text-primary)]';
-      case 'NORMAL': return 'bg-[var(--color-surface-hover)] text-[var(--color-primary)]';
-      case 'HIGH': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-      case 'URGENT': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'LOW': return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20';
+      case 'NORMAL': return 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20';
+      case 'HIGH': return 'bg-[var(--color-warning)]/10 text-[var(--color-warning)] border border-[var(--color-warning)]/20';
+      case 'URGENT': return 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20';
     }
   };
+
+  const getPriorityIcon = (priority: AnnouncementPriority) => {
+    switch (priority) {
+      case 'LOW':
+        return (
+          <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
+            <Info className="w-5 h-5 text-blue-500" />
+          </div>
+        );
+      case 'NORMAL':
+        return (
+          <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center shrink-0">
+            <Megaphone className="w-5 h-5 text-green-500" />
+          </div>
+        );
+      case 'HIGH':
+        return (
+          <div className="w-10 h-10 rounded-xl bg-[var(--color-warning)]/10 flex items-center justify-center shrink-0">
+            <AlertTriangle className="w-5 h-5 text-[var(--color-warning)]" />
+          </div>
+        );
+      case 'URGENT':
+        return (
+          <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0">
+            <AlertCircle className="w-5 h-5 text-red-500" />
+          </div>
+        );
+    }
+  };
+
+  const totalPages = Math.ceil(announcements.length / PAGE_SIZE);
+  const paginatedAnnouncements = announcements.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
   return (
     <main className="min-h-screen bg-background p-4 md:p-6">
@@ -239,73 +436,21 @@ export default function AdminAnnouncementsPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {announcements.map(announcement => (
-                <div
+              {paginatedAnnouncements.map(announcement => (
+                <AnnouncementCard
                   key={announcement.id}
-                  className="transition-[background-color,box-shadow,border-color] p-4 md:p-5 rounded-2xl border border-[var(--color-border-light)] bg-[var(--color-card)] hover:bg-[var(--color-surface-hover)]/40 shadow-[0_2px_8px_rgba(15,23,42,0.04)] hover:shadow-[0_6px_16px_rgba(15,23,42,0.08)]"
-                >
-                  <div className="flex items-start justify-between gap-3 md:gap-4">
-                    <div className="flex-shrink-0 mt-1">
-                      <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
-                        <Megaphone className="w-5 h-5 text-orange-500" />
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0 flex flex-col">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <h4 className="text-[11px] md:text-xs font-semibold uppercase tracking-wider text-[var(--color-primary)]">
-                          {announcement.priority} PRIORITY
-                        </h4>
-                      </div>
-                      <h3 className={`text-[15px] md:text-base font-semibold leading-snug text-[var(--color-text-primary)]`}>
-                        {announcement.title}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-1 mb-3">
-                        <p className="text-[11px] text-[var(--color-text-muted)] font-medium tracking-wide">
-                          {new Date(announcement.createdAt).toLocaleDateString('en-US', { weekday: 'long', hour: 'numeric', minute: 'numeric' })}
-                        </p>
-                      </div>
-
-                      <div className="bg-[var(--color-surface)]/70 border border-[var(--color-border-light)]/40 p-4 rounded-2xl rounded-tl-sm shadow-sm flex flex-col gap-3">
-                        <p className={`text-sm md:text-[15px] whitespace-pre-wrap leading-[1.6] text-[var(--color-text-secondary)]`}>
-                          {announcement.message}
-                        </p>
-
-                        <div className="flex flex-wrap items-center gap-4 text-[11px] text-[var(--color-text-muted)]/80 pt-3 border-t border-[var(--color-border-light)]/80 font-semibold uppercase tracking-wider">
-                          {announcement.expiresAt && (
-                            <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3" /> Expires: {formatDateTime(announcement.expiresAt)}</span>
-                          )}
-                          {announcement.targetAudience && (
-                            <>
-                              {announcement.targetAudience.departments && Array.isArray(announcement.targetAudience.departments) && announcement.targetAudience.departments.length > 0 && (
-                                <span>Depts: {announcement.targetAudience.departments.join(', ')}</span>
-                              )}
-                              {announcement.targetAudience.years && Array.isArray(announcement.targetAudience.years) && announcement.targetAudience.years.length > 0 && (
-                                <span>Years: {announcement.targetAudience.years.join(', ')}</span>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                    </div>
-
-                    <div className="flex gap-2 flex-shrink-0 mt-1">
-                      <button
-                        onClick={() => handleEdit(announcement)}
-                        className="p-2 hover:bg-[var(--color-surface-hover)] rounded-xl transition-colors"
-                      >
-                        <Edit className="w-4 h-4 text-[var(--color-primary)]" />
-                      </button>
-                      <button
-                        onClick={() => setDeleteTargetId(announcement.id)}
-                        className="p-2 hover:bg-red-500/10 rounded-xl transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  announcement={announcement}
+                  onEdit={handleEdit}
+                  onDelete={setDeleteTargetId}
+                  getPriorityIcon={getPriorityIcon}
+                  getPriorityColor={getPriorityColor}
+                />
               ))}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
             </div>
           )}
         </div>
@@ -313,52 +458,59 @@ export default function AdminAnnouncementsPage() {
 
       {/* Add/Edit Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
+        <DialogContent 
+          className="max-w-md p-0 overflow-hidden rounded-2xl border-[var(--color-border)] bg-[var(--color-card)] shadow-2xl max-h-[90vh] flex flex-col"
+          style={{ display: 'flex', flexDirection: 'column' }}
+        >
+          <DialogHeader className="p-4 pb-0 flex-shrink-0">
+            <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 shadow-inner">
+                {editingAnnouncement ? <Edit className="w-5 h-5 text-[var(--color-primary)]" /> : <Plus className="w-5 h-5 text-[var(--color-primary)]" />}
+              </div>
               {editingAnnouncement ? 'Edit Announcement' : 'New Announcement'}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Title</label>
+          <div className="p-4 space-y-2.5 overflow-y-auto flex-1 min-h-0">
+            <div className="space-y-1">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1">Title</label>
               <Input
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="Announcement title"
+                className="h-10 px-3 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border-light)] focus-visible:border-[var(--color-primary)] focus-visible:ring-[var(--color-primary)]/10 text-sm font-semibold placeholder:font-medium text-foreground outline-none"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Message</label>
+            <div className="space-y-1">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1">Message</label>
               <textarea
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full px-3 py-2.5 border border-[var(--color-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-input-focus)] bg-[var(--color-card)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] resize-none text-sm transition-shadow"
-                rows={5}
+                className="w-full px-3 py-2 bg-[var(--color-surface)] border border-[var(--color-border-light)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 transition-all font-medium text-sm text-[var(--color-text-primary)] placeholder:font-medium outline-none resize-none"
+                rows={3}
                 placeholder="Announcement message"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Priority</label>
+            <div className="space-y-1">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1">Priority</label>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { value: 'LOW', label: 'Low', color: 'bg-[var(--color-surface)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)] border-[var(--color-border)]' },
-                  { value: 'NORMAL', label: 'Normal', color: 'bg-transparent text-[var(--color-primary)] hover:bg-[var(--color-surface)] border-[var(--color-border)]' },
-                  { value: 'HIGH', label: 'High', color: 'bg-orange-100 text-orange-800 hover:bg-orange-200 border-orange-200' },
-                  { value: 'URGENT', label: 'Urgent', color: 'bg-red-100 text-red-800 hover:bg-red-200 border-red-200' }
+                  { value: 'LOW', label: 'Low', color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20' },
+                  { value: 'NORMAL', label: 'Normal', color: 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20' },
+                  { value: 'HIGH', label: 'High', color: 'bg-[var(--color-warning)]/10 text-[var(--color-warning)] border-[var(--color-warning)]/20' },
+                  { value: 'URGENT', label: 'Urgent', color: 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20' }
                 ].map((priority) => (
                   <button
                     key={priority.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, priority: priority.value as AnnouncementPriority })}
                     className={cn(
-                      "px-3 py-1.5 rounded-lg text-sm font-medium border transition-all",
+                      "h-8 rounded-lg px-3.5 text-xs font-bold border transition-all active:scale-95",
                       formData.priority === priority.value
                         ? `${priority.color} ring-2 ring-offset-1 ring-current border-transparent`
-                        : "bg-transparent border-[var(--color-border)] text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]"
+                        : "bg-transparent border-[var(--color-border-light)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]"
                     )}
                   >
                     {priority.label}
@@ -367,8 +519,8 @@ export default function AdminAnnouncementsPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Target Departments (optional)</label>
+            <div className="space-y-1">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1">Target Departments (optional)</label>
               <div className="flex flex-wrap gap-2">
                 {departments.map(dept => (
                   <Button
@@ -376,7 +528,12 @@ export default function AdminAnnouncementsPage() {
                     type="button"
                     variant={formData.targetAudience?.departments?.includes(dept) ? "default" : "outline"}
                     onClick={() => toggleDepartment(dept)}
-                    className="h-8 text-sm"
+                    className={cn(
+                      "h-8 rounded-lg px-3.5 text-xs font-bold active:scale-95 transition-all",
+                      formData.targetAudience?.departments?.includes(dept)
+                        ? "bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] border-transparent"
+                        : "border-[var(--color-border-light)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]"
+                    )}
                   >
                     {dept}
                   </Button>
@@ -384,8 +541,8 @@ export default function AdminAnnouncementsPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Target Years (optional)</label>
+            <div className="space-y-1">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1">Target Years (optional)</label>
               <div className="flex gap-2">
                 {years.map(year => (
                   <Button
@@ -393,7 +550,12 @@ export default function AdminAnnouncementsPage() {
                     type="button"
                     variant={formData.targetAudience?.years?.includes(year) ? "default" : "outline"}
                     onClick={() => toggleYear(year)}
-                    className="h-8 text-sm"
+                    className={cn(
+                      "h-8 rounded-lg px-3.5 text-xs font-bold active:scale-95 transition-all",
+                      formData.targetAudience?.years?.includes(year)
+                        ? "bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] border-transparent"
+                        : "border-[var(--color-border-light)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]"
+                    )}
                   >
                     Year {year}
                   </Button>
@@ -401,8 +563,8 @@ export default function AdminAnnouncementsPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Expires At (optional)</label>
+            <div className="space-y-1">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)] ml-1">Expires At (optional)</label>
               <Input
                 type="datetime-local"
                 value={formData.expiresAt instanceof Date
@@ -410,6 +572,7 @@ export default function AdminAnnouncementsPage() {
                   : (formData.expiresAt || '')
                 }
                 onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
+                className="h-10 px-3 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border-light)] focus-visible:border-[var(--color-primary)] focus-visible:ring-[var(--color-primary)]/10 text-sm font-semibold text-[var(--color-text-primary)] outline-none"
               />
             </div>
 
@@ -422,7 +585,7 @@ export default function AdminAnnouncementsPage() {
             )}
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="p-4 pt-0 flex gap-2.5 flex-shrink-0">
             <Button
               variant="outline"
               onClick={() => {
@@ -431,10 +594,15 @@ export default function AdminAnnouncementsPage() {
                 setSubmitError(null);
               }}
               disabled={submitting}
+              className="rounded-lg px-5 h-10 text-sm border-[var(--color-border-light)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)]"
             >
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={submitting || !formData.title || !formData.message}>
+            <Button 
+              onClick={handleSubmit} 
+              disabled={submitting || !formData.title || !formData.message}
+              className="rounded-lg px-5 h-10 text-sm bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 font-bold"
+            >
               {submitting ? 'Saving...' : editingAnnouncement ? 'Update' : 'Create'} Announcement
             </Button>
           </DialogFooter>

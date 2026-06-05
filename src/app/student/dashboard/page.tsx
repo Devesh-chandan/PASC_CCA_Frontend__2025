@@ -543,7 +543,7 @@ export default function StudentDashboard() {
                         {/* Performer details with enhanced visual metrics */}
                         <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:gap-4">
                           <div className="min-w-0">
-                            <p className="text-[15px] sm:text-base font-semibold text-foreground truncate leading-tight">
+                            <p className="text-[15px] sm:text-base font-semibold text-foreground truncate leading-tight" title={entry.userName || 'Anonymous'}>
                               {entry.userName || 'Anonymous'}
                             </p>
                             <p className="text-[13px] sm:text-sm text-muted-foreground font-medium mt-1 leading-tight">
@@ -798,89 +798,91 @@ export default function StudentDashboard() {
         {/* ═══════════════ ACHIEVEMENTS TAB ═══════════════ */}
         {activeTab === 'achievements' && (
           <div className="space-y-6">
-            {/* Personal Best */}
-            {(attendanceData?.userPersonalBest?.credits ?? 0) > 0 ? (
-              <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm">
-                <div className="mb-6 flex items-center gap-2">
-                  <Trophy className="w-6 h-6 text-orange-500" />
-                  <h3 className="text-xl font-bold text-[var(--color-text-primary)]">Personal Best Session</h3>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-[var(--color-text-muted)] mb-2">Highest credits earned in a single session</p>
-                    <p className="text-4xl font-bold text-[var(--color-text-primary)] mb-2">
-                      {attendanceData?.userPersonalBest?.credits} credits
-                    </p>
-                    <p className="text-sm text-[var(--color-text-secondary)]">
-                      From: {attendanceData?.sessions?.find((s: any) => s.id === attendanceData?.userPersonalBest?.sessionId)?.sessionName || 'Unknown Session'}
-                    </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Personal Best */}
+              {(attendanceData?.userPersonalBest?.credits ?? 0) > 0 ? (
+                <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-orange-500" />
+                    <h3 className="text-lg font-bold text-[var(--color-text-primary)]">Personal Best Session</h3>
                   </div>
-                  <Award className="w-20 h-20 text-orange-500 opacity-30" />
+                  <div className="flex items-center justify-between flex-1">
+                    <div>
+                      <p className="text-xs text-[var(--color-text-muted)] mb-1">Highest credits earned in a single session</p>
+                      <p className="text-3xl font-extrabold text-[var(--color-text-primary)] mb-1">
+                        {attendanceData?.userPersonalBest?.credits} credits
+                      </p>
+                      <p className="text-xs text-[var(--color-text-secondary)] font-medium">
+                        From: {attendanceData?.sessions?.find((s: any) => s.id === attendanceData?.userPersonalBest?.sessionId)?.sessionName || 'Unknown Session'}
+                      </p>
+                    </div>
+                    <Award className="w-16 h-16 text-orange-500 opacity-20 shrink-0 ml-4" />
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm text-center py-12">
-                <Trophy className="w-16 h-16 text-[var(--color-text-secondary)] mx-auto mb-4 opacity-50" />
-                <p className="text-[var(--color-text-muted)] font-medium">No achievements yet</p>
-                <p className="text-sm text-[var(--color-text-muted)] mt-2">Attend sessions to unlock achievements!</p>
-              </div>
-            )}
+              ) : (
+                <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-6 shadow-sm text-center py-8 flex flex-col items-center justify-center">
+                  <Trophy className="w-12 h-12 text-[var(--color-text-secondary)] mx-auto mb-3 opacity-50" />
+                  <p className="text-sm text-[var(--color-text-muted)] font-semibold">No achievements yet</p>
+                  <p className="text-xs text-[var(--color-text-muted)] mt-1">Attend sessions to unlock achievements!</p>
+                </div>
+              )}
 
-            {/* Badges Showcase (LeetCode Style) */}
-            <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-7 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-primary)]/5 rounded-full blur-3xl -mr-32 -mt-32" />
-              <div className="mb-6 relative z-10">
-                <h3 className="text-xl font-bold text-[var(--color-text-primary)] flex items-center justify-between">
-                  <span>Earned Badges</span>
-                  <span className="text-2xl font-bold">{
-                    [
-                      (attendanceData?.sessionsAttended ?? 0) >= 1,
-                      (attendanceData?.totalCredits ?? 0) >= 5,
-                      (attendanceData?.sessionsAttended ?? 0) >= 10,
-                      (attendanceData?.totalCredits ?? 0) >= 25,
-                      (attendanceData?.totalCredits ?? 0) >= 50
-                    ].filter(Boolean).length
-                  }</span>
-                </h3>
-                <p className="text-sm text-[var(--color-text-muted)] mt-1">Your most recently unlocked achievements</p>
-              </div>
-              <div className="relative z-10">
-                <div className="flex flex-wrap gap-4 items-center min-h-[100px]">
-                  {(() => {
-                    const allBadges = [
-                      { title: "First Steps", icon: "/first-steps.png", unlocked: (attendanceData?.sessionsAttended ?? 0) >= 1 },
-                      { title: "Getting Started", icon: "/getting-started.png", unlocked: (attendanceData?.totalCredits ?? 0) >= 5 },
-                      { title: "Dedicated Learner", icon: "/dedicated-learner.png", unlocked: (attendanceData?.sessionsAttended ?? 0) >= 10 },
-                      { title: "Credit Collector", icon: "/credit-collector.png", unlocked: (attendanceData?.totalCredits ?? 0) >= 25 },
-                      { title: "Credit Master", icon: "/credit-master.png", unlocked: (attendanceData?.totalCredits ?? 0) >= 50 },
-                    ];
-                    const unlocked = allBadges.filter(b => b.unlocked).reverse();
+              {/* Badges Showcase (LeetCode Style) */}
+              <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-6 shadow-sm relative overflow-hidden flex flex-col justify-between">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-[var(--color-primary)]/5 rounded-full blur-2xl -mr-24 -mt-24 pointer-events-none" />
+                <div className="mb-4 relative z-10">
+                  <h3 className="text-lg font-bold text-[var(--color-text-primary)] flex items-center justify-between">
+                    <span>Earned Badges</span>
+                    <span className="text-xl font-extrabold text-[var(--color-primary)]">{
+                      [
+                        (attendanceData?.sessionsAttended ?? 0) >= 1,
+                        (attendanceData?.totalCredits ?? 0) >= 5,
+                        (attendanceData?.sessionsAttended ?? 0) >= 10,
+                        (attendanceData?.totalCredits ?? 0) >= 25,
+                        (attendanceData?.totalCredits ?? 0) >= 50
+                      ].filter(Boolean).length
+                    }</span>
+                  </h3>
+                  <p className="text-xs text-[var(--color-text-muted)] mt-1">Your most recently unlocked achievements</p>
+                </div>
+                <div className="relative z-10 flex-1 flex items-center">
+                  <div className="flex flex-wrap gap-3.5 items-center w-full min-h-[80px]">
+                    {(() => {
+                      const allBadges = [
+                        { title: "First Steps", icon: "/first-steps.png", unlocked: (attendanceData?.sessionsAttended ?? 0) >= 1 },
+                        { title: "Getting Started", icon: "/getting-started.png", unlocked: (attendanceData?.totalCredits ?? 0) >= 5 },
+                        { title: "Dedicated Learner", icon: "/dedicated-learner.png", unlocked: (attendanceData?.sessionsAttended ?? 0) >= 10 },
+                        { title: "Credit Collector", icon: "/credit-collector.png", unlocked: (attendanceData?.totalCredits ?? 0) >= 25 },
+                        { title: "Credit Master", icon: "/credit-master.png", unlocked: (attendanceData?.totalCredits ?? 0) >= 50 },
+                      ];
+                      const unlocked = allBadges.filter(b => b.unlocked).reverse();
 
-                    if (unlocked.length === 0) {
-                      return (
-                        <div className="w-full py-6 flex flex-col items-center justify-center text-[var(--color-text-muted)]">
-                          <Star className="w-8 h-8 opacity-20 mb-2" />
-                          <p className="text-sm">No badges earned yet</p>
+                      if (unlocked.length === 0) {
+                        return (
+                          <div className="w-full py-4 flex flex-col items-center justify-center text-[var(--color-text-muted)]">
+                            <Star className="w-6 h-6 opacity-20 mb-1" />
+                            <p className="text-xs">No badges earned yet</p>
+                          </div>
+                        );
+                      }
+
+                      return unlocked.map((badge, idx) => (
+                        <div key={idx} className="flex flex-col items-center gap-1.5 group cursor-pointer">
+                          <div className="w-[60px] h-[60px] md:w-[68px] md:h-[68px] relative transition-transform group-hover:scale-110 drop-shadow-md">
+                            <img
+                              src={badge.icon}
+                              alt={badge.title}
+                              className="w-full h-full object-contain"
+                            />
+                            {idx === 0 && (
+                              <span className="absolute -top-1.5 -right-1.5 bg-yellow-500 text-white text-[8px] font-extrabold px-1 py-0.5 rounded shadow-sm border border-yellow-400">NEW</span>
+                            )}
+                          </div>
+                          <span className="text-[10px] font-semibold text-[var(--color-text-secondary)] text-center max-w-[72px] truncate">{badge.title}</span>
                         </div>
-                      );
-                    }
-
-                    return unlocked.map((badge, idx) => (
-                      <div key={idx} className="flex flex-col items-center gap-2 group cursor-pointer">
-                        <div className="w-[80px] h-[80px] md:w-[90px] md:h-[90px] relative transition-transform group-hover:scale-110 drop-shadow-md">
-                          <img
-                            src={badge.icon}
-                            alt={badge.title}
-                            className="w-full h-full object-contain"
-                          />
-                          {idx === 0 && (
-                            <span className="absolute -top-2 -right-2 bg-yellow-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md shadow-sm border border-yellow-400">NEW</span>
-                          )}
-                        </div>
-                        <span className="text-[11px] font-semibold text-[var(--color-text-secondary)] text-center max-w-[90px] truncate">{badge.title}</span>
-                      </div>
-                    ));
-                  })()}
+                      ));
+                    })()}
+                  </div>
                 </div>
               </div>
             </div>
