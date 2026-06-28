@@ -36,6 +36,7 @@ export default function SessionManagementPage({
   const [eventStartDate, setEventStartDate] = useState<string>(''); // ISO string
   const [eventEndDate, setEventEndDate] = useState<string>('');   // ISO string
   const [eventStatus, setEventStatus] = useState<string>('');
+  const [isEventDeleted, setIsEventDeleted] = useState(false);
   const [sessions, setSessions] = useState<AttendanceSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
@@ -73,6 +74,7 @@ export default function SessionManagementPage({
           setEventStartDate(toLocalInput(event.startDate));
           setEventEndDate(toLocalInput(event.endDate));
           setEventStatus(event.status ?? '');
+          setIsEventDeleted(event.isDeleted ?? false);
         }
       } catch (error) {
         console.error('Error fetching event:', error);
@@ -238,23 +240,25 @@ export default function SessionManagementPage({
                   <p className="text-sm md:text-base text-[var(--color-text-muted)] mt-1">{eventTitle}</p>
                 </div>
               </div>
-              <Button
-                onClick={() => {
-                  resetForm();
-                  setShowDialog(true);
-                }}
-                className="flex items-center gap-2"
-                disabled={eventStatus === 'COMPLETED'}
-                title={eventStatus === 'COMPLETED' ? 'Cannot create sessions for a completed event' : undefined}
-              >
-                <Plus className="w-5 h-5" />
-                Create Session
-              </Button>
+              {!isEventDeleted && (
+                <Button
+                  onClick={() => {
+                    resetForm();
+                    setShowDialog(true);
+                  }}
+                  className="flex items-center gap-2"
+                  disabled={eventStatus === 'COMPLETED'}
+                  title={eventStatus === 'COMPLETED' ? 'Cannot create sessions for a completed event' : undefined}
+                >
+                  <Plus className="w-5 h-5" />
+                  Create Session
+                </Button>
+              )}
             </div>
           </div>
         </header>
 
-        {eventStatus === 'COMPLETED' && (
+        {!isEventDeleted && eventStatus === 'COMPLETED' && (
           <div className="relative overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-sm transition-all duration-300">
             {/* Soft decorative glow background */}
             <div className="absolute right-0 top-0 -mr-6 -mt-6 w-32 h-32 rounded-full bg-[var(--color-text-secondary)]/5 blur-2xl pointer-events-none" />
@@ -275,6 +279,24 @@ export default function SessionManagementPage({
           </div>
         )}
 
+        {isEventDeleted && (
+          <div className="relative overflow-hidden rounded-2xl border border-red-200/60 dark:border-red-900/40 bg-red-50/40 dark:bg-red-950/10 p-5 shadow-sm transition-all duration-300">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/40 border border-red-200 dark:border-red-800 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 stroke-[2.5]" />
+              </div>
+              <div className="space-y-1">
+                <h4 className="font-bold text-base text-red-700 dark:text-red-400 leading-tight tracking-tight">
+                  Deleted Event
+                </h4>
+                <p className="text-sm font-medium text-red-600/80 dark:text-red-400/80 leading-relaxed">
+                  This event has been deleted. You can only view its past sessions.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
 
 
         {/* Sessions List */}
@@ -289,7 +311,11 @@ export default function SessionManagementPage({
             <div className="text-center py-12 text-[var(--color-text-muted)]">
               <Clock className="w-16 h-16 mx-auto mb-4 opacity-50" />
               <p className="text-lg mb-2 font-bold">No sessions yet</p>
-              <p className="text-sm">Create attendance sessions for this event</p>
+              <p className="text-sm">
+                {isEventDeleted 
+                  ? "No historical sessions exist for this event." 
+                  : "Create attendance sessions for this event."}
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -307,25 +333,27 @@ export default function SessionManagementPage({
                         {session.isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(session)}
-                        className="p-2 hover:bg-[var(--color-surface)] rounded-lg transition-colors"
-                        title="Edit session"
-                      >
-                        <Edit className="w-4 h-4 text-blue-600" />
-                      </button>
-                      <button
-                        onClick={() => handleDeactivate(session)}
-                        className={`p-2 rounded-lg transition-colors ${session.isActive
-                          ? 'hover:bg-red-100 dark:hover:bg-red-900/20'
-                          : 'hover:bg-green-100 dark:hover:bg-green-900/20'
-                          }`}
-                        title={session.isActive ? 'Deactivate session' : 'Activate session'}
-                      >
-                        <Clock className={`w-4 h-4 ${session.isActive ? 'text-red-600' : 'text-green-600'}`} />
-                      </button>
-                    </div>
+                    {!isEventDeleted && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(session)}
+                          className="p-2 hover:bg-[var(--color-surface)] rounded-lg transition-colors"
+                          title="Edit session"
+                        >
+                          <Edit className="w-4 h-4 text-blue-600" />
+                        </button>
+                        <button
+                          onClick={() => handleDeactivate(session)}
+                          className={`p-2 rounded-lg transition-colors ${session.isActive
+                            ? 'hover:bg-red-100 dark:hover:bg-red-900/20'
+                            : 'hover:bg-green-100 dark:hover:bg-green-900/20'
+                            }`}
+                          title={session.isActive ? 'Deactivate session' : 'Activate session'}
+                        >
+                          <Clock className={`w-4 h-4 ${session.isActive ? 'text-red-600' : 'text-green-600'}`} />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2 text-sm">

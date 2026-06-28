@@ -4,20 +4,21 @@ import { eventAPI, attendanceAPI } from "@/lib/api";
 import { useAuthStore } from "@/lib/store";
 
 
-export function useFetchEventsForAdmin(search?: string) {
+export function useFetchEventsForAdmin(search?: string, showDeleted = false) {
     const [fetchedEvents, setFetchedEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [totalCount, setTotalCount] = useState(0);
 
-    const fetchEvents = useCallback(async (searchQuery?: string) => {
+    const fetchEvents = useCallback(async (searchQuery?: string, deletedOnly = false) => {
         setLoading(true);
         setError(null);
         try {
             // Use admin events endpoint — supports backend search
             const res = await eventAPI.getAdminEvents({
                 search: searchQuery || undefined,
-                limit: 1000
+                limit: 1000,
+                showDeleted: deletedOnly
             });
 
             // Backend returns: { success, data: { events: [...], pagination: { total, page, limit, pages } } }
@@ -39,15 +40,22 @@ export function useFetchEventsForAdmin(search?: string) {
         }
     }, []);
 
+    // When showDeleted changes (tab switch), clear events immediately so stale
+    // events from the previous tab don't flash before the new fetch completes.
+    useEffect(() => {
+        setFetchedEvents([]);
+        setLoading(true);
+    }, [showDeleted]);
+
     // Debounce search: wait 400 ms after the last keystroke before hitting the backend
     useEffect(() => {
         const timer = setTimeout(() => {
-            fetchEvents(search);
+            fetchEvents(search, showDeleted);
         }, 400);
         return () => clearTimeout(timer);
-    }, [search, fetchEvents]);
+    }, [search, showDeleted, fetchEvents]);
 
-    return { events: fetchedEvents, loading, error, totalCount, refetchEvents: () => fetchEvents(search) };
+    return { events: fetchedEvents, loading, error, totalCount, refetchEvents: () => fetchEvents(search, showDeleted) };
 }
 
 export function useFetchEventsForStudentRsvp() {

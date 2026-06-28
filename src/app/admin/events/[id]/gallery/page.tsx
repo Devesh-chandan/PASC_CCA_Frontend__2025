@@ -22,6 +22,7 @@ export default function EventGalleryPage({
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [deleteImageId, setDeleteImageId] = useState<number | null>(null);
+  const [isEventDeleted, setIsEventDeleted] = useState(false);
   const [selectedImage, setSelectedImage] = useState<EventGallery | null>(null);
   const [formData, setFormData] = useState<GalleryCreateInput>({
     eventId: 0,
@@ -41,6 +42,7 @@ export default function EventGalleryPage({
         if (eventResponse.data?.success && eventResponse.data.data) {
           const event = eventResponse.data.data as any;
           setEventTitle(event.title);
+          setIsEventDeleted(event.isDeleted ?? false);
         }
       } catch (error) {
         console.error('Error fetching event:', error);
@@ -124,16 +126,18 @@ export default function EventGalleryPage({
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => {
-                  resetForm();
-                  setShowDialog(true);
-                }}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap self-start sm:self-center"
-              >
-                <Plus className="w-4 h-4" />
-                Add Image
-              </button>
+              {!isEventDeleted && (
+                <button
+                  onClick={() => {
+                    resetForm();
+                    setShowDialog(true);
+                  }}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap self-start sm:self-center"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Image
+                </button>
+              )}
             </div>
           </div>
         </header>
@@ -167,13 +171,15 @@ export default function EventGalleryPage({
               <p className="max-w-xs text-center mt-3 font-medium text-base">
                 Your event gallery is empty. Start adding some photos to document the event.
               </p>
-              <Button
-                variant="outline"
-                onClick={() => setShowDialog(true)}
-                className="mt-10 rounded-2xl px-8 h-12 border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors font-bold"
-              >
-                Upload First Photo
-              </Button>
+              {!isEventDeleted && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDialog(true)}
+                  className="mt-10 rounded-2xl px-8 h-12 border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors font-bold"
+                >
+                  Upload First Photo
+                </Button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -203,16 +209,18 @@ export default function EventGalleryPage({
                         >
                           <Maximize2 className="w-5 h-5" />
                         </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(image.id);
-                          }}
-                          className="p-3 bg-red-500/80 backdrop-blur-md rounded-2xl text-white hover:bg-red-600 transition-colors"
-                          title="Delete Photo"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                        {!isEventDeleted && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(image.id);
+                            }}
+                            className="p-3 bg-red-500/80 backdrop-blur-md rounded-2xl text-white hover:bg-red-600 transition-colors"
+                            title="Delete Photo"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        )}
                       </div>
                       
                       {image.caption && (
