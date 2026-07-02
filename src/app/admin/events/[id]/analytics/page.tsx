@@ -663,7 +663,7 @@ export default function EventAnalyticsPage({
                     </Badge>
                     
                     <div className="flex gap-2">
-                      {rsvp.status === 'WAITLISTED' && (
+                      {!event?.isDeleted && rsvp.status === 'WAITLISTED' && (
                         <>
                           <button
                             onClick={() => handleApproveRsvp(rsvp.id)}
@@ -679,7 +679,7 @@ export default function EventAnalyticsPage({
                           </button>
                         </>
                       )}
-                      {(rsvp.status === 'CONFIRMED' || rsvp.status === 'ATTENDING') && (
+                      {!event?.isDeleted && (rsvp.status === 'CONFIRMED' || rsvp.status === 'ATTENDING') && (
                         <button
                           onClick={() => handleRejectRsvp(rsvp.id)}
                           className="text-xs font-bold px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 transition-all shadow-sm active:scale-95"

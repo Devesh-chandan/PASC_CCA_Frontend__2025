@@ -91,10 +91,15 @@ export const EventsList = ({ events, filterStatus, onRefresh }: EventsListProps)
   }, [filterStatus]);
 
   const safeEvents = Array.isArray(events) ? events : [];
-  let filteredEvents =
-    filterStatus !== 'ALL EVENTS'
-      ? safeEvents.filter((event) => event.status === filterStatus)
-      : safeEvents;
+  let filteredEvents = safeEvents;
+  if (filterStatus === 'DELETED') {
+    filteredEvents = safeEvents.filter((event) => event.isDeleted === true);
+  } else if (filterStatus !== 'ALL EVENTS') {
+    filteredEvents = safeEvents.filter((event) => event.status === filterStatus && !event.isDeleted);
+  } else {
+    // ALL EVENTS
+    filteredEvents = safeEvents.filter((event) => !event.isDeleted);
+  }
 
   if (filterStatus === 'ALL EVENTS') {
     const statusOrder: Record<string, number> = {
@@ -125,9 +130,11 @@ export const EventsList = ({ events, filterStatus, onRefresh }: EventsListProps)
       <div className='flex flex-col items-center justify-center py-16 text-[var(--color-text-muted)]'>
         <p className='text-[var(--color-text-primary)] font-medium'>No events found</p>
         <p className='text-sm mt-1'>
-          {filterStatus !== 'ALL EVENTS'
-            ? `No ${filterStatus.toLowerCase()} events at the moment.`
-            : 'Create your first event to get started.'}
+          {filterStatus === 'DELETED'
+            ? 'No deleted events. Deleted events will appear here as a read-only log.'
+            : filterStatus !== 'ALL EVENTS'
+              ? `No ${filterStatus.toLowerCase()} events at the moment.`
+              : 'Create your first event to get started.'}
         </p>
       </div>
     );

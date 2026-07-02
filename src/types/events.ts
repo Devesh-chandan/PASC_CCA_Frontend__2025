@@ -12,6 +12,10 @@ export type Event = {
   prerequisite?: string;     // Backend uses singular 'prerequisite', not 'prerequisites'
   /** Set on student event list when session count is loaded client-side */
   sessionCount?: number;
+  isDeleted?: boolean;
+  deletedAt?: string | Date;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 };
 
 export interface Rsvp {
@@ -33,4 +37,4 @@ export interface EventWithRsvp {
 
 export type EventFor = 'ADMIN' | 'STUDENT RSVP' | 'STUDENT EVENTS';
 
-export type EventStatus = 'UPCOMING' | 'ONGOING' | 'COMPLETED' | 'ALL EVENTS';
+export type EventStatus = 'UPCOMING' | 'ONGOING' | 'COMPLETED' | 'ALL EVENTS' | 'DELETED';

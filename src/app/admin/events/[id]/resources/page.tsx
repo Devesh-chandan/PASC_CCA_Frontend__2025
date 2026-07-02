@@ -23,6 +23,7 @@ export default function EventResourcesPage({
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [deleteResourceId, setDeleteResourceId] = useState<number | null>(null);
+  const [isEventDeleted, setIsEventDeleted] = useState(false);
   const [editingResource, setEditingResource] = useState<EventResource | null>(null);
   const [formData, setFormData] = useState<ResourceCreateInput>({
     eventId: 0,
@@ -45,6 +46,7 @@ export default function EventResourcesPage({
         if (eventResponse.data?.success && eventResponse.data.data) {
           const event = eventResponse.data.data as any;
           setEventTitle(event.title);
+          setIsEventDeleted(event.isDeleted ?? false);
         }
       } catch (error) {
         console.error('Error fetching event:', error);
@@ -171,16 +173,18 @@ export default function EventResourcesPage({
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => {
-                  resetForm();
-                  setShowDialog(true);
-                }}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap self-start sm:self-center"
-              >
-                <Plus className="w-4 h-4" />
-                Add New Resource
-              </button>
+              {!isEventDeleted && (
+                <button
+                  onClick={() => {
+                    resetForm();
+                    setShowDialog(true);
+                  }}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap self-start sm:self-center"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add New Resource
+                </button>
+              )}
             </div>
           </div>
         </header>
@@ -214,16 +218,18 @@ export default function EventResourcesPage({
               <p className="max-w-xs text-center mt-2 font-medium">
                 Upload slides, documents, or links for students to access.
               </p>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  resetForm();
-                  setShowDialog(true);
-                }}
-                className="mt-10 rounded-2xl px-8 h-12 border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors font-bold"
-              >
-                Add Your First Resource
-              </Button>
+              {!isEventDeleted && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    resetForm();
+                    setShowDialog(true);
+                  }}
+                  className="mt-10 rounded-2xl px-8 h-12 border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors font-bold"
+                >
+                  Add Your First Resource
+                </Button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -236,20 +242,22 @@ export default function EventResourcesPage({
                     <div className={`p-3 rounded-2xl ${getResourceColor(resource.type)} group-hover:scale-110 transition-transform duration-300`}>
                       {getResourceIcon(resource.type)}
                     </div>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => handleEdit(resource)}
-                        className="p-2 rounded-xl bg-[var(--color-info)]/10 text-[var(--color-info)] hover:bg-[var(--color-info)]/20 transition-all active:scale-90"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(resource.id)}
-                        className="p-2 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 transition-all active:scale-90"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    {!isEventDeleted && (
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => handleEdit(resource)}
+                          className="p-2 rounded-xl bg-[var(--color-info)]/10 text-[var(--color-info)] hover:bg-[var(--color-info)]/20 transition-all active:scale-90"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(resource.id)}
+                          className="p-2 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 transition-all active:scale-90"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex-1 space-y-2">

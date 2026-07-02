@@ -14,7 +14,7 @@ const AdminEventsPage = () => {
     const router = useRouter();
 
     // Search is sent to backend — filtering happens in the database, not the browser
-    const { events, loading, error, refetchEvents } = useFetchEventsForAdmin(searchQuery);
+    const { events, loading, error, refetchEvents } = useFetchEventsForAdmin(searchQuery, activeTab === "DELETED");
 
     if (loading) {
         return (
@@ -62,13 +62,15 @@ const AdminEventsPage = () => {
                                 </p>
                             </div>
                         </div>
-                        <button
-                            onClick={() => router.push("/admin/createEvent")}
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap"
-                        >
-                            <Plus className="h-4 w-4" />
-                            Create Event
-                        </button>
+                        {activeTab !== "DELETED" && (
+                            <button
+                                onClick={() => router.push("/admin/createEvent")}
+                                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-transparent bg-[var(--color-button-primary)] text-white hover:bg-[var(--color-button-primary-hover)] transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap"
+                            >
+                                <Plus className="h-4 w-4" />
+                                Create Event
+                            </button>
+                        )}
                     </div>
                 </header>
 
@@ -97,8 +99,8 @@ const AdminEventsPage = () => {
                 {/* Events Section */}
                 <div className="rounded-2xl sm:rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
                     {/* Tab Pills */}
-                    <div className="w-full grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-3 items-center mb-6">
-                        {["ALL EVENTS", "ONGOING", "UPCOMING", "COMPLETED"].map((tab) => (
+                    <div className="w-full grid grid-cols-2 lg:grid-cols-5 gap-2.5 md:gap-3 items-center mb-6">
+                        {["ALL EVENTS", "ONGOING", "UPCOMING", "COMPLETED", "DELETED"].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
@@ -108,13 +110,13 @@ const AdminEventsPage = () => {
                                         : "bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] border border-[var(--color-border-light)]"
                                 }`}
                             >
-                                {tab === "ALL EVENTS" ? "All" : tab}
+                                {tab === "ALL EVENTS" ? "All" : tab === "DELETED" ? "Deleted" : tab}
                             </button>
                         ))}
                     </div>
 
                     <div className="mt-0">
-                        {["ALL EVENTS", "ONGOING", "UPCOMING", "COMPLETED"].map((status) => (
+                        {["ALL EVENTS", "ONGOING", "UPCOMING", "COMPLETED", "DELETED"].map((status) => (
                             activeTab === status && (
                                 <EventsList key={status} events={events} filterStatus={status as EventStatus} onRefresh={refetchEvents} />
                             )

@@ -91,9 +91,6 @@ export const authAPI = {
   register: (data: any) =>
     api.post('auth/user/register', data),
 
-  // Invitation system
-  sendInvites: (emails: string[]) =>
-    api.post('admin/send-invites', { emails }),
 
   // Password reset
   forgotPassword: (email: string) =>
@@ -125,7 +122,7 @@ export const eventAPI = {
   delete: (id: number) =>
     api.delete(`events/${id}`),
 
-  getAdminEvents: (params?: { search?: string; page?: number; limit?: number }) =>
+  getAdminEvents: (params?: { search?: string; page?: number; limit?: number; showDeleted?: boolean }) =>
     api.get('events/admin', { params }),
 
   // User endpoints (requireUser)

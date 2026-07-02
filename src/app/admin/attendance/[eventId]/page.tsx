@@ -53,6 +53,7 @@ const AttendanceManagement: React.FC = () => {
   const [editSessionId, setEditSessionId] = useState<number | null>(null);
   const [eventTitle, setEventTitle] = useState<string>('');
   const [eventDateRange, setEventDateRange] = useState<string>('');
+  const [isEventDeleted, setIsEventDeleted] = useState(false);
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -62,6 +63,7 @@ const AttendanceManagement: React.FC = () => {
         if (res.data && res.data.success && res.data.data) {
           const event = res.data.data;
           setEventTitle(event.title);
+          setIsEventDeleted(event.isDeleted ?? false);
           const start = new Date(event.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'UTC' });
           const end = new Date(event.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'UTC' });
           setEventDateRange(`${start} - ${end}`);
@@ -402,51 +404,53 @@ const AttendanceManagement: React.FC = () => {
                     }`}
                   onClick={() => setActiveSession(session.id)}
                 >
-                  <div className="flex items-center justify-end space-x-2 mb-3 pb-2 border-b border-[var(--color-border-light)]">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenEditModal(session);
-                      }}
-                      className="p-1.5 rounded-xl text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface)]"
-                      title="Edit Session"
-                    >
-                      <Edit3 className="w-4 h-4" />
-                    </button>
-                    <button
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         handleEditSession(session);
-                       }}
-                       className="p-1.5 rounded-xl text-[var(--color-text-muted)] hover:text-green-600 dark:hover:text-green-400 hover:bg-green-500/10"
-                       title="Update Session"
-                     >
-                       <span className="font-bold">Update</span>
-                     </button>
-                     <button
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         toggleSession(activeSession as number);
-                       }}
-                       className={`p-1.5 rounded-xl ${session.isActive
-                         ? 'text-green-600 dark:text-green-400 hover:text-green-700 hover:bg-green-500/10'
-                         : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
-                         }`}
-                       title={session.isActive ? 'Disable Session' : 'Enable Session'}
-                     >
-                       {session.isActive ? <Power className="w-4 h-4" /> : <PowerOff className="w-4 h-4" />}
-                     </button>
-                     <button
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         deleteSession(session.id);
-                       }}
-                       className="p-1.5 rounded-xl text-[var(--color-text-muted)] hover:text-red-600 dark:hover:text-red-400 hover:bg-red-500/10"
-                       title="Delete Session"
-                     >
-                       <Trash2 className="w-4 h-4" />
-                     </button>
-                  </div>
+                  {!isEventDeleted && (
+                    <div className="flex items-center justify-end space-x-2 mb-3 pb-2 border-b border-[var(--color-border-light)]">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditModal(session);
+                        }}
+                        className="p-1.5 rounded-xl text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface)]"
+                        title="Edit Session"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           handleEditSession(session);
+                         }}
+                         className="p-1.5 rounded-xl text-[var(--color-text-muted)] hover:text-green-600 dark:hover:text-green-400 hover:bg-green-500/10"
+                         title="Update Session"
+                       >
+                         <span className="font-bold">Update</span>
+                       </button>
+                       <button
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           toggleSession(activeSession as number);
+                         }}
+                         className={`p-1.5 rounded-xl ${session.isActive
+                           ? 'text-green-600 dark:text-green-400 hover:text-green-700 hover:bg-green-500/10'
+                           : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-muted)] hover:bg-[var(--color-surface)]'
+                           }`}
+                         title={session.isActive ? 'Disable Session' : 'Enable Session'}
+                       >
+                         {session.isActive ? <Power className="w-4 h-4" /> : <PowerOff className="w-4 h-4" />}
+                       </button>
+                       <button
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           deleteSession(session.id);
+                         }}
+                         className="p-1.5 rounded-xl text-[var(--color-text-muted)] hover:text-red-600 dark:hover:text-red-400 hover:bg-red-500/10"
+                         title="Delete Session"
+                       >
+                         <Trash2 className="w-4 h-4" />
+                       </button>
+                    </div>
+                  )}
 
                   {/* Title */}
                   <div className="mb-3">
@@ -464,12 +468,12 @@ const AttendanceManagement: React.FC = () => {
                   </div>
                   {/* Status */}
                   <div className="flex items-center justify-between">
-                     <span
-                       className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${session.isActive ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-[var(--color-surface)] text-[var(--color-text-primary)] border border-[var(--color-border-light)]'
-                         }`}
-                     >
-                      {session.isActive ? 'Active' : 'Disabled'}
-                    </span>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${(session.isActive && !isEventDeleted) ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-[var(--color-surface)] text-[var(--color-text-primary)] border border-[var(--color-border-light)]'
+                          }`}
+                      >
+                       {(session.isActive && !isEventDeleted) ? 'Active' : 'Disabled'}
+                     </span>
                     {activeSession === session.id && (
                       <div className="w-2 h-2 bg-[var(--color-button-primary)] rounded-full"></div>
                     )}
@@ -487,25 +491,27 @@ const AttendanceManagement: React.FC = () => {
               <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
                 Attendance For {sessions.find((s) => s.id === activeSession)?.sessionName}
               </h2>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-[var(--color-text-muted)]">Enable Attendance</span>
-                  <button
-                    onClick={() => toggleSession(activeSession)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${sessions.find((s) => s.id === activeSession)?.isActive
-                      ? 'bg-[var(--color-button-primary)]'
-                      : 'bg-[var(--color-surface-hover)]'
-                      }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-[var(--color-card)] transition-transform ${sessions.find((s) => s.id === activeSession)?.isActive
-                        ? 'translate-x-6'
-                        : 'translate-x-1'
+              {!isEventDeleted && (
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-[var(--color-text-muted)]">Enable Attendance</span>
+                    <button
+                      onClick={() => toggleSession(activeSession)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${sessions.find((s) => s.id === activeSession)?.isActive
+                        ? 'bg-[var(--color-button-primary)]'
+                        : 'bg-[var(--color-surface-hover)]'
                         }`}
-                    />
-                  </button>
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-[var(--color-card)] transition-transform ${sessions.find((s) => s.id === activeSession)?.isActive
+                          ? 'translate-x-6'
+                          : 'translate-x-1'
+                          }`}
+                      />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Show code if session is active */}
